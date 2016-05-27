@@ -21,6 +21,8 @@ package org.unittested.cassandra.test.exception;
  */
 public class CassandraTestException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     public CassandraTestException(String message, Object ... args) {
         super(String.format(message, args));
 

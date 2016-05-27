@@ -16,8 +16,6 @@
 
 package org.unittested.cassandra.test.connect.basic;
 
-import java.net.InetAddress;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.unittested.cassandra.test.connect.AbstractConnectSettings;
@@ -54,7 +52,7 @@ public class BasicConnectSettings extends AbstractConnectSettings {
         Cluster.Builder builder = Cluster.builder();
 
         if (this.host.length == 0 || (this.host.length == 1 && this.host[0].isEmpty())) {
-            builder.addContactPoints(InetAddress.getLoopbackAddress());
+            builder.addContactPoints("127.0.0.1");
         } else if (this.host.length > 0) {
             builder.addContactPoints(this.host);
         }
