@@ -47,6 +47,8 @@ public @interface CassandraForeignKeyspace {
 
     /**
      * The test keyspace.
+     *
+     * @return The test keyspace.
      */
     String keyspace();
 

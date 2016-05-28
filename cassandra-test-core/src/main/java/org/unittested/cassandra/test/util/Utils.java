@@ -67,7 +67,7 @@ public final class Utils {
     /**
      * Expand comma delimited entries in input array.
      * <p>
-     * Example: [ "a,b", "c", "d,e"] -> [ "a", "b", "c", "d", "e" ]
+     * Example: [ "a,b", "c", "d,e"] to [ "a", "b", "c", "d", "e" ]
      *
      * @param input String array
      * @return Expanded string array

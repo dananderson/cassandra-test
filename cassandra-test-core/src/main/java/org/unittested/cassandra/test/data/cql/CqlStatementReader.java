@@ -87,7 +87,7 @@ class CqlStatementReader implements StatementReader {
                     throw new CassandraTestException("APPLY BATCH without matching BEGIN BATCH.");
                 }
 
-                if (batchStatement.size() == 0) {
+                if (batchStatement.getStatements().isEmpty()) {
                     throw new CassandraTestException("Empty batch statement.");
                 }
 

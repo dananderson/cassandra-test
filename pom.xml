@@ -34,6 +34,7 @@
   <modules>
     <module>cassandra-test-core</module>
     <module>cassandra-test-testng</module>
+    <module>cassandra-test-spring</module>
   </modules>
 
   <properties>
@@ -46,6 +47,7 @@
     <slf4j-log4j12.version>1.7.6</slf4j-log4j12.version>
     <equalsverifier.version>1.7.7</equalsverifier.version>
     <apache.commons.version>3.4</apache.commons.version>
+    <springframework.version>4.2.6.RELEASE</springframework.version>
   </properties>
 
   <dependencies>

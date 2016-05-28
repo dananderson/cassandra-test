@@ -50,6 +50,8 @@ public @interface CassandraKeyspace {
 
     /**
      * The test keyspace.
+     *
+     * @return The test keyspace.
      */
     String keyspace();
 
@@ -81,7 +83,6 @@ public @interface CassandraKeyspace {
      * source locator. The schema data source locator takes the form of protocol.contentType: {value}.
      * <p>
      * Supported Protocols
-     * <p>
      * <ul>
      *     <li>string - String literal.</li>
      *     <li>file - Path to file on the filesystem.</li>
@@ -89,7 +90,6 @@ public @interface CassandraKeyspace {
      * </ul>
      * <p>
      * Supported Content Types
-     * <p>
      * <ul>
      *     <li>cql - Semi-colon (;) delimited set of CQL statements.</li>
      * </ul>

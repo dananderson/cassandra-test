@@ -34,7 +34,10 @@ import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
-public abstract class AbstractTestNgCassandraTest {
+/**
+ * Base class for TestNG-based Cassandra Test tests.
+ */
+public abstract class AbstractTestNGCassandraTest {
 
     private TestEnvironmentAdapter adapter;
 
@@ -52,11 +55,11 @@ public abstract class AbstractTestNgCassandraTest {
     @CassandraBean
     private KeyspaceContainer keyspaceContainer;
 
-    public AbstractTestNgCassandraTest() {
+    public AbstractTestNGCassandraTest() {
         this.propertyResolver = new JavaPropertyResolver();
     }
 
-    public AbstractTestNgCassandraTest(final PropertyResolver propertyResolver) {
+    public AbstractTestNGCassandraTest(final PropertyResolver propertyResolver) {
         this.propertyResolver = propertyResolver;
     }
 
@@ -64,13 +67,21 @@ public abstract class AbstractTestNgCassandraTest {
     public void beforeClass() throws Exception {
         TestSettings settings = TestSettingsBuilder.fromAnnotatedElement(getClass(), this.propertyResolver);
         this.adapter = new TestEnvironmentAdapter(settings);
-        this.adapter.onBeforeClass(this, null);
+        this.adapter.onBeforeClass(getClass(), null);
+
+    }
+
+    @BeforeClass(alwaysRun = true, dependsOnMethods = "beforeClass")
+    public void prepareTestInstance() throws Exception {
+        if (this.adapter != null) {
+            this.adapter.onPrepareTestInstance(this, null);
+        }
     }
 
     @AfterClass(alwaysRun = true)
     public void afterClass() throws Exception {
         if (this.adapter != null) {
-            this.adapter.onAfterClass(this, null);
+            this.adapter.onAfterClass(getClass(), null);
             this.adapter = null;
         }
     }

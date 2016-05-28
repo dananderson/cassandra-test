@@ -41,34 +41,39 @@ public abstract class AbstractCassandraTest {
     @CassandraBean
     private KeyspaceContainer keyspaceContainer;
 
-    private TestEnvironmentAdapter adpater;
+    private TestEnvironmentAdapter adapter;
 
     @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception {
         TestSettings settings = TestSettingsBuilder.fromAnnotatedElement(getClass());
-        this.adpater = new TestEnvironmentAdapter(settings);
-        this.adpater.onBeforeClass(this, null);
+        this.adapter = new TestEnvironmentAdapter(settings);
+        this.adapter.onBeforeClass(getClass(), null);
+    }
+
+    @BeforeClass(alwaysRun = true, dependsOnMethods = "beforeClass")
+    public void prepareTestInstance() throws Exception {
+        this.adapter.onPrepareTestInstance(this, null);
     }
 
     @AfterClass(alwaysRun = true)
     public void afterClass() throws Exception {
-        if (this.adpater != null) {
-            this.adpater.onAfterClass(this, null);
-            this.adpater = null;
+        if (this.adapter != null) {
+            this.adapter.onAfterClass(getClass(), null);
+            this.adapter = null;
         }
     }
 
     @BeforeMethod(alwaysRun = true)
     public void beforeMethod(Method testMethod) throws Exception {
-        if (this.adpater != null) {
-            this.adpater.onBeforeMethod(this, testMethod, null);
+        if (this.adapter != null) {
+            this.adapter.onBeforeMethod(this, testMethod, null);
         }
     }
 
     @AfterMethod(alwaysRun = true)
     public void afterMethod(Method testMethod) throws Exception {
-        if (this.adpater != null) {
-            this.adpater.onAfterMethod(this, testMethod, null);
+        if (this.adapter != null) {
+            this.adapter.onAfterMethod(this, testMethod, null);
         }
     }
 

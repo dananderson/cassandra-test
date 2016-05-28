@@ -16,15 +16,11 @@
 
 package org.unittested.cassandra.test.data.cql;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
 import java.io.StringReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -294,7 +290,7 @@ public class CqlStatementReaderTest {
         }
 
         assertThat(getBatchType(batchStatement), is(expectedBatchType));
-        assertThat(batchStatement.size(), is(1));
+        assertThat(batchStatement.getStatements(), hasSize(1));
         assertThat(getQueryString(batchStatement.getStatements().iterator().next()), is(expectedCql));
     }
 

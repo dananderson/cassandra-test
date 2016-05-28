@@ -31,11 +31,9 @@ public class TestRuntime {
     private Method testMethod;
     private Keyspace keyspace;
 
-    public TestRuntime(Object test,
-                       Object testEnvironmentContext,
+    public TestRuntime(Object testEnvironmentContext,
                        Session session,
                        TestSettings settings) {
-        this.test = test;
         this.testSettings = settings;
         this.keyspace = new Keyspace(session, settings.getKeyspaceSettings().getKeyspace());
         this.testEnvironmentContext = testEnvironmentContext;
@@ -90,7 +88,11 @@ public class TestRuntime {
         return this.testSettings;
     }
 
-    void update(Method testMethod) {
+    void updateTestMethod(Method testMethod) {
         this.testMethod = testMethod;
+    }
+
+    void updateTest(Object test) {
+        this.test = test;
     }
 }

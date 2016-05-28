@@ -33,7 +33,18 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
 /**
- * Connects a test environment to Cassandra Test.
+ * Handles events from the test environment to manage a Cassandra Test.
+ *
+ * Adapter events are called in the following order:
+ * <ol>
+ *     <li>{@link #onBeforeClass(Class, Object)}</li>
+ *     <li>{@link #onPrepareTestInstance(Object, Object)}</li>
+ *     <li>{@link #onBeforeMethod(Object, Method, Object)}</li>
+ *     <li>Run test method.</li>
+ *     <li>{@link #onAfterMethod(Object, Method, Object)}</li>
+ *     <li>Repeat #3 until all test methods have been run.</li>
+ *     <li>{@link #onAfterClass(Class, Object)}</li>
+ * </ol>
  */
 public class TestEnvironmentAdapter {
 
@@ -55,28 +66,54 @@ public class TestEnvironmentAdapter {
     }
 
     /**
-     * Setup before test methods start running.
+     * Handle setup of the test class.
+     * <p>
+     * The test environment calls this once prior to test instance creation. Setup is limited to access to
+     * the test class only. All test instance setup should be in {@link #onPrepareTestInstance(Object, Object)}. The
+     * setup is structured like this to support different behaviors of test environments.
      *
-     * @param test Test instance.
-     * @param testEnvironmentContext Test environment context. Can be null if test environment does not have the concept of a context.
+     * @param testClass Test class.
+     * @param testEnvironmentContext Test environment specific context. Can be null.
      * @throws Exception on test setup failure
      */
-    public void onBeforeClass(Object test, Object testEnvironmentContext) throws Exception {
+    public void onBeforeClass(Class<?> testClass, Object testEnvironmentContext) throws Exception {
         LOG.trace("onBeforeClass()");
 
-        this.runtime = openConnection(test, testEnvironmentContext, this.testSettings);
-
-        populateCassandraBeanFields(test, this.runtime);
+        this.runtime = openConnection(testClass, testEnvironmentContext, this.testSettings);
     }
 
     /**
-     * Tear down after all test methods have finished running.
+     * Handle setup of the test instance.
+     * <p>
+     * The test environment calls this once when the test instance is created and before the test methods start
+     * running. Instance setup is performed here, including assigning fields with the {@link CassandraBean} annotation.
      *
      * @param test Test instance.
-     * @param testEnvironmentContext Test environment context. Can be null if test environment does not have the concept of a context.
+     * @param testEnvironmentContext Test environment specific context. Can be null.
+     * @throws Exception on test setup failure
+     */
+    public void onPrepareTestInstance(Object test, Object testEnvironmentContext) throws Exception {
+        LOG.trace("onPrepareTestInstance()");
+
+        if (this.runtime == null) {
+            return;
+        }
+
+        populateCassandraBeanFields(test, this.runtime);
+        this.runtime.updateTest(test);
+    }
+
+    /**
+     * Handle clean up of the test instance and class.
+     * <p>
+     * The test environment calls this once after all test methods have run. The Cassandra keyspace is cleaned up and
+     * the connection is closed.
+     *
+     * @param testClass Test class.
+     * @param testEnvironmentContext Test environment specific context. Can be null.
      * @throws Exception on test clean up failure
      */
-    public void onAfterClass(Object test, Object testEnvironmentContext) throws Exception {
+    public void onAfterClass(Class<?> testClass, Object testEnvironmentContext) throws Exception {
         LOG.trace("onAfterClass()");
 
         if (this.runtime == null) {
@@ -92,11 +129,15 @@ public class TestEnvironmentAdapter {
     }
 
     /**
-     * Setup before a test method runs.
+     * Handle setup before a test method runs.
+     * <p>
+     * The test environment calls this before each test method that is run. The keyspace, schema and data are examined
+     * to check that the Cassandra state is consistent with the current configuration. This method will ensure that
+     * the Cassandra state is synced with the configuration.
      *
      * @param test Test instance.
      * @param testMethod Test method.
-     * @param testEnvironmentContext Test environment context. Can be null if test environment does not have the concept of a context.
+     * @param testEnvironmentContext Test environment specific context. Can be null.
      * @throws Exception on test setup failure
      */
     public void onBeforeMethod(Object test, Method testMethod, Object testEnvironmentContext) throws Exception {
@@ -106,14 +147,16 @@ public class TestEnvironmentAdapter {
             return;
         }
 
-        this.runtime.update(testMethod);
+        this.runtime.updateTestMethod(testMethod);
         syncSchema(this.runtime, this.keyspaceStateManager);
         loadData(this.runtime);
         this.runtime.getKeyspace().use();
     }
 
     /**
-     * Tear dwon after a test method runs.
+     * Handle tear down after a test method runs.
+     * <p>
+     * The test environment calls this after each test method that is run. Rollback of Cassandra data is performed here.
      *
      * @param test Test instance.
      * @param testMethod Test method.
@@ -130,7 +173,7 @@ public class TestEnvironmentAdapter {
         try {
             rollbackAfterMethod(this.runtime);
         } finally {
-            this.runtime.update(null);
+            this.runtime.updateTestMethod(null);
         }
     }
 
@@ -143,9 +186,8 @@ public class TestEnvironmentAdapter {
         return this.runtime;
     }
 
-    protected TestRuntime openConnection(Object test, Object testEnvironmentContext, TestSettings config) {
+    protected TestRuntime openConnection(Class<?> testClass, Object testEnvironmentContext, TestSettings config) {
         return new TestRuntime(
-                test,
                 testEnvironmentContext,
                 config.getConnectSettings().connect(),
                 config);
