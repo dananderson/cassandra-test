@@ -19,6 +19,7 @@ package org.unittested.cassandra.test.testng;
 import java.lang.reflect.Method;
 
 import org.unittested.cassandra.test.Keyspace;
+import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
 import org.unittested.cassandra.test.TestSettingsBuilder;
 import org.unittested.cassandra.test.TestSettings;
@@ -26,6 +27,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.property.PropertyResolver;
 import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
 
@@ -35,7 +37,20 @@ import com.datastax.driver.core.Session;
 public abstract class AbstractTestNgCassandraTest {
 
     private TestEnvironmentAdapter adapter;
+
     private PropertyResolver propertyResolver;
+
+    @CassandraBean
+    private Session session;
+
+    @CassandraBean
+    private Cluster cluster;
+
+    @CassandraBean
+    private Keyspace keyspace;
+
+    @CassandraBean
+    private KeyspaceContainer keyspaceContainer;
 
     public AbstractTestNgCassandraTest() {
         this.propertyResolver = new JavaPropertyResolver();
@@ -75,14 +90,18 @@ public abstract class AbstractTestNgCassandraTest {
     }
 
     protected Cluster getCluster() {
-        return this.adapter.getRuntime().getKeyspace().getContainer().getCluster();
+        return this.cluster;
     }
 
     protected Session getSession() {
-        return this.adapter.getRuntime().getKeyspace().getSession();
+        return this.session;
     }
 
     protected Keyspace getKeyspace() {
-        return this.adapter.getRuntime().getKeyspace();
+        return this.keyspace;
+    }
+
+    protected KeyspaceContainer getKeyspaceContainer() {
+        return this.keyspaceContainer;
     }
 }

@@ -22,11 +22,24 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.unittested.cassandra.test.annotation.CassandraBean;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
 public abstract class AbstractCassandraTest {
+
+    @CassandraBean
+    private Session session;
+
+    @CassandraBean
+    private Cluster cluster;
+
+    @CassandraBean
+    private Keyspace keyspace;
+
+    @CassandraBean
+    private KeyspaceContainer keyspaceContainer;
 
     private TestEnvironmentAdapter adpater;
 
@@ -60,14 +73,18 @@ public abstract class AbstractCassandraTest {
     }
 
     protected Cluster getCluster() {
-        return this.adpater.getRuntime().getKeyspace().getContainer().getCluster();
+        return this.cluster;
     }
 
     protected Session getSession() {
-        return this.adpater.getRuntime().getKeyspace().getSession();
+        return this.session;
     }
 
     protected Keyspace getKeyspace() {
-        return this.adpater.getRuntime().getKeyspace();
+        return this.keyspace;
+    }
+
+    protected KeyspaceContainer getKeyspaceContainer() {
+        return this.keyspaceContainer;
     }
 }

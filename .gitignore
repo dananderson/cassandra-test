@@ -1,4 +1,14 @@
-.idea
-.DS_Store
-target
+
+target/
+
+.settings/
+.classpath
+.project
+.loadpath
+
+.idea/
 *.iml
+*.ipr
+*.iws
+
+.DS_Store

@@ -16,12 +16,21 @@
 
 package org.unittested.cassandra.test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.unittested.cassandra.test.annotation.CassandraBean;
+import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.keyspace.state.BasicKeyspaceStateManager;
 import org.unittested.cassandra.test.keyspace.state.KeyspaceStateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
 
 /**
  * Connects a test environment to Cassandra Test.
@@ -56,6 +65,8 @@ public class TestEnvironmentAdapter {
         LOG.trace("onBeforeClass()");
 
         this.runtime = openConnection(test, testEnvironmentContext, this.testSettings);
+
+        populateCassandraBeanFields(test, this.runtime);
     }
 
     /**
@@ -67,6 +78,10 @@ public class TestEnvironmentAdapter {
      */
     public void onAfterClass(Object test, Object testEnvironmentContext) throws Exception {
         LOG.trace("onAfterClass()");
+
+        if (this.runtime == null) {
+            return;
+        }
 
         try {
             rollbackAfterClass(this.runtime);
@@ -87,6 +102,10 @@ public class TestEnvironmentAdapter {
     public void onBeforeMethod(Object test, Method testMethod, Object testEnvironmentContext) throws Exception {
         LOG.trace("onBeforeMethod() : {}", testMethod.getName());
 
+        if (this.runtime == null) {
+            return;
+        }
+
         this.runtime.update(testMethod);
         syncSchema(this.runtime, this.keyspaceStateManager);
         loadData(this.runtime);
@@ -103,6 +122,10 @@ public class TestEnvironmentAdapter {
      */
     public void onAfterMethod(Object test, Method testMethod, Object testEnvironmentContext) throws Exception {
         LOG.trace("onAfterMethod() : {}", testMethod.getName());
+
+        if (this.runtime == null) {
+            return;
+        }
 
         try {
             rollbackAfterMethod(this.runtime);
@@ -138,11 +161,11 @@ public class TestEnvironmentAdapter {
         keyspace.getContainer().close();
     }
 
-    protected void rollbackAfterMethod(final TestRuntime runtime) {
+    protected void rollbackAfterMethod(TestRuntime runtime) {
         runtime.getTestSettings().getRollbackSettings().rollbackAfterMethod(runtime);
     }
 
-    protected void rollbackAfterClass(final TestRuntime runtime) {
+    protected void rollbackAfterClass(TestRuntime runtime) {
         runtime.getTestSettings().getRollbackSettings().rollbackAfterClass(runtime);
     }
 
@@ -152,5 +175,44 @@ public class TestEnvironmentAdapter {
 
     protected void loadData(TestRuntime runtime) {
         runtime.getTestSettings().getDataSettings().load(runtime);
+    }
+
+    protected void populateCassandraBeanFields(Object test, TestRuntime runtime) {
+        Map<Class<?>, Object> beanMap = null;
+
+        for (Class<?> c = test.getClass(); c != null && !c.equals(Object.class); c = c.getSuperclass()) {
+            for (Field field : c.getDeclaredFields()) {
+                if(!field.isAnnotationPresent(CassandraBean.class)) {
+                    continue;
+                }
+
+                if((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
+                    throw new CassandraTestException("CassandraBean cannot set final fields = %s.%s",
+                            c.getCanonicalName(), field.getName());
+                }
+
+                if (beanMap == null) {
+                    beanMap = new HashMap<Class<?>, Object>();
+                    beanMap.put(Session.class, runtime.getKeyspace().getSession());
+                    beanMap.put(Cluster.class, runtime.getKeyspace().getSession().getCluster());
+                    beanMap.put(Keyspace.class, runtime.getKeyspace());
+                    beanMap.put(KeyspaceContainer.class, runtime.getKeyspace().getContainer());
+                    beanMap.put(TestSettings.class, runtime.getTestSettings());
+                }
+
+                if (!beanMap.containsKey(field.getType())) {
+                    throw new CassandraTestException("Field type %s not supported by CassandraBean",
+                            field.getType().getCanonicalName());
+                }
+
+                field.setAccessible(true);
+
+                try {
+                    field.set(test, beanMap.get(field.getType()));
+                } catch (IllegalAccessException e) {
+                    throw new CassandraTestException("Cannot set CassandraBean field '%s'", field.getName(), e);
+                }
+            }
+        }
     }
 }
