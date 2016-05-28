@@ -47,9 +47,9 @@ public class KeyspaceContainerTest extends AbstractCassandraTest {
     }
 
     @DataProvider
-    public static Object[][] keyspaceMetadata() {
+    public Object[][] keyspaceMetadata() {
         return new Object[][] {
-                { "test", notNullValue() },
+                { getKeyspace().getName(), notNullValue() },
                 { Keyspace.NULL, nullValue() },
                 { null, nullValue() },
         };
@@ -73,16 +73,16 @@ public class KeyspaceContainerTest extends AbstractCassandraTest {
         KeyspaceContainer keyspaceContainer = new KeyspaceContainer(cluster);
 
         // when
-        keyspaceContainer.getKeyspaceMetadata("test");
+        keyspaceContainer.getKeyspaceMetadata(getKeyspace().getName());
 
         // then
         // CassandraTestException
     }
 
     @DataProvider
-    public static Object[][] hasKeyspaceData() {
+    public Object[][] hasKeyspaceData() {
         return new Object[][] {
-                { "test", true },
+                { getKeyspace().getName(), true },
                 { Keyspace.NULL, false },
                 { null, false },
         };
@@ -106,7 +106,7 @@ public class KeyspaceContainerTest extends AbstractCassandraTest {
         KeyspaceContainer keyspaceContainer = new KeyspaceContainer(cluster);
 
         // when
-        keyspaceContainer.hasKeyspace("test");
+        keyspaceContainer.hasKeyspace(getKeyspace().getName());
 
         // then
         // CassandraTestException
