@@ -25,8 +25,9 @@
   <groupId>org.unittested</groupId>
   <artifactId>cassandra-test-spring</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>Cassandra Test - Spring</name>
-  <description>Bindings for the Spring Test environment.</description>
+
+  <name>Spring Test - ${project.groupId}:${project.artifactId}</name>
+  <description>Cassandra Test bindings for the Spring Test environment.</description>
   <url>https://github.com/dananderson/cassandra-test</url>
 
   <dependencies>
@@ -103,19 +104,6 @@
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <phase>test-compile</phase>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
