@@ -93,7 +93,6 @@ Cassandra Test has been built and tested with the following technologies.
 **Datastax Java Driver**
 - 2.0.2+
 - 2.1.0+
-- 2.2.0+
 - 3.0.0+
 
 **Apache Cassandra**
@@ -112,7 +111,6 @@ Cassandra Test has been built and tested with the following technologies.
 These work items are being considered for Cassandra Test.
 
 - Publish artifacts on Maven Central.
-- Add a matrix of driver version, cassandra version and java version to the CI build.
 - README.md docs for each module.
 - Wiki documentation.
 - Create an examples project.
