@@ -188,6 +188,7 @@ public class TestEnvironmentAdapter {
 
     protected TestRuntime openConnection(Class<?> testClass, Object testEnvironmentContext, TestSettings config) {
         return new TestRuntime(
+                testClass,
                 testEnvironmentContext,
                 config.getConnectSettings().connect(),
                 config);
@@ -229,7 +230,12 @@ public class TestEnvironmentAdapter {
                 }
 
                 if((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
-                    throw new CassandraTestException("CassandraBean cannot set final fields = %s.%s",
+                    throw new CassandraTestException("CassandraBean cannot be used with final fields = %s.%s",
+                            c.getCanonicalName(), field.getName());
+                }
+
+                if((field.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
+                    throw new CassandraTestException("CassandraBean cannot be used with static fields = %s.%s",
                             c.getCanonicalName(), field.getName());
                 }
 

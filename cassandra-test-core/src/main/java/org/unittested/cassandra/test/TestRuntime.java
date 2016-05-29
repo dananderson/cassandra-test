@@ -26,26 +26,38 @@ import com.datastax.driver.core.Session;
 public class TestRuntime {
 
     private Object test;
+    private Class<?> testClass;
     private Object testEnvironmentContext;
     private TestSettings testSettings;
     private Method testMethod;
     private Keyspace keyspace;
 
-    public TestRuntime(Object testEnvironmentContext,
+    public TestRuntime(Class<?> testClass,
+                       Object testEnvironmentContext,
                        Session session,
                        TestSettings settings) {
+        this.testClass = testClass;
         this.testSettings = settings;
         this.keyspace = new Keyspace(session, settings.getKeyspaceSettings().getKeyspace());
         this.testEnvironmentContext = testEnvironmentContext;
     }
 
     /**
-     * Cassandra Test instance.
+     * Currently running test class instance.
      *
      * @return Test instance.
      */
     public Object getTest() {
         return this.test;
+    }
+
+    /**
+     * Currently running test class.
+     *
+     * @return Test class.
+     */
+    public Class<?> getTestClass() {
+        return testClass;
     }
 
     /**

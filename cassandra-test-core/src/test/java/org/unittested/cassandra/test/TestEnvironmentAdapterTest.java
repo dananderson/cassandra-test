@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import java.lang.reflect.Method;
 
 import org.mockito.Matchers;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.connect.ConnectSettings;
@@ -61,6 +62,7 @@ public class TestEnvironmentAdapterTest {
         assertThat(adapter.getRuntime().getKeyspace().getSession(), is(session));
         assertThat(adapter.getRuntime().getTestEnvironmentContext(), nullValue());
         assertThat(adapter.getRuntime().getTestMethod(), nullValue());
+        assertThat(MockTest.class.equals(adapter.getRuntime().getTestClass()), is(true));
     }
 
     @Test
@@ -88,12 +90,20 @@ public class TestEnvironmentAdapterTest {
         assertThat(test.testSettings, is(testSettings));
     }
 
-    @Test(expectedExceptions = CassandraTestException.class)
-    public void onPrepareTestInstancePopulateCassandraBeanFail() throws Exception {
+    @DataProvider
+    public static Object[][] cassandraBeanClasses() {
+        return new Object[][] {
+                { new CassandraBeanWithUnsupportedType() },
+                { new CassandraBeanWithFinal() },
+                { new CassandraBeanWithStatic() },
+        };
+    }
+
+    @Test(dataProvider = "cassandraBeanClasses", expectedExceptions = CassandraTestException.class)
+    public void onPrepareTestInstancePopulateCassandraBeanFail(Object test) throws Exception {
         // given
         TestSettings testSettings = createSettings();
         TestEnvironmentAdapter adapter = new TestEnvironmentAdapter(testSettings);
-        BadCassandraBeanUsage test = new BadCassandraBeanUsage();
         Cluster cluster = mock(Cluster.class);
         Session session = mock(Session.class);
 
@@ -261,8 +271,18 @@ public class TestEnvironmentAdapterTest {
         }
     }
 
-    private static class BadCassandraBeanUsage {
+    private static class CassandraBeanWithUnsupportedType {
         @CassandraBean
         Object bad;
+    }
+
+    private static class CassandraBeanWithFinal {
+        @CassandraBean
+        final Keyspace bad = null;
+    }
+
+    private static class CassandraBeanWithStatic {
+        @CassandraBean
+        static Keyspace bad;
     }
 }
