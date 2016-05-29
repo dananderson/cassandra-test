@@ -1,9 +1,22 @@
 language: java
-jdk:
-  - openjdk6
+
 sudo: false
+
 cache:
   directories:
   - $HOME/.m2
-services:
-  - cassandra
+  - $HOME/.cache/pip
+  - $HOME/.ccm/repository
+
+env:
+  - CASSANDRA_VERSION=3.5
+
+before_install:
+  - pip install --user ccm
+  - export PATH=$PATH:$HOME/.local/bin
+  - jdk_switcher use oraclejdk8
+  - ccm create -v binary:$CASSANDRA_VERSION -n 1 -s -b --vnodes cassandra_test
+  - jdk_switcher use openjdk6
+
+jdk:
+  - openjdk6
