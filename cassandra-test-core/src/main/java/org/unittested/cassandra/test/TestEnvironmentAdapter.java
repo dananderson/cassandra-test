@@ -144,7 +144,7 @@ public class TestEnvironmentAdapter {
         LOG.trace("onBeforeMethod() : {}", testMethod.getName());
 
         if (this.runtime == null) {
-            return;
+            throw new CassandraTestException("onBeforeMethod: adapter is not initialized");
         }
 
         this.runtime.updateTestMethod(testMethod);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.spring;
+package org.unittested.cassandra.test.spring.sample;
 
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,6 +30,7 @@ import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
+import org.unittested.cassandra.test.spring.SpringCassandraTestExecutionListener;
 
 import com.datastax.driver.core.ResultSet;
 

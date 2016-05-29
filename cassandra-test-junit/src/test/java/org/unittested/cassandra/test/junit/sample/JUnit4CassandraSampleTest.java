@@ -44,7 +44,7 @@ public class JUnit4CassandraSampleTest extends AbstractJUnit4CassandraTest {
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        ResultSet result = getKeyspace().getSession().execute("SELECT COUNT(*) FROM timeseries");
+        ResultSet result = getSession().execute("SELECT COUNT(*) FROM timeseries");
         assertThat(result.one().getLong(0), is(3L));
     }
 }

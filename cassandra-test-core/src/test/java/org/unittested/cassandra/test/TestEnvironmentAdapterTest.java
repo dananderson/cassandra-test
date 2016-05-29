@@ -54,6 +54,7 @@ public class TestEnvironmentAdapterTest {
 
         // then
         verify(testSettings.getConnectSettings(), times(1)).connect();
+        verifyNoMoreInteractions(testSettings.getConnectSettings());
 
         assertThat(adapter.getRuntime(), notNullValue());
         assertThat(adapter.getRuntime().getTestSettings(), is(testSettings));
@@ -152,6 +153,7 @@ public class TestEnvironmentAdapterTest {
         // then
         verify(cluster, times(1)).close();
         verify(testSettings.getRollbackSettings(), times(1)).rollbackAfterClass(Matchers.any(TestRuntime.class));
+        verifyNoMoreInteractions(cluster, testSettings.getRollbackSettings());
     }
 
     @Test
@@ -191,9 +193,10 @@ public class TestEnvironmentAdapterTest {
                 Matchers.any(TestRuntime.class), Matchers.any(KeyspaceStateManager.class));
         verify(testSettings.getDataSettings(), times(1)).load(Matchers.any(TestRuntime.class));
         verify(session, times(1)).execute("use \"test\";");
+        verifyNoMoreInteractions(testSettings.getDataSettings());
     }
 
-    @Test
+    @Test(expectedExceptions = CassandraTestException.class)
     public void onBeforeMethodUninitialized() throws Exception {
         // given
         TestEnvironmentAdapter adapter = new TestEnvironmentAdapter(createSettings());
@@ -203,7 +206,7 @@ public class TestEnvironmentAdapterTest {
         adapter.onBeforeMethod(test, test.getMethod(), null);
 
         // then
-        // no exception on uninitialized adapter (onBeforeClass not called).
+        // CassandraTestException
     }
 
     @Test
@@ -227,6 +230,7 @@ public class TestEnvironmentAdapterTest {
         // then
         assertThat(adapter.getRuntime().getTestMethod(), nullValue());
         verify(testSettings.getRollbackSettings(), times(1)).rollbackAfterMethod(adapter.getRuntime());
+        verifyNoMoreInteractions(testSettings.getRollbackSettings());
     }
 
     @Test
@@ -236,7 +240,7 @@ public class TestEnvironmentAdapterTest {
         MockTest test = new MockTest();
 
         // when
-        adapter.onBeforeMethod(test, test.getMethod(), null);
+        adapter.onAfterMethod(test, test.getMethod(), null);
 
         // then
         // no exception on uninitialized adapter (onBeforeClass not called).

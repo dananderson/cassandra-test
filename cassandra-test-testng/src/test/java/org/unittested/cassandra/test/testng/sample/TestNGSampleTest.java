@@ -20,8 +20,6 @@ package org.unittested.cassandra.test.testng.sample;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import org.unittested.cassandra.test.Keyspace;
-import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.testng.annotations.Test;
@@ -39,17 +37,14 @@ import com.datastax.driver.core.ResultSet;
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 
-    @CassandraBean
-    private Keyspace keyspace;
-
     @Test
     public void timeseriesTableExists() throws Exception {
-        assertThat(this.keyspace.hasTable("timeseries"), is(true));
+        assertThat(getKeyspace().hasTable("timeseries"), is(true));
     }
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        ResultSet result = this.keyspace.getSession().execute("SELECT COUNT(*) FROM timeseries");
+        ResultSet result = getSession().execute("SELECT COUNT(*) FROM timeseries");
         assertThat(result.one().getLong(0), is(3L));
     }
 }

@@ -17,8 +17,6 @@
 package org.unittested.cassandra.test.junit;
 
 import static org.mockito.Mockito.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 
@@ -37,11 +35,7 @@ public class CassandraTestMethodRuleTest {
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
         TestEnvironmentAdapterProvider provider = createProvider(adapter);
         CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = mock(Description.class);
-
-        when(description.getTestClass()).thenReturn((Class)this.getClass());
-        when(description.getMethodName()).thenReturn("evaluate");
-
+        Description description = createDescription(getClass(), "evaluate");
         Statement statement = rule.apply(mock(Statement.class), description);
 
         // when
@@ -59,11 +53,7 @@ public class CassandraTestMethodRuleTest {
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
         TestEnvironmentAdapterProvider provider = createProvider(adapter);
         CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = mock(Description.class);
-
-        when(description.getTestClass()).thenReturn((Class)Object.class);
-        when(description.getMethodName()).thenReturn("evaluate");
-
+        Description description = createDescription(Object.class, "evaluate");
         Statement statement = rule.apply(mock(Statement.class), description);
 
         // when
@@ -79,11 +69,7 @@ public class CassandraTestMethodRuleTest {
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
         TestEnvironmentAdapterProvider provider = createProvider(adapter);
         CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = mock(Description.class);
-
-        when(description.getTestClass()).thenReturn((Class)this.getClass());
-        when(description.getMethodName()).thenReturn("does not exist");
-
+        Description description = createDescription(getClass(), "does not exist");
         Statement statement = rule.apply(mock(Statement.class), description);
 
         // when
@@ -117,4 +103,15 @@ public class CassandraTestMethodRuleTest {
             }
         };
     }
+
+    @SuppressWarnings("unchecked")
+    private Description createDescription(Class<?> testClass, String methodName) {
+        Description description = mock(Description.class);
+
+        when(description.getTestClass()).thenReturn((Class)testClass);
+        when(description.getMethodName()).thenReturn(methodName);
+
+        return description;
+    }
+
 }

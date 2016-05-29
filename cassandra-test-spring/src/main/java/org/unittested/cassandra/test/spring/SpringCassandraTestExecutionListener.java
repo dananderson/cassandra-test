@@ -34,7 +34,7 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
  * No Cassandra Test base test classes are provided in the Spring environment due to multiple inheritance issues that
  * would quickly arise. The Cassandra Test base classes provide API to objects that test writers will find useful, including
  * {@link com.datastax.driver.core.Session} and {@link org.unittested.cassandra.test.Keyspace}. For tests using this
- * test execution lister, the {@link org.unittested.cassandra.test.annotation.CassandraBean} annotation can be used
+ * test execution listener, the {@link org.unittested.cassandra.test.annotation.CassandraBean} annotation can be used
  * to autowire these objects.
  */
 public class SpringCassandraTestExecutionListener implements TestExecutionListener {

@@ -28,6 +28,7 @@ import org.unittested.cassandra.test.TestEnvironmentAdapter;
 public class CassandraTestClassRuleTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void evaluate() throws Throwable {
         // given
         MyCassandraTestClassRule rule = new MyCassandraTestClassRule();
