@@ -8,7 +8,7 @@ cache:
   - $HOME/.cache/pip
 
 env:
-  - CASSANDRA_VERSION=3.5 CASSANDRA_DRIVER_VERSION=3.0.2
+  - CASSANDRA_VERSION=3.5 CASSANDRA_DRIVER_VERSION=3.0.2 CODE_COVERAGE="-P coverage"
   - CASSANDRA_VERSION=3.0.0 CASSANDRA_DRIVER_VERSION=3.0.0
   - CASSANDRA_VERSION=2.2.0 CASSANDRA_DRIVER_VERSION=2.1.0
   - CASSANDRA_VERSION=2.1.0 CASSANDRA_DRIVER_VERSION=2.1.0
@@ -16,6 +16,7 @@ env:
 
 before_install:
   - pip install --user ccm
+  - pip install --user codecov
   - export PATH=$PATH:$HOME/.local/bin
   - jdk_switcher use oraclejdk8
   - ccm create -v binary:$CASSANDRA_VERSION -n 1 -s -b --vnodes cassandra_test
@@ -23,7 +24,9 @@ before_install:
 
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcassandra.driver.version=$CASSANDRA_DRIVER_VERSION -B -V
 
-script: mvn test -Dcassandra.driver.version=$CASSANDRA_DRIVER_VERSION -B
+script: mvn test -Dcassandra.driver.version=$CASSANDRA_DRIVER_VERSION -B $CODE_COVERAGE
+
+after_success: [[ $CODE_COVERAGE ]] && codecov
 
 jdk:
   - openjdk6
