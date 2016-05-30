@@ -79,8 +79,6 @@ public class BasicKeyspaceSettings extends AbstractKeyspaceSettings {
         }
 
         Integer key = runtime.getTestSettings().getKeyspaceSettings().hashCode();
-        UUID schemaVesion = null;
-        Integer keyspaceSchemaSignature = null;
         boolean installSchema = false;
 
         if (!keyspaceStateManager.isTracked(key)) {
@@ -89,13 +87,13 @@ public class BasicKeyspaceSettings extends AbstractKeyspaceSettings {
         } else if (!keyspace.exists()) {
             installSchema = true;
         } else if (this.schemaChangeDetection.equals(SchemaChangeDetectionEnum.CLUSTER)) {
-            schemaVesion = Utils.getSchemaVersion(keyspace.getSession());
+            UUID schemaVesion = Utils.getSchemaVersion(keyspace.getSession());
             if (keyspaceStateManager.hasClusterSchemaVersionChanged(key, schemaVesion)) {
                 keyspace.drop();
                 installSchema = true;
             }
         } else if (this.schemaChangeDetection.equals(SchemaChangeDetectionEnum.KEYSPACE)) {
-            keyspaceSchemaSignature = keyspace.getSchemaSignature();
+            Integer keyspaceSchemaSignature = keyspace.getSchemaSignature();
             if (keyspaceStateManager.hasKeyspaceCqlSignatureChanged(key, keyspaceSchemaSignature)) {
                 keyspace.drop();
                 installSchema = true;
@@ -122,15 +120,10 @@ public class BasicKeyspaceSettings extends AbstractKeyspaceSettings {
                 }
             }
 
-            if (schemaVesion == null) {
-                schemaVesion = Utils.getSchemaVersion(keyspace.getSession());
-            }
-
-            if (keyspaceSchemaSignature == null) {
-                keyspaceSchemaSignature = keyspace.getSchemaSignature();
-            }
-
-            keyspaceStateManager.track(key, schemaVesion, keyspaceSchemaSignature);
+            keyspaceStateManager.track(
+                    key,
+                    Utils.getSchemaVersion(keyspace.getSession()),
+                    keyspace.getSchemaSignature());
 
             keyspace.use();
         }
