@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.unittested</groupId>
     <artifactId>cassandra-test-project</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>org.unittested</groupId>
   <artifactId>cassandra-test-testng</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <name>TestNG - ${project.groupId}:${project.artifactId}</name>
   <description>Cassandra Test bindings for the TestNG environment.</description>
