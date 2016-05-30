@@ -22,7 +22,8 @@
   <packaging>pom</packaging>
 
   <name>Cassandra Test</name>
-  <description>Java unit testing framework for Cassandra.</description>
+  <description>Cassandra Test is a unit test and integration test framework featuring support for multiple test environments, schema management, table data loading and connection management.
+  </description>
   <url>https://github.com/dananderson/cassandra-test</url>
 
   <licenses>

@@ -2,76 +2,8 @@
 [![Build Status](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)
 [![codecov.io](https://codecov.io/github/dananderson/cassandra-test/coverage.svg?branch=master)](https://codecov.io/github/dananderson/cassandra-test?branch=master)
-Java unit testing framework for Cassandra.
 
-## Features
-
-- Works with multiple test environments, including TestNG, JUnit and Spring Test.
-- Schema installation, control and monitoring.
-- Pseudo-rollbacks to ensure a Cassandra keyspace is in a known state before a test rungs.
-- Load table data from CQL files.
-- Ability to plug in specialized connection, schema, rollback and data importing behavior.
-
-## Getting Cassandra Test
-Cassandra Test modules are organized by test environment integration. Pick an environment that fits your project and start writing some Cassandra tests.
-### TestNG
-**Maven**
-```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-testng</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-```
-**Gradle**
-```
-compile group: 'org.unittested', name: 'cassandra-test-testng', version: '1.0.0'
-```
-### JUnit
-**Maven**
-```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-junit</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-```
-**Gradle**
-```
-compile group: 'org.unittested', name: 'cassandra-test-junit', version: '1.0.0'
-```
-### Spring Test
-**Maven**
-```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-spring</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-```
-**Gradle**
-```
-compile group: 'org.unittested', name: 'cassandra-test-spring', version: '1.0.0'
-```
-### Custom
-**Maven**
-```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-core</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-```
-**Gradle**
-```
-compile group: 'org.unittested', name: 'cassandra-test-core', version: '1.0.0'
-```
-
-## Example Test
-This test connects to a Cassandra cluster at 127.0.0.1:9042, creates a keyspace,
-installs schema from a cql file and populates table data from a cql file. The test has
-access to the driver Session. When the test completes, the keyspace is cleaned up, leaving
-Cassandra ready for the next test.
+Cassandra Test is a unit test and integration test framework featuring support for multiple test environments, schema management, table data loading and connection management.
 
 ```java
 @CassandraKeyspace(keyspace = "testng_cassandra_test", schema = "classpath:sample-schema.cql")
@@ -87,40 +19,59 @@ public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 
 ```
 
+## Getting Cassandra Test
+
+Cassandra Test modules are organized by the supported test environments: TestNG, JUnit and Spring Test. To include
+Cassandra Test in your project, choose the artifactId that matches your test environment.
+
+[TestNG](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-testng)
+```
+    <dependency>
+      <groupId>org.unittested</groupId>
+      <artifactId>cassandra-test-testng</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+```
+[JUnit](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-junit)
+```
+    <dependency>
+      <groupId>org.unittested</groupId>
+      <artifactId>cassandra-test-junit</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+```
+[Spring Test](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-spring)
+```
+    <dependency>
+      <groupId>org.unittested</groupId>
+      <artifactId>cassandra-test-spring</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+```
 
 ## Compatibility
-Cassandra Test has been built and tested with the following technologies.
+Cassandra Test has been built and tested with:
 
-**Datastax Java Driver**
-- 2.0.2+
-- 2.1.0+
-- 3.0.0+
-
-**Apache Cassandra**
-- 2.0.4+
-- 2.1.0+
-- 2.2.0+
-- 3.0.0+
-
-**Java**
-- 6+
+| Technology            | Supported Versions           |
+| --------------------- | ---------------------------- |
+| Datastax Java Driver  | 2.0.2+, 2.1.0+, 3.0.0+       |
+| Apache Cassandra      | 2.0.4+ 2.1.0+ 2.2.0+ 3.0.0+  |
+| Java                  | 6+                           |
 
 ## License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-## Roadmap
-These work items are being considered for Cassandra Test.
+## Contributing
+Pull requests for bug fixes and new features are welcome.
 
-- Publish artifacts on Maven Central.
-- README.md docs for each module.
+The following items are being considered for future releases of Cassandra Test.
+- Improve README documentation across the project.
 - Wiki documentation.
-- Create an examples project.
-- JSON data loading.
-- XML data loading.
-- YAML data loading.
-- CCM support.
-- Embedded Cassandra support.
-- SCassandra support.
-- Add plugins for popular schema managers.
-- Performance: file caching, session caching, etc.
-- Parallel test support (?)
+- Create an example usage project.
+- Investigate other data loading source file formats, including JSON, YAML, XML and CSV.
+- Investigate "golden" data for table data state verification.
+- Add plugins for schema management tools.
+- Investigate support for managing Cassandra instances with CCM, Embedded Cassandra and SCassandra.
+- Investigate negative testing tools to put Cassandra into bad states (node down, etc).
+- Performance: session cache, file read cache, etc.
+- Parallel test support (why?).
