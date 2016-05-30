@@ -28,17 +28,16 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
 public class SpringCassandraTestExecutionListenerTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void lifecycle() throws Exception {
         // given
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
         SpringCassandraTestExecutionListener listener = createListener(adapter);
         Method testMethod = getClass().getDeclaredMethods()[0];
         TestContext testContext = mock(TestContext.class);
-        @SuppressWarnings("unchecked")
-        Class testClass = getClass();
 
         when(testContext.getTestMethod()).thenReturn(testMethod);
-        when(testContext.getTestClass()).thenReturn(testClass);
+        when(testContext.getTestClass()).thenReturn((Class)getClass());
         when(testContext.getTestInstance()).thenReturn(this);
 
         // when
@@ -57,8 +56,31 @@ public class SpringCassandraTestExecutionListenerTest {
         verifyNoMoreInteractions(adapter);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void lifecycleAfterSetupFailure() throws Exception {
+        // given
+        TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
+        SpringCassandraTestExecutionListener listener = createListener(adapter);
+        Method testMethod = getClass().getDeclaredMethods()[0];
+        TestContext testContext = mock(TestContext.class);
+
+        when(testContext.getTestMethod()).thenReturn(testMethod);
+        when(testContext.getTestClass()).thenReturn((Class)getClass());
+        when(testContext.getTestInstance()).thenReturn(this);
+
+        // when
+        listener.prepareTestInstance(testContext);
+        listener.beforeTestMethod(testContext);
+        listener.afterTestMethod(testContext);
+        listener.afterTestClass(testContext);
+
+        // then
+        verifyNoMoreInteractions(adapter);
+    }
+
     @Test(expectedExceptions = CassandraTestException.class)
-    public void beforeClassWithNull() throws Exception {
+    public void beforeClassWithNullAdapter() throws Exception {
         // given
         TestContext testContext = mock(TestContext.class);
         SpringCassandraTestExecutionListener listener = createListener(null);

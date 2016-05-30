@@ -20,16 +20,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.unittested.cassandra.test.util.DriverCompatibility;
 
 import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.SimpleStatement;
-import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.TableMetadata;
 
 /**
@@ -44,7 +40,6 @@ public class Keyspace {
      * Name of the null keyspace.
      */
     public static final String NULL = "";
-    private static final int TRUNCATE_TIMEOUT = (int)TimeUnit.SECONDS.toMillis(65);
 
     private KeyspaceContainer container;
     private Session session;
@@ -98,7 +93,7 @@ public class Keyspace {
      * @return {@link Boolean}
      */
     public boolean isCaseSensitiveName() {
-        return !StringUtils.isAllLowerCase(this.name);
+        return !isNull() && !StringUtils.isAllLowerCase(this.name);
     }
 
     /**
@@ -109,14 +104,14 @@ public class Keyspace {
             return;
         }
 
-        this.session.execute(String.format("use \"%s\";", this.name));
+        this.session.execute(String.format("use \"%s\"", this.name));
     }
 
     /**
      * Drop this keyspace.
      */
     public void drop() {
-        this.session.execute(String.format("drop keyspace \"%s\";", this.name));
+        this.session.execute(String.format("drop keyspace \"%s\"", this.name));
     }
 
     /**
@@ -136,29 +131,20 @@ public class Keyspace {
     }
 
     /**
-     * Create this keyspace if it does not already exist. If the keyspace does exist, do nothing.
-     */
-    public void createIfNotExists() {
-        if (!exists()) {
-            create();
-        }
-    }
-
-    /**
      * Does this keyspace exist?
      *
      * @return {@link Boolean}
      */
     public boolean exists() {
-        return this.container.hasKeyspace(this.name);
+        return this.container.keyspaceExists(this.name);
     }
 
     /**
-     * List all tables in this keyspace.
+     * List all tables in this keyspace by name.
      *
      * @return All table names.
      */
-    public Collection<String> allTables() {
+    public Collection<String> allTableNames() {
         Collection<TableMetadata> tables = getTables();
         Collection<String> result = new ArrayList<String>(tables.size());
 
@@ -170,23 +156,45 @@ public class Keyspace {
     }
 
     /**
+     * List all tables in this keyspace.
+     *
+     * @return All tables.
+     */
+    public Collection<Table> allTables() {
+        Collection<TableMetadata> tables = getTables();
+        Collection<Table> result = new ArrayList<Table>(tables.size());
+
+        for (TableMetadata t : tables) {
+            result.add(new Table(t.getName(), this));
+        }
+
+        return Collections.unmodifiableCollection(result);
+    }
+
+    /**
      * Does a table exist in this keyspace?
      *
      * @param table Table name.
      * @return {@link Boolean}
      */
-    public boolean hasTable(String table) {
+    public boolean tableExists(String table) {
         if (table == null || table.isEmpty() || isNull()) {
             return false;
         }
 
         KeyspaceMetadata keyspaceMetadata = this.container.getKeyspaceMetadata(this.name);
 
-        if (keyspaceMetadata == null) {
-            return false;
-        }
+        return (keyspaceMetadata != null && keyspaceMetadata.getTable(table) != null);
+    }
 
-        return (keyspaceMetadata.getTable(table) != null);
+    /**
+     * Get a table by name.
+     *
+     * @param table Table name
+     * @return {@link Table}
+     */
+    public Table getTable(String table) {
+        return new Table(table, this);
     }
 
     /**
@@ -195,9 +203,9 @@ public class Keyspace {
      * @param tables List of tables in this keyspace.
      */
     public void truncateTables(Set<String> tables) {
-        for (TableMetadata table : getTables()) {
+        for (Table table : allTables()) {
             if (tables.contains(table.getName())) {
-                truncate(table.getName());
+                table.truncate();
             }
         }
     }
@@ -211,13 +219,6 @@ public class Keyspace {
         return new HashCodeBuilder(17, 37)
             .append(exists() ? this.container.getKeyspaceMetadata(this.name).exportAsString() : null)
             .build();
-    }
-
-    private void truncate(String table) {
-        Statement statement = new SimpleStatement(String.format("truncate \"%s\";", table)).setKeyspace(this.name);
-
-        DriverCompatibility.setReadTimeoutMillis(statement, TRUNCATE_TIMEOUT);
-        this.session.execute(statement);
     }
 
     private Collection<TableMetadata> getTables() {

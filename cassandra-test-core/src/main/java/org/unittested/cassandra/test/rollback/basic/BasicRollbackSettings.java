@@ -108,7 +108,7 @@ public class BasicRollbackSettings implements RollbackSettings {
         if (inclusions.length > 0) {
             Collections.addAll(tables, inclusions);
         } else {
-            tables.addAll(runtime.getKeyspace().allTables());
+            tables.addAll(runtime.getKeyspace().allTableNames());
             for (String t : exclusions) {
                 tables.remove(t);
             }

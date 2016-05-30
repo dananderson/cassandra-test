@@ -80,7 +80,7 @@ public class KeyspaceContainerTest extends AbstractCassandraTest {
     }
 
     @DataProvider
-    public Object[][] hasKeyspaceData() {
+    public Object[][] keyspaceExists() {
         return new Object[][] {
                 { getKeyspace().getName(), true },
                 { Keyspace.NULL, false },
@@ -88,13 +88,13 @@ public class KeyspaceContainerTest extends AbstractCassandraTest {
         };
     }
 
-    @Test(dataProvider = "hasKeyspaceData")
-    public void hasKeyspace(String keyspace, boolean expectedResult) throws Exception {
+    @Test(dataProvider = "keyspaceExists")
+    public void keyspaceExists(String keyspace, boolean expectedResult) throws Exception {
         // given
         KeyspaceContainer keyspaceContainer = new KeyspaceContainer(getCluster());
 
         // when
-        boolean result = keyspaceContainer.hasKeyspace(keyspace);
+        boolean result = keyspaceContainer.keyspaceExists(keyspace);
 
         // then
         assertThat(result, is(expectedResult));
@@ -106,7 +106,7 @@ public class KeyspaceContainerTest extends AbstractCassandraTest {
         KeyspaceContainer keyspaceContainer = new KeyspaceContainer(cluster);
 
         // when
-        keyspaceContainer.hasKeyspace(getKeyspace().getName());
+        keyspaceContainer.keyspaceExists(getKeyspace().getName());
 
         // then
         // CassandraTestException

@@ -223,7 +223,7 @@ public class TestEnvironmentAdapterTest {
         verify(testSettings.getKeyspaceSettings(), times(1)).sync(
                 Matchers.any(TestRuntime.class), Matchers.any(KeyspaceStateManager.class));
         verify(testSettings.getDataSettings(), times(1)).load(Matchers.any(TestRuntime.class));
-        verify(session, times(1)).execute("use \"test\";");
+        verify(session, times(1)).execute("use \"test\"");
         verifyNoMoreInteractions(testSettings.getDataSettings());
     }
 

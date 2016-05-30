@@ -27,8 +27,6 @@ import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 import org.unittested.cassandra.test.testng.AbstractTestNGCassandraTest;
 
-import com.datastax.driver.core.ResultSet;
-
 /**
  * Sample usage of {@link AbstractTestNGCassandraTest} to write tests.
  */
@@ -39,13 +37,12 @@ public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 
     @Test
     public void timeseriesTableExists() throws Exception {
-        assertThat(getKeyspace().hasTable("timeseries"), is(true));
+        assertThat(getKeyspace().tableExists("timeseries"), is(true));
     }
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        ResultSet result = getSession().execute("SELECT COUNT(*) FROM timeseries");
-        assertThat(result.one().getLong(0), is(3L));
+        assertThat(getKeyspace().getTable("timeseries").getCount(), is(3L));
     }
 }
 

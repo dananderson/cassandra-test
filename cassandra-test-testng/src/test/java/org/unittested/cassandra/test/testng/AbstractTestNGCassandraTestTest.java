@@ -59,8 +59,25 @@ public class AbstractTestNGCassandraTestTest extends AbstractTestNGCassandraTest
         verifyNoMoreInteractions(adapter);
     }
 
+    @Test
+    public void lifecycleAfterSetupFailure() throws Exception {
+        // given
+        TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
+        AbstractTestNGCassandraTest base = createBase(adapter);
+        Method testMethod = AbstractTestNGCassandraTestTest.class.getDeclaredMethods()[0];
+
+        // when
+        base.prepareTestInstance();
+        base.beforeMethod(testMethod);
+        base.afterMethod(testMethod);
+        base.afterClass();
+
+        // then
+        verifyNoMoreInteractions(adapter);
+    }
+
     @Test(expectedExceptions = CassandraTestException.class)
-    public void beforeClassWithNull() throws Exception {
+    public void beforeClassWithNullAdapter() throws Exception {
         // given
         AbstractTestNGCassandraTest base = createBase(null);
 

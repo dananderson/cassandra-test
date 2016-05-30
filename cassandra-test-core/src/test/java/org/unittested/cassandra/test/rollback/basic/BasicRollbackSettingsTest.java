@@ -41,8 +41,6 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
                 { false, TRUNCATE, EMPTY, toArray("b"), EMPTY, true, true, 0, 1, 0 },
                 { false, TRUNCATE, EMPTY, toArray("b"), toArray("p"), true, true, 0, 1, 1 },
 
-
-
                 { false, KEYSPACE_TRUNCATE, EMPTY, EMPTY, toArray("p"), true, true, 0, 0, 1 },
                 { false, KEYSPACE_TRUNCATE, EMPTY, EMPTY, EMPTY, true, true, 0, 0, 0 },
                 { false, KEYSPACE_TRUNCATE, toArray("a"), EMPTY, EMPTY, true, true, 0, 0, 0 },
@@ -81,9 +79,9 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
                 String [] protectedTables,
                 boolean canDropKeyspace,
                 boolean expectKeyspaceExists,
-                int expectedTableASize,
-                int expectedTableBSize,
-                int expectedTablePSize) throws Exception {
+                long expectedTableASize,
+                long expectedTableBSize,
+                long expectedTablePSize) throws Exception {
         // given
         RollbackSettings rollbackSettings = new BasicRollbackSettings(tableInclusions, tableExclusions, strategy, NONE);
         TestRuntime runtime = createRuntime(useNullKeyspace, protectedTables, canDropKeyspace);
@@ -97,9 +95,9 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
         }
 
         if (expectKeyspaceExists) {
-            assertThat(tableSize("p"), is(expectedTablePSize));
-            assertThat(tableSize("a"), is(expectedTableASize));
-            assertThat(tableSize("b"), is(expectedTableBSize));
+            assertThat(getKeyspace().getTable("p").getCount(), is(expectedTablePSize));
+            assertThat(getKeyspace().getTable("a").getCount(), is(expectedTableASize));
+            assertThat(getKeyspace().getTable("b").getCount(), is(expectedTableBSize));
         }
     }
 
@@ -112,9 +110,9 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
                 String [] protectedTables,
                 boolean canDropKeyspace,
                 boolean expectKeyspaceExists,
-                int expectedTableASize,
-                int expectedTableBSize,
-                int expectedTablePSize) throws Exception {
+                long expectedTableASize,
+                long expectedTableBSize,
+                long expectedTablePSize) throws Exception {
         // given
         RollbackSettings rollbackSettings = new BasicRollbackSettings(tableInclusions, tableExclusions, NONE, strategy);
         TestRuntime runtime = createRuntime(useNullKeyspace, protectedTables, canDropKeyspace);
@@ -128,9 +126,9 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
         }
 
         if (expectKeyspaceExists) {
-            assertThat(tableSize("p"), is(expectedTablePSize));
-            assertThat(tableSize("a"), is(expectedTableASize));
-            assertThat(tableSize("b"), is(expectedTableBSize));
+            assertThat(getKeyspace().getTable("p").getCount(), is(expectedTablePSize));
+            assertThat(getKeyspace().getTable("a").getCount(), is(expectedTableASize));
+            assertThat(getKeyspace().getTable("b").getCount(), is(expectedTableBSize));
         }
     }
 
@@ -171,10 +169,6 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
 
         // then
         // CassandraTestException
-    }
-
-    private int tableSize(String table) {
-        return (int)getSession().execute("select count(*) from " + table).one().getLong(0);
     }
 
     private TestRuntime createRuntime(boolean useNullKeyspace, String[] protectedTables, boolean canDropKeyspace) {

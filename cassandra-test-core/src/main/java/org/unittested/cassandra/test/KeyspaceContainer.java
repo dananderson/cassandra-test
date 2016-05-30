@@ -47,7 +47,7 @@ public class KeyspaceContainer {
      * @param name Keyspace name.
      * @return {@link Boolean}
      */
-    public boolean hasKeyspace(String name) {
+    public boolean keyspaceExists(String name) {
         return (getKeyspaceMetadata(name) != null);
     }
 

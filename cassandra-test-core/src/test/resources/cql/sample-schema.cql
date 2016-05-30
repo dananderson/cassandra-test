@@ -17,3 +17,7 @@
 CREATE TABLE test_table (
     id INT PRIMARY KEY,
     name TEXT);
+
+CREATE TABLE test_table_2 (
+    id INT PRIMARY KEY,
+    name TEXT);

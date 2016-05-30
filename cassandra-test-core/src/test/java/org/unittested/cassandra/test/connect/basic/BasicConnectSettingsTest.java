@@ -40,8 +40,8 @@ public class BasicConnectSettingsTest {
     @DataProvider
     public Object[][] connectSettingsData() {
         return new Object[][] {
-                { toArray("0.0.0.0"), 1000, "", "", toArray("0.0.0.0"), 1000,  null },
-                { toArray("1.1.1.1"), 1000, "", "", toArray("1.1.1.1"), 1000, null },
+                { toArray("0.0.0.0"), 1000, "", "", toArray("0.0.0.0"), 1000, null },
+                { toArray("1.1.1.1", "2.2.2.2"), 1000, "", "", toArray("1.1.1.1", "2.2.2.2"), 1000, null },
                 { toArray("1.1.1.1"), -1, "", "", toArray("1.1.1.1"), 9042, null },
                 { toArray(""), 1000, "", "", toArray("127.0.0.1"), 1000, null },
                 { new String[0], 1000, "", "", toArray("127.0.0.1"), 1000, null },
@@ -65,7 +65,7 @@ public class BasicConnectSettingsTest {
 
         // then
         Cluster.Builder builder = connectSettings.getClusterBuilder();
-        assertThat(builder.getContactPoints(), hasSize(1));
+        assertThat(builder.getContactPoints(), hasSize(expectedContactPoints.length));
         int i = 0;
         for (InetSocketAddress address : builder.getContactPoints()) {
             assertThat(address.getAddress().getHostAddress(), is(expectedContactPoints[i++]));

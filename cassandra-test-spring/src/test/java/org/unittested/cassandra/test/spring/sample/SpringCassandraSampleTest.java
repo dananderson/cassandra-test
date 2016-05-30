@@ -32,8 +32,6 @@ import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 import org.unittested.cassandra.test.spring.SpringCassandraTestExecutionListener;
 
-import com.datastax.driver.core.ResultSet;
-
 /**
  * Sample usage of {@link SpringCassandraTestExecutionListener} to write tests.
  */
@@ -49,12 +47,11 @@ public class SpringCassandraSampleTest extends AbstractTestNGSpringContextTests 
 
     @Test
     public void timeseriesTableExists() throws Exception {
-        assertThat(this.keyspace.hasTable("timeseries"), is(true));
+        assertThat(this.keyspace.tableExists("timeseries"), is(true));
     }
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        ResultSet result = this.keyspace.getSession().execute("SELECT COUNT(*) FROM timeseries");
-        assertThat(result.one().getLong(0), is(3L));
+        assertThat(this.keyspace.getTable("timeseries").getCount(), is(3L));
     }
 }

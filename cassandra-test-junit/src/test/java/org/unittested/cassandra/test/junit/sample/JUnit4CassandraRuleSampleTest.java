@@ -32,8 +32,6 @@ import org.unittested.cassandra.test.junit.CassandraTestClassRule;
 import org.unittested.cassandra.test.junit.CassandraTestMethodRule;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
-import com.datastax.driver.core.ResultSet;
-
 /**
  * Sample usage of Cassandra Test JUnit rules to write tests.
  */
@@ -53,12 +51,11 @@ public class JUnit4CassandraRuleSampleTest {
 
     @Test
     public void timeseriesTableExists() throws Exception {
-        assertThat(this.keyspace.hasTable("timeseries"), is(true));
+        assertThat(this.keyspace.tableExists("timeseries"), is(true));
     }
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        ResultSet result = this.keyspace.getSession().execute("SELECT COUNT(*) FROM timeseries");
-        assertThat(result.one().getLong(0), is(3L));
+        assertThat(this.keyspace.getTable("timeseries").getCount(), is(3L));
     }
 }

@@ -49,9 +49,33 @@ public class CassandraTestMethodRuleTest {
         verify(adapter, times(1)).onAfterMethod(eq(this), Matchers.any(Method.class), eq(null));
         verify(adapter, times(1)).onPrepareTestInstance(eq(this), eq(null));
     }
+    @Test
+    public void evaluateWithChildStatementFailure() throws Throwable {
+        // given
+        TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
+        TestEnvironmentAdapterProvider provider = createProvider(adapter);
+        CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
+        Description description = createDescription(getClass(), "evaluate");
+        Statement baseStatement = mock(Statement.class);
+        Statement statement = rule.apply(baseStatement, description);
+
+        doThrow(Exception.class).when(baseStatement).evaluate();
+
+        // when
+        try {
+            statement.evaluate();
+        } catch (Exception e) {
+            // ignore
+        }
+
+        // then
+        verify(adapter, times(1)).onBeforeMethod(eq(this), Matchers.any(Method.class), eq(null));
+        verify(adapter, times(1)).onAfterMethod(eq(this), Matchers.any(Method.class), eq(null));
+        verify(adapter, times(1)).onPrepareTestInstance(eq(this), eq(null));
+    }
 
     @Parameterized.Parameters
-    public static Object[][] data() {
+    public static Object[][] evaluateWithTestClassMismatchParameters() {
         return new Object [][] {
             { Object.class, "evaluate"},
             { null, "evaluate"},

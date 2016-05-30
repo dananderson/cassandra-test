@@ -12,11 +12,9 @@ public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        ResultSet result = getSession().execute("SELECT COUNT(*) FROM timeseries");
-        assertThat(result.one().getLong(0), is(3L));
+        assertThat(getKeyspace().getTable("timeseries).getCount(), is(3L));
     }
 }
-
 ```
 
 ## Getting Cassandra Test
@@ -68,6 +66,7 @@ The following items are being considered for future releases of Cassandra Test.
 - Improve README documentation across the project.
 - Wiki documentation.
 - Create an example usage project.
+- Add method level annotations.
 - Investigate other data loading source file formats, including JSON, YAML, XML and CSV.
 - Investigate "golden" data for table data state verification.
 - Add plugins for schema management tools.

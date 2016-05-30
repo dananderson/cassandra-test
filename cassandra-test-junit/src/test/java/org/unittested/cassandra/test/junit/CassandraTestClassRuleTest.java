@@ -50,6 +50,36 @@ public class CassandraTestClassRuleTest {
         verify(rule.mockAdapter, times(1)).onBeforeClass(CassandraTestClassRuleTest.class, null);
         verify(rule.mockAdapter, times(1)).onAfterClass(CassandraTestClassRuleTest.class, null);
     }
+    @Test
+    @SuppressWarnings("unchecked")
+    public void evaluateWithChildStatementFailure() throws Throwable {
+        // given
+        MyCassandraTestClassRule rule = new MyCassandraTestClassRule();
+        Description description = mock(Description.class);
+
+        when(description.getTestClass()).thenReturn((Class)CassandraTestClassRuleTest.class);
+
+        Statement baseStatement = mock(Statement.class);
+        Statement statement = rule.apply(mock(Statement.class), description);
+
+        doThrow(Exception.class).when(baseStatement).evaluate();
+
+        assertThat(statement, notNullValue());
+        verifyZeroInteractions(rule.mockAdapter);
+        assertThat(rule.getAdapter(), nullValue());
+
+        // when
+        try {
+            statement.evaluate();
+        } catch (Exception e) {
+            // ignore
+        }
+
+        // then
+        assertThat(rule.getAdapter(), nullValue());
+        verify(rule.mockAdapter, times(1)).onBeforeClass(CassandraTestClassRuleTest.class, null);
+        verify(rule.mockAdapter, times(1)).onAfterClass(CassandraTestClassRuleTest.class, null);
+    }
 
     public static final class MyCassandraTestClassRule extends CassandraTestClassRule {
 
