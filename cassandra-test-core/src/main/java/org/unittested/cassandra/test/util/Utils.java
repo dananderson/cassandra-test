@@ -16,16 +16,11 @@
 
 package org.unittested.cassandra.test.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import com.datastax.driver.core.BatchStatement;
-import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.Statement;
 
 /**
  * Internal utilities.
@@ -84,88 +79,4 @@ public final class Utils {
         return output.toArray(new String[output.size()]);
     }
 
-    /**
-     * Set refresh schema interval on {@link QueryOptions}.
-     * <p>
-     * Uses reflection to ensure backwards compatibility with older driver versions.
-     *
-     * @param queryOptions {@link QueryOptions}
-     * @param refreshSchemaIntervalMillis Refresh schema interval.
-     * @return Passed in QueryOptions for chaining
-     */
-    public static QueryOptions setRefreshSchemaIntervalMillis(QueryOptions queryOptions, int refreshSchemaIntervalMillis) {
-        // Turn off driver de-bouncing for schema queries, as it can cause schema modifying tests to take really long.
-        // Might want to make this configurable. Use reflection to maintain driver backwards compatibility.
-        try {
-            Method setRefreshSchemaIntervalMillis = QueryOptions.class.getDeclaredMethod("setRefreshSchemaIntervalMillis", int.class);
-            setRefreshSchemaIntervalMillis.invoke(queryOptions, refreshSchemaIntervalMillis);
-        } catch (NoSuchMethodException e) {
-            // ignore
-        } catch (InvocationTargetException e) {
-            // ignore
-        } catch (IllegalAccessException e) {
-            // ignore
-        }
-
-        return queryOptions;
-    }
-
-    /**
-     * Set the read timeout for a {@link Statement}.
-     * <p>
-     * Uses reflection to ensure backwards compatibility with older driver versions.
-     *
-     * @param statement {@link Statement}
-     * @param readTimeoutMillis Read timeout.
-     * @return Passed in statement for chaining
-     */
-    public static Statement setReadTimeoutMillis(Statement statement, int readTimeoutMillis) {
-        try {
-            Method setReadTimeoutMillis = Statement.class.getDeclaredMethod("setReadTimeoutMillis", int.class);
-            setReadTimeoutMillis.invoke(statement, readTimeoutMillis);
-        } catch (Exception e) {
-            // Ignore.
-        }
-
-        return statement;
-    }
-
-    /**
-     * Set default timestamp of a {@link BatchStatement}.
-     * <p>
-     * Uses reflection to ensure backwards compatibility with older driver versions.
-     *
-     * @param batchStatement {@link BatchStatement}
-     * @param timestamp The timestamp value to set.
-     * @return Passed in batchStatement for chaining
-     */
-    public static BatchStatement setDefaultTimestamp(BatchStatement batchStatement, long timestamp) {
-        try {
-            Method setDefaultTimestamp = BatchStatement.class.getDeclaredMethod("setDefaultTimestamp", long.class);
-            setDefaultTimestamp.invoke(batchStatement, timestamp);
-        } catch (Exception e) {
-            // Ignore.
-        }
-
-        return batchStatement;
-    }
-
-    /**
-     * Get default timestamp from a {@link BatchStatement}.
-     * <p>
-     * Uses reflection to ensure backwards compatibility with older driver versions.
-     *
-     * @param batchStatement {@link BatchStatement}
-     * @return Default timestamp value or null if default timestamp is not available.
-     */
-    public static Long getDefaultTimestamp(BatchStatement batchStatement) {
-        try {
-            Method getDefaultTimestamp = BatchStatement.class.getDeclaredMethod("getDefaultTimestamp");
-            return (Long)getDefaultTimestamp.invoke(batchStatement);
-        } catch (Exception e) {
-            // Ignore.
-        }
-
-        return null;
-    }
 }

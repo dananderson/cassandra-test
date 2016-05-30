@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.unittested.cassandra.test.util.Utils;
+import org.unittested.cassandra.test.util.DriverCompatibility;
 
 import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Session;
@@ -216,7 +216,7 @@ public class Keyspace {
     private void truncate(String table) {
         Statement statement = new SimpleStatement(String.format("truncate \"%s\";", table)).setKeyspace(this.name);
 
-        Utils.setReadTimeoutMillis(statement, TRUNCATE_TIMEOUT);
+        DriverCompatibility.setReadTimeoutMillis(statement, TRUNCATE_TIMEOUT);
         this.session.execute(statement);
     }
 

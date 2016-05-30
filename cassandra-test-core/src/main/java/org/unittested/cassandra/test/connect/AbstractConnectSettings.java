@@ -16,7 +16,6 @@
 
 package org.unittested.cassandra.test.connect;
 
-import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 
 import com.datastax.driver.core.Cluster;

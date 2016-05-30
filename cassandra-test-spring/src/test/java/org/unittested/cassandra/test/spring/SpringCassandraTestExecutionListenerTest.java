@@ -18,6 +18,8 @@ package org.unittested.cassandra.test.spring;
 
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Method;
+
 import org.springframework.test.context.TestContext;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
@@ -26,26 +28,40 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
 public class SpringCassandraTestExecutionListenerTest {
 
     @Test
-    public void beforeTestClass() throws Exception {
+    public void lifecycle() throws Exception {
         // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
+        TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
+        SpringCassandraTestExecutionListener listener = createListener(adapter);
+        Method testMethod = getClass().getDeclaredMethods()[0];
+        TestContext testContext = mock(TestContext.class);
+        @SuppressWarnings("unchecked")
+        Class testClass = getClass();
+
+        when(testContext.getTestMethod()).thenReturn(testMethod);
+        when(testContext.getTestClass()).thenReturn(testClass);
+        when(testContext.getTestInstance()).thenReturn(this);
 
         // when
         listener.beforeTestClass(testContext);
+        listener.prepareTestInstance(testContext);
+        listener.beforeTestMethod(testContext);
+        listener.afterTestMethod(testContext);
+        listener.afterTestClass(testContext);
 
         // then
-        verify(listener.adapter, times(1)).onBeforeClass(testContext.getTestClass(), testContext);
-        verifyNoMoreInteractions(listener.adapter);
+        verify(adapter, times(1)).onBeforeClass(getClass(), testContext);
+        verify(adapter, times(1)).onPrepareTestInstance(this, testContext);
+        verify(adapter, times(1)).onBeforeMethod(this, testMethod, testContext);
+        verify(adapter, times(1)).onAfterMethod(this, testMethod, testContext);
+        verify(adapter, times(1)).onAfterClass(getClass(), testContext);
+        verifyNoMoreInteractions(adapter);
     }
 
     @Test(expectedExceptions = CassandraTestException.class)
-    public void beforeTestClassWithNullAdapter() throws Exception {
+    public void beforeClassWithNull() throws Exception {
         // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        listener.adapter = null;
+        TestContext testContext = mock(TestContext.class);
+        SpringCassandraTestExecutionListener listener = createListener(null);
 
         // when
         listener.beforeTestClass(testContext);
@@ -54,120 +70,17 @@ public class SpringCassandraTestExecutionListenerTest {
         // CassandraTestException
     }
 
-    @Test
-    public void afterTestClass() throws Exception {
-        // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        listener.beforeTestClass(testContext);
-        reset(listener.adapter);
-
-        // when
-        listener.afterTestClass(testContext);
-
-        // then
-        verify(listener.adapter, times(1)).onAfterClass(testContext.getTestClass(), testContext);
-        verifyNoMoreInteractions(listener.adapter);
-    }
-
-    @Test
-    public void afterTestClassButNotInitialized() throws Exception {
-        // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        // when
-        listener.afterTestClass(testContext);
-
-        // then
-        verifyNoMoreInteractions(listener.adapter);
-    }
-
-    @Test
-    public void beforeTestMethod() throws Exception {
-        // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        listener.beforeTestClass(testContext);
-        reset(listener.adapter);
-
-        // when
-        listener.beforeTestMethod(testContext);
-
-        // then
-        verify(listener.adapter, times(1)).onBeforeMethod(testContext.getTestInstance(), testContext.getTestMethod(), testContext);
-        verifyNoMoreInteractions(listener.adapter);
-    }
-
-    @Test
-    public void beforeTestMethodButNotInitialized() throws Exception {
-        // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        // when
-        listener.beforeTestMethod(testContext);
-
-        // then
-        verifyNoMoreInteractions(listener.adapter);
-    }
-
-    @Test
-    public void afterTestMethod() throws Exception {
-        // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        listener.beforeTestClass(testContext);
-        listener.beforeTestMethod(testContext);
-        reset(listener.adapter);
-
-        // when
-        listener.afterTestMethod(testContext);
-
-        // then
-        verify(listener.adapter, times(1)).onAfterMethod(testContext.getTestInstance(), testContext.getTestMethod(), testContext);
-        verifyNoMoreInteractions(listener.adapter);
-    }
-
-    @Test
-    public void afterTestMethodButNotInitialized() throws Exception {
-        // given
-        Listener listener = new Listener();
-        TestContext testContext = createTestContext();
-
-        // when
-        listener.afterTestMethod(testContext);
-
-        // then
-        verifyNoMoreInteractions(listener.adapter);
+    private SpringCassandraTestExecutionListener createListener(final TestEnvironmentAdapter adapter) {
+        return new SpringCassandraTestExecutionListener() {
+            @Override
+            protected TestEnvironmentAdapter createTestEnvironmentAdapter(TestContext testContext) {
+                return adapter;
+            }
+        };
     }
 
     @Test
     public void defaultConstructor() throws Exception {
         SpringCassandraTestExecutionListener.class.newInstance();
-    }
-
-    @SuppressWarnings("unchecked")
-    private TestContext createTestContext() {
-        TestContext testContext = mock(TestContext.class);
-
-        when(testContext.getTestInstance()).thenReturn(this);
-        when(testContext.getTestClass()).thenReturn((Class)getClass());
-        when(testContext.getTestMethod()).thenReturn(getClass().getDeclaredMethods()[0]);
-
-        return testContext;
-    }
-
-    public static class Listener extends SpringCassandraTestExecutionListener {
-
-        TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
-
-        @Override
-        protected TestEnvironmentAdapter createTestEnvironmentAdapter(final TestContext testContext) {
-            return this.adapter;
-        }
     }
 }

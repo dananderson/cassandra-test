@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.unittested.cassandra.test.util.DriverCompatibility;
 import org.unittested.cassandra.test.util.Utils;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 
@@ -281,7 +282,7 @@ class CqlStatementReader implements StatementReader {
         }
 
         if (timestamp != null) {
-            Utils.setDefaultTimestamp(batchStatement, Long.parseLong(timestamp));
+            DriverCompatibility.setDefaultTimestamp(batchStatement, Long.parseLong(timestamp));
         }
 
         return batchStatement;

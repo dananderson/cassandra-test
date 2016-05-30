@@ -59,8 +59,8 @@ public class CassandraTestMethodRule implements TestRule {
 
                 if (!testInstance.getClass().equals(description.getTestClass())) {
                     throw new CassandraTestException("Registered test instance class (%s) does not match class of currently executing test (%s).",
-                            testInstance.getClass().getCanonicalName(),
-                            description.getTestClass().getCanonicalName());
+                            getCanonicalName(testInstance.getClass()),
+                            getCanonicalName(description.getTestClass()));
                 }
 
                 Method testMethod = findTestMethod(description);
@@ -81,7 +81,7 @@ public class CassandraTestMethodRule implements TestRule {
      * The Description object exposes the test method name, but not the Method object or the full signature. With limited
      * info, search through the Test Methods and pick the first one with the matching name.
      */
-    private static Method findTestMethod(Description description) {
+    private Method findTestMethod(Description description) {
         for (Class<?> c = description.getTestClass(); c != null && !c.equals(Object.class); c = c.getSuperclass()) {
             for (Method method : c.getDeclaredMethods()) {
                 if (!method.getName().equals(description.getMethodName())) {
@@ -95,6 +95,10 @@ public class CassandraTestMethodRule implements TestRule {
         }
 
         throw new CassandraTestException("Cannot find test method '%s' in '%s'",
-                description.getMethodName(), description.getTestClass().getCanonicalName());
+                description.getMethodName(), getCanonicalName(description.getTestClass()));
+    }
+
+    private String getCanonicalName(Class<?> testClass) {
+        return testClass != null ? testClass.getCanonicalName() : "null";
     }
 }

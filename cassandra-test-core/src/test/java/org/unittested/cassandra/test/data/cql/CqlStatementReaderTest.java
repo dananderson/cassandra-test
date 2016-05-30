@@ -30,7 +30,7 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.unittested.cassandra.test.util.Utils;
+import org.unittested.cassandra.test.util.DriverCompatibility;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.ConsistencyLevel;
@@ -283,7 +283,7 @@ public class CqlStatementReaderTest {
         assertThat(statement, instanceOf(BatchStatement.class));
 
         BatchStatement batchStatement = (BatchStatement)statement;
-        Long timestamp = Utils.getDefaultTimestamp(batchStatement);
+        Long timestamp = DriverCompatibility.getDefaultTimestamp(batchStatement);
 
         if (timestamp != null) {
             assertThat(timestamp, is(expectedTimestamp));

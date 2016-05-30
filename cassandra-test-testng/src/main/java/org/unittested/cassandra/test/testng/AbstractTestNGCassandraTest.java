@@ -27,7 +27,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.unittested.cassandra.test.annotation.CassandraBean;
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
 
 import com.datastax.driver.core.Cluster;
@@ -59,6 +59,11 @@ public abstract class AbstractTestNGCassandraTest {
     @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception {
         this.adapter = createTestEnvironmentAdapter(getClass());
+
+        if (this.adapter == null) {
+            throw new CassandraTestException("Failed to create a TestEnvironmentAdapter.");
+        }
+
         this.adapter.onBeforeClass(getClass(), null);
     }
 

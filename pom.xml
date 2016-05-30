@@ -148,6 +148,12 @@
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>0.7.6.201602180812</version>
+            <configuration>
+              <excludes>
+                <exclude>**/SchemaChangeDetection.*</exclude>
+                <exclude>**/DriverCompatibility.*</exclude>
+              </excludes>
+            </configuration>
             <executions>
               <execution>
                 <goals>
@@ -175,7 +181,12 @@
                         <limit>
                           <counter>INSTRUCTION</counter>
                           <value>COVEREDRATIO</value>
-                          <minimum>0.80</minimum>
+                          <minimum>0.90</minimum>
+                        </limit>
+                        <limit>
+                          <counter>CLASS</counter>
+                          <value>MISSEDCOUNT</value>
+                          <maximum>0</maximum>
                         </limit>
                       </limits>
                     </rule>

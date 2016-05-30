@@ -180,7 +180,7 @@ public class TestSettingsBuilderTest {
     }
 
     @Test(dataProvider = "missingSetting", expectedExceptions = CassandraTestException.class)
-    public void buildWithMissingSettingAndNoTestClass(ConnectSettings connectSettings,
+    public void buildWithTestClass(ConnectSettings connectSettings,
                                         KeyspaceSettings keyspaceSettings,
                                         DataSettings dataSettings,
                                         RollbackSettings rollbackSettings) throws Exception {
@@ -198,8 +198,47 @@ public class TestSettingsBuilderTest {
         // CassandraTestException
     }
 
+    static class MyBasicConnectSettings extends BasicConnectSettings {}
+    static class MyBasicKeyspaceSettings extends BasicKeyspaceSettings {}
+    static class MyBasicDataSettings extends BasicDataSettings {}
+    static class MyBasicRollbackSettings extends BasicRollbackSettings {}
+
     @Test
-    public void buildWithNoTestClass() throws Exception {
+    public void buildWithDefaultSettingsAndDefaultOverrides() throws Exception {
+        // given
+        TestSettingsBuilder builder = new TestSettingsBuilder()
+                .withDefaultConnectSettings(MyBasicConnectSettings.class)
+                .withDefaultKeyspaceSettings(MyBasicKeyspaceSettings.class)
+                .withDefaultDataSettings(MyBasicDataSettings.class)
+                .withDefaultRollbackSettings(MyBasicRollbackSettings.class)
+                .withTestClass(WithDefaultSettings.class);
+
+        // when
+        TestSettings testSettings = builder.build();
+
+        // then
+        assertThat(testSettings.getConnectSettings(), instanceOf(MyBasicConnectSettings.class));
+        assertThat(testSettings.getKeyspaceSettings(), instanceOf(MyBasicKeyspaceSettings.class));
+        assertThat(testSettings.getDataSettings(), instanceOf(MyBasicDataSettings.class));
+        assertThat(testSettings.getRollbackSettings(), instanceOf(MyBasicRollbackSettings.class));
+    }
+
+    @Test(expectedExceptions = CassandraTestException.class)
+    public void buildWithSettingsCreateFailure() throws Exception {
+        // given
+        TestSettingsBuilder builder = new TestSettingsBuilder()
+                .withDefaultConnectSettings(ConnectSettings.class)
+                .withTestClass(WithDefaultSettings.class);
+
+        // when
+        builder.build();
+
+        // then
+        // CassandraTestException
+    }
+
+    @Test
+    public void buildWithOverridesAndNoTestClass() throws Exception {
         // given
         ConnectSettings connectSettings = mock(ConnectSettings.class);
         KeyspaceSettings keyspaceSettings = mock(KeyspaceSettings.class);
@@ -219,7 +258,6 @@ public class TestSettingsBuilderTest {
         assertThat(testSettings.getKeyspaceSettings(), is(keyspaceSettings));
         assertThat(testSettings.getDataSettings(), is(dataSettings));
         assertThat(testSettings.getRollbackSettings(), is(rollbackSettings));
-
     }
 
     @Target(ElementType.TYPE)

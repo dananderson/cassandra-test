@@ -195,13 +195,7 @@ public class TestEnvironmentAdapter {
     }
 
     protected void closeConnection(TestRuntime runtime) {
-        Keyspace keyspace = runtime.getKeyspace();
-
-        if (keyspace == null) {
-            return;
-        }
-
-        keyspace.getContainer().close();
+        runtime.getKeyspace().getContainer().close();
     }
 
     protected void rollbackAfterMethod(TestRuntime runtime) {
@@ -229,12 +223,12 @@ public class TestEnvironmentAdapter {
                     continue;
                 }
 
-                if((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
+                if(Modifier.isFinal(field.getModifiers())) {
                     throw new CassandraTestException("CassandraBean cannot be used with final fields = %s.%s",
                             c.getCanonicalName(), field.getName());
                 }
 
-                if((field.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
+                if(Modifier.isStatic(field.getModifiers())) {
                     throw new CassandraTestException("CassandraBean cannot be used with static fields = %s.%s",
                             c.getCanonicalName(), field.getName());
                 }

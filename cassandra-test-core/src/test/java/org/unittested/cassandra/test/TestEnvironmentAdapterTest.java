@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 import java.lang.reflect.Method;
 
 import org.mockito.Matchers;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.annotation.CassandraBean;
@@ -154,6 +155,36 @@ public class TestEnvironmentAdapterTest {
         verify(cluster, times(1)).close();
         verify(testSettings.getRollbackSettings(), times(1)).rollbackAfterClass(Matchers.any(TestRuntime.class));
         verifyNoMoreInteractions(cluster, testSettings.getRollbackSettings());
+        assertThat(adapter.getRuntime(), nullValue());
+    }
+
+    @Test
+    public void onAfterClassRollbackFailure() throws Exception {
+        // given
+        TestSettings testSettings = spy(createSettings());
+        TestEnvironmentAdapter adapter = new TestEnvironmentAdapter(testSettings);
+        MockTest test = new MockTest();
+        Cluster cluster = mock(Cluster.class);
+        Session session = mock(Session.class);
+
+        when(session.getCluster()).thenReturn(cluster);
+        when(testSettings.getConnectSettings().connect()).thenReturn(session);
+        when(testSettings.getRollbackSettings()).thenThrow(new RuntimeException());
+
+        adapter.onBeforeClass(MockTest.class, null);
+        adapter.onPrepareTestInstance(test, null);
+
+        try {
+            // when
+            adapter.onAfterClass(MockTest.class, null);
+        } catch (Exception e) {
+            // then
+            verify(cluster, times(1)).close();
+            assertThat(adapter.getRuntime(), nullValue());
+            return;
+        }
+
+        Assert.fail("Expected exception thrown from onAfterClass.");
     }
 
     @Test
@@ -231,6 +262,34 @@ public class TestEnvironmentAdapterTest {
         assertThat(adapter.getRuntime().getTestMethod(), nullValue());
         verify(testSettings.getRollbackSettings(), times(1)).rollbackAfterMethod(adapter.getRuntime());
         verifyNoMoreInteractions(testSettings.getRollbackSettings());
+    }
+
+    @Test
+    public void onAfterMethodRollbackFailure() throws Exception {
+        // given
+        TestSettings testSettings = spy(createSettings());
+        TestEnvironmentAdapter adapter = new TestEnvironmentAdapter(testSettings);
+        MockTest test = new MockTest();
+        Cluster cluster = mock(Cluster.class);
+        Session session = mock(Session.class);
+
+        when(session.getCluster()).thenReturn(cluster);
+        when(testSettings.getConnectSettings().connect()).thenReturn(session);
+        when(testSettings.getRollbackSettings()).thenThrow(new RuntimeException());
+
+        adapter.onBeforeClass(MockTest.class, null);
+        adapter.onPrepareTestInstance(test, null);
+
+        try {
+            // when
+            adapter.onAfterMethod(test, test.getMethod(), null);
+        } catch (Exception e) {
+            // then
+            assertThat(adapter.getRuntime().getTestMethod(), nullValue());
+            return;
+        }
+
+        Assert.fail("Expected exception thrown from onAfterMethod.");
     }
 
     @Test

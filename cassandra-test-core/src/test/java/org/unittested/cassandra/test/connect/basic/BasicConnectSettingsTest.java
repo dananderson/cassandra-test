@@ -16,11 +16,14 @@
 
 package org.unittested.cassandra.test.connect.basic;
 
+import static org.apache.commons.lang3.ArrayUtils.toArray;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
+import java.net.InetSocketAddress;
 
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.exception.CassandraTestException;
@@ -37,18 +40,23 @@ public class BasicConnectSettingsTest {
     @DataProvider
     public Object[][] connectSettingsData() {
         return new Object[][] {
-                { "0.0.0.0", 9042, "", "",  null },
-                { "1.1.1.1", 9042, "", "", null },
-                { "0.0.0.0", 9042, "admin", "password", PlainTextAuthProvider.class },
+                { toArray("0.0.0.0"), 1000, "", "", toArray("0.0.0.0"), 1000,  null },
+                { toArray("1.1.1.1"), 1000, "", "", toArray("1.1.1.1"), 1000, null },
+                { toArray("1.1.1.1"), -1, "", "", toArray("1.1.1.1"), 9042, null },
+                { toArray(""), 1000, "", "", toArray("127.0.0.1"), 1000, null },
+                { new String[0], 1000, "", "", toArray("127.0.0.1"), 1000, null },
+                { toArray("0.0.0.0"), 1000, "admin", "password", toArray("0.0.0.0"), 1000, PlainTextAuthProvider.class },
         };
     }
 
     @Test(dataProvider = "connectSettingsData")
-    public void newInstance(String host,
-                                int port,
-                                String user,
-                                String pass,
-                                Class<? extends AuthProvider> authProviderClass) throws Exception {
+    public void newInstance(String [] host,
+                            int port,
+                            String user,
+                            String pass,
+                            String [] expectedContactPoints,
+                            int expectedPort,
+                            Class<? extends AuthProvider> expectedAuthProvider) throws Exception {
         // given
         // data provider
 
@@ -58,10 +66,13 @@ public class BasicConnectSettingsTest {
         // then
         Cluster.Builder builder = connectSettings.getClusterBuilder();
         assertThat(builder.getContactPoints(), hasSize(1));
-        assertThat(builder.getContactPoints().get(0).getAddress().getHostAddress(), is(host));
-        assertThat(builder.getContactPoints().get(0).getPort(), is(port));
-        if (authProviderClass != null) {
-            assertThat(builder.getConfiguration().getProtocolOptions().getAuthProvider(), instanceOf(authProviderClass));
+        int i = 0;
+        for (InetSocketAddress address : builder.getContactPoints()) {
+            assertThat(address.getAddress().getHostAddress(), is(expectedContactPoints[i++]));
+        }
+        assertThat(builder.getContactPoints().get(0).getPort(), is(expectedPort));
+        if (expectedAuthProvider != null) {
+            assertThat(builder.getConfiguration().getProtocolOptions().getAuthProvider(), instanceOf(expectedAuthProvider));
         } else {
             assertThat(builder.getConfiguration().getProtocolOptions().getAuthProvider(), is(AuthProvider.NONE));
         }

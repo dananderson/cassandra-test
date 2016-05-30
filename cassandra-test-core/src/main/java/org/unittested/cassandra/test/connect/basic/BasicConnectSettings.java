@@ -19,7 +19,7 @@ package org.unittested.cassandra.test.connect.basic;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.unittested.cassandra.test.connect.AbstractConnectSettings;
-import org.unittested.cassandra.test.util.Utils;
+import org.unittested.cassandra.test.util.DriverCompatibility;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ProtocolOptions;
@@ -53,7 +53,7 @@ public class BasicConnectSettings extends AbstractConnectSettings {
 
         if (this.host.length == 0 || (this.host.length == 1 && this.host[0].isEmpty())) {
             builder.addContactPoints("127.0.0.1");
-        } else if (this.host.length > 0) {
+        } else {
             builder.addContactPoints(this.host);
         }
 
@@ -65,7 +65,7 @@ public class BasicConnectSettings extends AbstractConnectSettings {
             builder.withCredentials(this.username, this.password);
         }
 
-        QueryOptions queryOptions = Utils.setRefreshSchemaIntervalMillis(new QueryOptions(), 0);
+        QueryOptions queryOptions = DriverCompatibility.setRefreshSchemaIntervalMillis(new QueryOptions(), 0);
 
         return builder.withQueryOptions(queryOptions);
     }

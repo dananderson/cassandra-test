@@ -302,22 +302,17 @@ public class TestSettingsBuilder {
     private Object newInstance(Class<?> type) {
         try {
             return type.newInstance();
-        } catch (InstantiationException e) {
-            throw new CassandraTestException("Failed to create instance of class %s", type.getSimpleName());
-        } catch (IllegalAccessException e) {
-            throw new CassandraTestException("Failed to create instance of class %s", type.getSimpleName());
+        } catch (Exception e) {
+            throw new CassandraTestException("Failed to create instance of class %s", type.getSimpleName(), e);
         }
     }
 
     private Object invoke(Method method, Object instance, Object... args) {
         try {
             return method.invoke(instance, args);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             throw new CassandraTestException(String.format("Failed to invoke method %s on class %s",
-                    method.getName(), instance.getClass().getSimpleName()));
-        } catch (InvocationTargetException e) {
-            throw new CassandraTestException(String.format("Failed to invoke method %s on class %s",
-                    method.getName(), instance.getClass().getSimpleName()));
+                    method.getName(), instance.getClass().getSimpleName()), e);
         }
     }
 }

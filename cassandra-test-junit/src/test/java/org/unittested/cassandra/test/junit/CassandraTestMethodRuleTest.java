@@ -22,11 +22,14 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.junit.runners.model.Statement;
 import org.mockito.Matchers;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 
+@RunWith(Parameterized.class)
 public class CassandraTestMethodRuleTest {
 
     @Test
@@ -47,29 +50,29 @@ public class CassandraTestMethodRuleTest {
         verify(adapter, times(1)).onPrepareTestInstance(eq(this), eq(null));
     }
 
+    @Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object [][] {
+            { Object.class, "evaluate"},
+            { null, "evaluate"},
+            { CassandraTestMethodRuleTest.class, "does not exist" },
+            { CassandraTestMethodRuleTest.class, "createDescription" },
+        };
+    }
+
+    @Parameterized.Parameter(0)
+    public Class<?> paramTestClass;
+
+    @Parameterized.Parameter(1)
+    public String paramMethodName;
+
     @Test(expected = CassandraTestException.class)
     public void evaluateWithTestClassMismatch() throws Throwable {
         // given
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
         TestEnvironmentAdapterProvider provider = createProvider(adapter);
         CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = createDescription(Object.class, "evaluate");
-        Statement statement = rule.apply(mock(Statement.class), description);
-
-        // when
-        statement.evaluate();
-
-        // then
-        // CassandraTestException
-    }
-
-    @Test(expected = CassandraTestException.class)
-    public void evaluateWithMethodNotFound() throws Throwable {
-        // given
-        TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
-        TestEnvironmentAdapterProvider provider = createProvider(adapter);
-        CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = createDescription(getClass(), "does not exist");
+        Description description = createDescription(this.paramTestClass, this.paramMethodName);
         Statement statement = rule.apply(mock(Statement.class), description);
 
         // when

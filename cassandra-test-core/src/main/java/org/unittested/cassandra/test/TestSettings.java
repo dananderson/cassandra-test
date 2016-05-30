@@ -17,13 +17,9 @@
 package org.unittested.cassandra.test;
 
 import org.unittested.cassandra.test.connect.ConnectSettings;
-import org.unittested.cassandra.test.connect.basic.BasicConnectSettings;
 import org.unittested.cassandra.test.data.DataSettings;
-import org.unittested.cassandra.test.data.basic.BasicDataSettings;
 import org.unittested.cassandra.test.rollback.RollbackSettings;
-import org.unittested.cassandra.test.rollback.basic.BasicRollbackSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
-import org.unittested.cassandra.test.keyspace.basic.BasicKeyspaceSettings;
 
 /**
  * Cassandra Test configuration.
@@ -34,10 +30,6 @@ public class TestSettings {
     private final DataSettings dataSettings;
     private final RollbackSettings rollbackSettings;
     private final KeyspaceSettings keyspaceSettings;
-
-    public TestSettings() {
-        this(new BasicConnectSettings(), new BasicKeyspaceSettings(), new BasicDataSettings(), new BasicRollbackSettings());
-    }
 
     public TestSettings(ConnectSettings connectSettings,
                         KeyspaceSettings keyspaceSettings,
