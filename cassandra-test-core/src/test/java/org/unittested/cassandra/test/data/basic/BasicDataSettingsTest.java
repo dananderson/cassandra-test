@@ -24,11 +24,14 @@ import static org.mockito.Mockito.when;
 import org.unittested.cassandra.test.AbstractCassandraTest;
 import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
+import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
 import org.testng.annotations.Test;
+import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
-@CassandraKeyspace(keyspace = "data_manager_test", schema = "CREATE TABLE a (x int PRIMARY KEY);")
+@CassandraKeyspace(keyspace = "data_settings_test", schema = "CREATE TABLE a (x int PRIMARY KEY);")
+@CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class BasicDataSettingsTest extends AbstractCassandraTest {
 
     private static final String [] DATA = new String [] {

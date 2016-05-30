@@ -22,7 +22,6 @@ import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
 import org.unittested.cassandra.test.TestSettingsBuilder;
-import org.unittested.cassandra.test.TestSettings;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -41,8 +40,6 @@ public abstract class AbstractTestNGCassandraTest {
 
     private TestEnvironmentAdapter adapter;
 
-    private PropertyResolver propertyResolver;
-
     @CassandraBean
     private Session session;
 
@@ -56,19 +53,13 @@ public abstract class AbstractTestNGCassandraTest {
     private KeyspaceContainer keyspaceContainer;
 
     public AbstractTestNGCassandraTest() {
-        this.propertyResolver = new JavaPropertyResolver();
-    }
 
-    public AbstractTestNGCassandraTest(final PropertyResolver propertyResolver) {
-        this.propertyResolver = propertyResolver;
     }
 
     @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception {
-        TestSettings settings = TestSettingsBuilder.fromAnnotatedElement(getClass(), this.propertyResolver);
-        this.adapter = new TestEnvironmentAdapter(settings);
+        this.adapter = createTestEnvironmentAdapter(getClass());
         this.adapter.onBeforeClass(getClass(), null);
-
     }
 
     @BeforeClass(alwaysRun = true, dependsOnMethods = "beforeClass")
@@ -114,5 +105,13 @@ public abstract class AbstractTestNGCassandraTest {
 
     protected KeyspaceContainer getKeyspaceContainer() {
         return this.keyspaceContainer;
+    }
+
+    protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
+        return new TestEnvironmentAdapter(
+                new TestSettingsBuilder()
+                        .withPropertyResolver(new JavaPropertyResolver())
+                        .withTestClass(testClass)
+                        .build());
     }
 }

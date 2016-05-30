@@ -20,9 +20,9 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
-import org.unittested.cassandra.test.TestSettings;
 import org.unittested.cassandra.test.TestSettingsBuilder;
 import org.unittested.cassandra.test.exception.CassandraTestException;
+import org.unittested.cassandra.test.property.PropertyResolver;
 
 /**
  * {@link TestExecutionListener} that provides support for writing tests against a Cassandra database configured by
@@ -50,9 +50,7 @@ public class SpringCassandraTestExecutionListener implements TestExecutionListen
 
     @Override
     public void beforeTestClass(TestContext testContext) throws Exception {
-        TestSettings testSettings = createTestSettings(testContext);
-
-        this.adapter = createAdapter(testContext, testSettings);
+        this.adapter = createTestEnvironmentAdapter(testContext);
 
         if (this.adapter == null) {
             throw new CassandraTestException("Failed to create a TestEnvironmentAdapter.");
@@ -82,13 +80,14 @@ public class SpringCassandraTestExecutionListener implements TestExecutionListen
         }
     }
 
-    protected TestSettings createTestSettings(TestContext testContext) {
-        return TestSettingsBuilder.fromAnnotatedElement(
-                testContext.getTestClass(),
-                new SpringEnvironmentPropertyResolver(testContext.getApplicationContext().getEnvironment()));
-    }
+    protected TestEnvironmentAdapter createTestEnvironmentAdapter(TestContext testContext) {
+        PropertyResolver propertyResolver
+                = new SpringEnvironmentPropertyResolver(testContext.getApplicationContext().getEnvironment());
 
-    protected TestEnvironmentAdapter createAdapter(TestContext testContext, TestSettings testSettings) {
-        return new TestEnvironmentAdapter(testSettings);
+        return new TestEnvironmentAdapter(
+                new TestSettingsBuilder()
+                        .withPropertyResolver(propertyResolver)
+                        .withTestClass(testContext.getTestClass())
+                        .build());
     }
 }

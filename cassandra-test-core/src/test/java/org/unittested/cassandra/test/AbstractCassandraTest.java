@@ -23,6 +23,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.unittested.cassandra.test.annotation.CassandraBean;
+import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -45,8 +46,7 @@ public abstract class AbstractCassandraTest {
 
     @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception {
-        TestSettings settings = TestSettingsBuilder.fromAnnotatedElement(getClass());
-        this.adapter = new TestEnvironmentAdapter(settings);
+        this.adapter = createTestEnvironmentAdapter(getClass());
         this.adapter.onBeforeClass(getClass(), null);
     }
 
@@ -91,5 +91,13 @@ public abstract class AbstractCassandraTest {
 
     protected KeyspaceContainer getKeyspaceContainer() {
         return this.keyspaceContainer;
+    }
+
+    protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
+        return new TestEnvironmentAdapter(
+            new TestSettingsBuilder()
+                    .withPropertyResolver(new JavaPropertyResolver())
+                    .withTestClass(testClass)
+                    .build());
     }
 }

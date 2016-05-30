@@ -22,25 +22,30 @@ import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.*;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.AnnotatedElement;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.hamcrest.Matcher;
 import org.unittested.cassandra.test.annotation.CassandraConnect;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
+import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.ConnectSettingsFactory;
 import org.unittested.cassandra.test.connect.basic.BasicConnectSettings;
 import org.unittested.cassandra.test.connect.basic.BasicConnectSettingsFactory;
+import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.DataSettingsFactory;
 import org.unittested.cassandra.test.data.basic.BasicDataSettings;
 import org.unittested.cassandra.test.data.basic.BasicDataSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
+import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
+import org.unittested.cassandra.test.rollback.RollbackSettings;
 import org.unittested.cassandra.test.rollback.RollbackSettingsFactory;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 import org.unittested.cassandra.test.rollback.basic.BasicRollbackSettings;
@@ -74,7 +79,7 @@ public class TestSettingsBuilderTest {
     private static class WithSettings {}
 
     @DataProvider
-    public static Object[][] annotatedElements() {
+    public static Object[][] testClasses() {
         return new Object[][] {
                 { WithDefaultSettings.class, 9042, Keyspace.NULL, ArrayUtils.EMPTY_STRING_ARRAY, RollbackStrategy.TRUNCATE },
                 { WithConnectSettings.class, 1234, Keyspace.NULL, ArrayUtils.EMPTY_STRING_ARRAY, RollbackStrategy.TRUNCATE },
@@ -85,16 +90,16 @@ public class TestSettingsBuilderTest {
         };
     }
 
-    @Test(dataProvider = "annotatedElements")
-    public void fromAnnotatedElement(AnnotatedElement annotatedElement,
-                                     int port, String expectedKeyspace,
-                                     String [] expectedData,
-                                     RollbackStrategy expectedAfterMethodRolback) throws Exception {
+    @Test(dataProvider = "testClasses")
+    public void buildWithTestClass(Class<?> testClass,
+                                   int port, String expectedKeyspace,
+                                   String [] expectedData,
+                                   RollbackStrategy expectedAfterMethodRolback) throws Exception {
         // given
-        // data provider
+        TestSettingsBuilder builder = new TestSettingsBuilder().withTestClass(testClass);
 
         // when
-        TestSettings settings = TestSettingsBuilder.fromAnnotatedElement(annotatedElement);
+        TestSettings settings = builder.build();
 
         // then
         assertThat(settings, notNullValue());
@@ -115,6 +120,106 @@ public class TestSettingsBuilderTest {
 
         assertThat(settings.getKeyspaceSettings(), instanceOf(BasicKeyspaceSettings.class));
         assertThat(settings.getKeyspaceSettings().getKeyspace(), is(expectedKeyspace));
+    }
+
+    @DataProvider
+    public static Object[][] defaultSettings() {
+        ConnectSettings connectSettings = mock(ConnectSettings.class);
+        KeyspaceSettings keyspaceSettings = mock(KeyspaceSettings.class);
+        DataSettings dataSettings = mock(DataSettings.class);
+        RollbackSettings rollbackSettings = mock(RollbackSettings.class);
+
+        return new Object[][]{
+            { connectSettings, null, null, null, is(connectSettings), notNullValue(), notNullValue(), notNullValue() },
+            { null, keyspaceSettings, null, null, notNullValue(), is(keyspaceSettings), notNullValue(), notNullValue() },
+            { null, null, dataSettings, null, notNullValue(), notNullValue(), is(dataSettings), notNullValue() },
+            { null, null, null, rollbackSettings, notNullValue(), notNullValue(), notNullValue(), is(rollbackSettings) },
+        };
+    }
+
+    @Test(dataProvider = "defaultSettings")
+    public void buildWithDefaultSettings(ConnectSettings connectSettings,
+                                         KeyspaceSettings keyspaceSettings,
+                                         DataSettings dataSettings,
+                                         RollbackSettings rollbackSettings,
+                                         Matcher<ConnectSettings> expectedConnectSettings,
+                                         Matcher<KeyspaceSettings> expectedKeyspaceSettings,
+                                         Matcher<DataSettings> expectedDataSettings,
+                                         Matcher<RollbackSettings> expectedRollbackSettings) throws Exception {
+        // given
+        TestSettingsBuilder builder = new TestSettingsBuilder()
+                .withConnectSettings(connectSettings)
+                .withDataSettings(dataSettings)
+                .withKeyspaceSettings(keyspaceSettings)
+                .withRollbackSettings(rollbackSettings)
+                .withTestClass(WithSettings.class);
+
+        // when
+        TestSettings testSettings = builder.build();
+
+        // then
+        assertThat(testSettings.getConnectSettings(), expectedConnectSettings);
+        assertThat(testSettings.getKeyspaceSettings(), expectedKeyspaceSettings);
+        assertThat(testSettings.getDataSettings(), expectedDataSettings);
+        assertThat(testSettings.getRollbackSettings(), expectedRollbackSettings);
+    }
+
+    @DataProvider
+    public static Object[][] missingSetting() {
+        ConnectSettings connectSettings = mock(ConnectSettings.class);
+        KeyspaceSettings keyspaceSettings = mock(KeyspaceSettings.class);
+        DataSettings dataSettings = mock(DataSettings.class);
+        RollbackSettings rollbackSettings = mock(RollbackSettings.class);
+
+        return new Object[][]{
+                { connectSettings, keyspaceSettings, dataSettings, null },
+                { connectSettings, keyspaceSettings, null, rollbackSettings },
+                { connectSettings, null, dataSettings, rollbackSettings },
+                { null, keyspaceSettings, dataSettings, rollbackSettings },
+        };
+    }
+
+    @Test(dataProvider = "missingSetting", expectedExceptions = CassandraTestException.class)
+    public void buildWithMissingSettingAndNoTestClass(ConnectSettings connectSettings,
+                                        KeyspaceSettings keyspaceSettings,
+                                        DataSettings dataSettings,
+                                        RollbackSettings rollbackSettings) throws Exception {
+        // given
+        TestSettingsBuilder builder = new TestSettingsBuilder()
+                .withConnectSettings(connectSettings)
+                .withDataSettings(dataSettings)
+                .withKeyspaceSettings(keyspaceSettings)
+                .withRollbackSettings(rollbackSettings);
+
+        // when
+        builder.build();
+
+        // then
+        // CassandraTestException
+    }
+
+    @Test
+    public void buildWithNoTestClass() throws Exception {
+        // given
+        ConnectSettings connectSettings = mock(ConnectSettings.class);
+        KeyspaceSettings keyspaceSettings = mock(KeyspaceSettings.class);
+        DataSettings dataSettings = mock(DataSettings.class);
+        RollbackSettings rollbackSettings = mock(RollbackSettings.class);
+        TestSettingsBuilder builder = new TestSettingsBuilder()
+                .withConnectSettings(connectSettings)
+                .withDataSettings(dataSettings)
+                .withKeyspaceSettings(keyspaceSettings)
+                .withRollbackSettings(rollbackSettings);
+
+        // when
+        TestSettings testSettings = builder.build();
+
+        // then
+        assertThat(testSettings.getConnectSettings(), is(connectSettings));
+        assertThat(testSettings.getKeyspaceSettings(), is(keyspaceSettings));
+        assertThat(testSettings.getDataSettings(), is(dataSettings));
+        assertThat(testSettings.getRollbackSettings(), is(rollbackSettings));
+
     }
 
     @Target(ElementType.TYPE)
@@ -168,12 +273,12 @@ public class TestSettingsBuilderTest {
     }
 
     @Test(dataProvider = "duplicateSettings", expectedExceptions = CassandraTestException.class)
-    public void fromAnnotatedElementWithDuplicateSettings(AnnotatedElement annotatedElement) throws Exception {
+    public void fromAnnotatedElementWithDuplicateSettings(Class<?> testClass) throws Exception {
         // given
-        // data provider
+        TestSettingsBuilder builder = new TestSettingsBuilder().withTestClass(testClass);
 
         // when
-        TestSettingsBuilder.fromAnnotatedElement(annotatedElement);
+        builder.build();
 
         // then
         // CassandraTestException

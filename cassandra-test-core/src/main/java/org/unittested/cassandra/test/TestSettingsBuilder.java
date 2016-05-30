@@ -20,6 +20,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.basic.BasicConnectSettings;
@@ -34,27 +37,216 @@ import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.basic.BasicKeyspaceSettings;
 
 /**
- * Builds {@link TestSettings} from Cassandra Test annotations.
+ * Helper for building {@link TestSettings} objects.
  */
 public class TestSettingsBuilder {
 
-    public static TestSettings fromAnnotatedElement(AnnotatedElement annotatedElement, PropertyResolver propertyResolver) {
-        return new TestSettings(
-                getSettings(annotatedElement, "__connectSettingsFactory", ConnectSettings.class, BasicConnectSettings.class, propertyResolver),
-                getSettings(annotatedElement, "__keyspaceSettingsFactory", KeyspaceSettings.class, BasicKeyspaceSettings.class, propertyResolver),
-                getSettings(annotatedElement, "__dataSettingsFactory", DataSettings.class, BasicDataSettings.class, propertyResolver),
-                getSettings(annotatedElement, "__rollbackSettingsFactory", RollbackSettings.class, BasicRollbackSettings.class, propertyResolver));
+    private static final Map<Class<?>, String> SETTINGS_FACTORY_PROPERTY_MAP;
+    static {
+        Map<Class<?>, String> map = new HashMap<Class<?>, String>();
+
+        map.put(ConnectSettings.class, "__connectSettingsFactory");
+        map.put(KeyspaceSettings.class, "__keyspaceSettingsFactory");
+        map.put(DataSettings.class, "__dataSettingsFactory");
+        map.put(RollbackSettings.class, "__rollbackSettingsFactory");
+
+        SETTINGS_FACTORY_PROPERTY_MAP = Collections.unmodifiableMap(map);
     }
 
-    public static TestSettings fromAnnotatedElement(AnnotatedElement annotatedElement) {
-        return fromAnnotatedElement(annotatedElement, new JavaPropertyResolver());
+    private Class<?> testClass;
+
+    private PropertyResolver propertyResolver;
+
+    private ConnectSettings connectSettings;
+    private KeyspaceSettings keyspaceSettings;
+    private DataSettings dataSettings;
+    private RollbackSettings rollbackSettings;
+
+    private Class<? extends ConnectSettings> defaultConnectSettingsClass = BasicConnectSettings.class;
+    private Class<? extends KeyspaceSettings> defaultKeyspaceSettingsClass = BasicKeyspaceSettings.class;
+    private Class<? extends DataSettings> defaultDataSettingsClass = BasicDataSettings.class;
+    private Class<? extends RollbackSettings> defaultRollbackSettingsClass = BasicRollbackSettings.class;
+
+    /**
+     * Test class containing Cassandra Test annotations.
+     * <p>
+     * Each settings object type has an annotation that configures it. If the annotation is not present, the default
+     * settings class will be used to create a new instance of the setting with default configuration.
+     * <p>
+     * The annotation reading and default instance creation can be overridden by specifying the settings instance in
+     * this class. For example, if {@link #withConnectSettings(ConnectSettings)} is used, the connect setting annotation
+     * will not be considered.
+     *
+     * @param testClass Test class.
+     * @return this
+     */
+    public TestSettingsBuilder withTestClass(Class<?> testClass) {
+        this.testClass = testClass;
+        return this;
     }
 
-    private static <T> T getSettings(AnnotatedElement annotatedElement,
-                                     String factoryPropertyName,
-                                     Class<T> settingsClass,
-                                     Class<? extends T> defaultSettingsClass,
-                                     PropertyResolver propertyResolver) {
+    /**
+     * {@link PropertyResolver} for resolving property references in annotations.
+     * <p>
+     * If not specified, the {@link JavaPropertyResolver} will be used.
+     *
+     * @param propertyResolver {@link PropertyResolver}
+     * @return this
+     */
+    public TestSettingsBuilder withPropertyResolver(PropertyResolver propertyResolver) {
+        this.propertyResolver = propertyResolver;
+        return this;
+    }
+
+    /**
+     * Use this {@link ConnectSettings} object for {@link TestSettings}.
+     * <p>
+     * If specified, tbe connect settings annotation will be ignored.
+     *
+     * @param connectSettings {@link ConnectSettings}
+     * @return this
+     */
+    public TestSettingsBuilder withConnectSettings(ConnectSettings connectSettings) {
+        this.connectSettings = connectSettings;
+        return this;
+    }
+
+    /**
+     * The default {@link ConnectSettings} object to create if the connect settings is not present.
+     *
+     * @param defaultConnectSettingsClass {@link ConnectSettings} class
+     * @return this
+     */
+    public TestSettingsBuilder withDefaultConnectSettings(Class<? extends ConnectSettings> defaultConnectSettingsClass) {
+        this.defaultConnectSettingsClass = defaultConnectSettingsClass;
+        return this;
+    }
+
+    /**
+     * Use this {@link KeyspaceSettings} object for {@link TestSettings}.
+     * <p>
+     * If specified, tbe keyspace settings annotation will be ignored.
+     *
+     * @param keyspaceSettings {@link KeyspaceSettings}
+     * @return this
+     */
+    public TestSettingsBuilder withKeyspaceSettings(KeyspaceSettings keyspaceSettings) {
+        this.keyspaceSettings = keyspaceSettings;
+        return this;
+    }
+
+    /**
+     * The default {@link KeyspaceSettings} object to create if the keyspace settings is not present.
+     *
+     * @param defaultKeyspaceSettingsClass {@link KeyspaceSettings} class
+     * @return this
+     */
+    public TestSettingsBuilder withDefaultKeyspaceSettings(Class<? extends KeyspaceSettings> defaultKeyspaceSettingsClass) {
+        this.defaultKeyspaceSettingsClass = defaultKeyspaceSettingsClass;
+        return this;
+    }
+
+    /**
+     * Use this {@link DataSettings} object for {@link TestSettings}.
+     * <p>
+     * If specified, tbe data settings annotation will be ignored.
+     *
+     * @param dataSettings {@link DataSettings}
+     * @return this
+     */
+    public TestSettingsBuilder withDataSettings(DataSettings dataSettings) {
+        this.dataSettings = dataSettings;
+        return this;
+    }
+
+    /**
+     * The default {@link DataSettings} object to create if the data settings is not present.
+     *
+     * @param defaultDataSettingsClass {@link DataSettings} class
+     * @return this
+     */
+    public TestSettingsBuilder withDefaultDataSettings(Class<? extends DataSettings> defaultDataSettingsClass) {
+        this.defaultDataSettingsClass = defaultDataSettingsClass;
+        return this;
+    }
+
+    /**
+     * Use this {@link RollbackSettings} object for {@link TestSettings}.
+     * <p>
+     * If specified, tbe rollback settings annotation will be ignored.
+     *
+     * @param rollbackSettings {@link RollbackSettings}
+     * @return this
+     */
+    public TestSettingsBuilder withRollbackSettings(RollbackSettings rollbackSettings) {
+        this.rollbackSettings = rollbackSettings;
+        return this;
+    }
+
+    /**
+     * The default {@link RollbackSettings} object to create if the rollback settings is not present.
+     *
+     * @param defaultRollbackSettingsClass {@link RollbackSettings} class
+     * @return this
+     */
+    public TestSettingsBuilder withDefaultRollbackSettings(Class<? extends RollbackSettings> defaultRollbackSettingsClass) {
+        this.defaultRollbackSettingsClass = defaultRollbackSettingsClass;
+        return this;
+    }
+
+    /**
+     * Create a new {@link TestSettings} object from the current builder state.
+     *
+     * @return {@link TestSettings}
+     */
+    public TestSettings build() {
+        ConnectSettings selectedConnectSettings = getSettingsOrDefault(
+                ConnectSettings.class,
+                this.defaultConnectSettingsClass,
+                this.connectSettings);
+
+        KeyspaceSettings selectedKeyspaceSettings = getSettingsOrDefault(
+                KeyspaceSettings.class,
+                this.defaultKeyspaceSettingsClass,
+                this.keyspaceSettings);
+
+        DataSettings selectedDataSettings = getSettingsOrDefault(
+                DataSettings.class,
+                this.defaultDataSettingsClass,
+                this.dataSettings);
+
+        RollbackSettings selectedRollbackSettings = getSettingsOrDefault(
+                RollbackSettings.class,
+                this.defaultRollbackSettingsClass,
+                this.rollbackSettings);
+
+        return new TestSettings(selectedConnectSettings, selectedKeyspaceSettings, selectedDataSettings, selectedRollbackSettings);
+    }
+
+    private <T> T getSettingsOrDefault(Class<T> settingsType,
+                                       Class<? extends T> defaultSettingsClass,
+                                       T defaultSettings) {
+        if (defaultSettings != null) {
+            return defaultSettings;
+        }
+
+        if (this.testClass == null) {
+            throw new CassandraTestException("TestSettingsBuilder requires a test class to load %s", settingsType.getSimpleName());
+        }
+
+        return getSettings(
+                this.testClass,
+                SETTINGS_FACTORY_PROPERTY_MAP.get(settingsType),
+                settingsType,
+                defaultSettingsClass,
+                this.propertyResolver != null ? this.propertyResolver : new JavaPropertyResolver());
+    }
+
+    private <T> T getSettings(AnnotatedElement annotatedElement,
+                              String factoryPropertyName,
+                              Class<T> settingsClass,
+                              Class<? extends T> defaultSettingsClass,
+                              PropertyResolver propertyResolver) {
 
         // 1. Find the annotation with a property named factoryPropertyName.
 
@@ -107,7 +299,7 @@ public class TestSettingsBuilder {
         return settingsClass.cast(settings);
     }
 
-    private static Object newInstance(Class<?> type) {
+    private Object newInstance(Class<?> type) {
         try {
             return type.newInstance();
         } catch (InstantiationException e) {
@@ -117,7 +309,7 @@ public class TestSettingsBuilder {
         }
     }
 
-    private static Object invoke(Method method, Object instance, Object... args) {
+    private Object invoke(Method method, Object instance, Object... args) {
         try {
             return method.invoke(instance, args);
         } catch (IllegalAccessException e) {

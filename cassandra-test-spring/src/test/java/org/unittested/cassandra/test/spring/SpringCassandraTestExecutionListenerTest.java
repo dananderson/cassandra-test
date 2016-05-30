@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 import org.springframework.test.context.TestContext;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
-import org.unittested.cassandra.test.TestSettings;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 
 public class SpringCassandraTestExecutionListenerTest {
@@ -166,16 +165,9 @@ public class SpringCassandraTestExecutionListenerTest {
 
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
 
-        TestSettings settings = mock(TestSettings.class);
-
         @Override
-        protected TestEnvironmentAdapter createAdapter(final TestContext testContext, final TestSettings testSettings) {
+        protected TestEnvironmentAdapter createTestEnvironmentAdapter(final TestContext testContext) {
             return this.adapter;
-        }
-
-        @Override
-        protected TestSettings createTestSettings(final TestContext testContext) {
-            return this.settings;
         }
     }
 }
