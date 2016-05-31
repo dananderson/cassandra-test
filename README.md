@@ -22,7 +22,7 @@ public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 Cassandra Test modules are organized by the supported test environments: TestNG, JUnit and Spring Test. To include
 Cassandra Test in your project, choose the artifactId that matches your test environment.
 
-[TestNG](casandra-test-testng)
+[TestNG](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-testng)
 ```
     <dependency>
       <groupId>org.unittested</groupId>
@@ -30,7 +30,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
       <version>1.0.0</version>
     </dependency>
 ```
-[JUnit](casandra-test-junit)
+[JUnit](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-junit)
 ```
     <dependency>
       <groupId>org.unittested</groupId>
@@ -38,7 +38,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
       <version>1.0.0</version>
     </dependency>
 ```
-[Spring Test](casandra-test-spring)
+[Spring Test](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-spring)
 ```
     <dependency>
       <groupId>org.unittested</groupId>
