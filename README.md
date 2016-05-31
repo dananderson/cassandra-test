@@ -1,6 +1,6 @@
 # Cassandra Test
 [![Build Status](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](http://mvnrepository.com/artifact/org.unittested/cassandra-test-junit/1.0.0)
 [![codecov.io](https://codecov.io/github/dananderson/cassandra-test/coverage.svg?branch=master)](https://codecov.io/github/dananderson/cassandra-test?branch=master)
 
 Cassandra Test is a unit test and integration test framework featuring support for multiple test environments, schema management, table data loading and connection management.
@@ -22,7 +22,7 @@ public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 Cassandra Test modules are organized by the supported test environments: TestNG, JUnit and Spring Test. To include
 Cassandra Test in your project, choose the artifactId that matches your test environment.
 
-[TestNG](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-testng)
+[TestNG](casandra-test-testng)
 ```
     <dependency>
       <groupId>org.unittested</groupId>
@@ -30,7 +30,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
       <version>1.0.0</version>
     </dependency>
 ```
-[JUnit](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-junit)
+[JUnit](casandra-test-junit)
 ```
     <dependency>
       <groupId>org.unittested</groupId>
@@ -38,7 +38,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
       <version>1.0.0</version>
     </dependency>
 ```
-[Spring Test](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-spring)
+[Spring Test](casandra-test-spring)
 ```
     <dependency>
       <groupId>org.unittested</groupId>
