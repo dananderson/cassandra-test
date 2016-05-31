@@ -71,6 +71,15 @@
   </properties>
 
   <dependencies>
+
+    <!-- Include the driver with 'provided' scope to allow Cassandra Test users to select the driver version they want to use. -->
+    <dependency>
+      <groupId>com.datastax.cassandra</groupId>
+      <artifactId>cassandra-driver-core</artifactId>
+      <version>${cassandra.driver.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>

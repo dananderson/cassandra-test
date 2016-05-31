@@ -35,13 +35,6 @@
     <!-- Compile scope dependencies. -->
 
     <dependency>
-      <groupId>com.datastax.cassandra</groupId>
-      <artifactId>cassandra-driver-core</artifactId>
-      <version>${cassandra.driver.version}</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${apache.commons.version}</version>
