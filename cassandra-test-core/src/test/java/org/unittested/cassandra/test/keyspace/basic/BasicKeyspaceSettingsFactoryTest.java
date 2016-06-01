@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
 import org.unittested.cassandra.test.FactoryTestAnnotations;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettingsFactory;
 import org.testng.annotations.DataProvider;
@@ -41,7 +41,7 @@ public class BasicKeyspaceSettingsFactoryTest {
         CassandraKeyspace cassandraKeyspace = FactoryTestAnnotations.class.getAnnotation(CassandraKeyspace.class);
 
         // when
-        KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(cassandraKeyspace, new JavaPropertyResolver());
+        KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(cassandraKeyspace, PropertiesPropertyResolver.SYSTEM);
 
         // then
         assertThat(keyspaceSettings, instanceOf(BasicKeyspaceSettings.class));
@@ -66,7 +66,7 @@ public class BasicKeyspaceSettingsFactoryTest {
         KeyspaceSettingsFactory keyspaceSettingsFactory = new BasicKeyspaceSettingsFactory();
 
         // when
-        keyspaceSettingsFactory.create(annotation, new JavaPropertyResolver());
+        keyspaceSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
 
         // then
         // expect IllegalArgumentException

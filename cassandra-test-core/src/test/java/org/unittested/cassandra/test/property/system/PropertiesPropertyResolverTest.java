@@ -16,8 +16,10 @@
 
 package org.unittested.cassandra.test.property.system;
 
+import java.io.InputStream;
 import java.util.Properties;
 
+import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.property.PropertyResolver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -25,7 +27,7 @@ import org.testng.annotations.Test;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-public class JavaPropertyResolverTest {
+public class PropertiesPropertyResolverTest {
 
     @DataProvider
     public static Object[][] validInputs() {
@@ -48,9 +50,9 @@ public class JavaPropertyResolverTest {
     }
 
     @Test(dataProvider = "validInputs")
-    public void resolve(String input, String expectedOutput) throws Exception {
+    public void resolveFromProperties(String input, String expectedOutput) throws Exception {
         // given
-        PropertyResolver propertyResolver = new JavaPropertyResolver(getProperties());
+        PropertyResolver propertyResolver = new PropertiesPropertyResolver(getProperties());
 
         // when
         String output = propertyResolver.resolve(input);
@@ -59,10 +61,41 @@ public class JavaPropertyResolverTest {
         assertThat(output, is(expectedOutput));
     }
 
+    @Test(dataProvider = "validInputs")
+    public void resolveFromLocator(String input, String expectedOutput) throws Exception {
+        // given
+        PropertyResolver propertyResolver = PropertiesPropertyResolver.fromLocator(
+                "classpath:properties-property-resolver-test.properties");
+
+        // when
+        String output = propertyResolver.resolve(input);
+
+        // then
+        assertThat(output, is(expectedOutput));
+    }
+
+    @DataProvider
+    public static Object[][] badLocators() {
+        return new Object[][] {
+                { "error" },
+                { "classpath:does/not/exist.properties" },
+        };
+    }
+
+    @Test(dataProvider = "badLocators", expectedExceptions = CassandraTestException.class)
+    public void fromLocatorWithBadLocator(String locator) throws Exception {
+        PropertiesPropertyResolver.fromLocator(locator);
+    }
+
+    @Test
+    public void systemProperties() throws Exception {
+        assertThat(PropertiesPropertyResolver.SYSTEM.resolve("${java.class.path}"), is(not("${java.class.path}")));
+    }
+
     @Test(expectedExceptions = NullPointerException.class)
     public void resolveWithNullInput() throws Exception {
         // given
-        PropertyResolver propertyResolver = new JavaPropertyResolver(getProperties());
+        PropertyResolver propertyResolver = new PropertiesPropertyResolver(getProperties());
 
         // when
         propertyResolver.resolve((String)null);
@@ -74,7 +107,7 @@ public class JavaPropertyResolverTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void resolveArrayWithNullInput() throws Exception {
         // given
-        PropertyResolver propertyResolver = new JavaPropertyResolver(getProperties());
+        PropertyResolver propertyResolver = new PropertiesPropertyResolver(getProperties());
 
         // when
         propertyResolver.resolve((String [])null);
@@ -83,12 +116,18 @@ public class JavaPropertyResolverTest {
         // throws NullPointerException
     }
 
-    private Properties getProperties() {
+    private Properties getProperties() throws Exception {
         Properties p = new Properties();
+        InputStream stream = null;
 
-        p.setProperty("a", "a_value");
-        p.setProperty("b.c", "bc_value");
-        p.setProperty("d_e", "de_value");
+        try {
+            stream = getClass().getClassLoader().getResourceAsStream("properties-property-resolver-test.properties");
+            p.load(stream);
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
 
         return p;
     }

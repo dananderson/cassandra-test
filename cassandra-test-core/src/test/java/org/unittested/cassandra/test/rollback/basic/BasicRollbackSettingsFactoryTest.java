@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 import org.unittested.cassandra.test.FactoryTestAnnotations;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.rollback.RollbackSettings;
 import org.unittested.cassandra.test.rollback.RollbackSettingsFactory;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
@@ -26,7 +26,7 @@ public class BasicRollbackSettingsFactoryTest {
         CassandraRollback rollback = FactoryTestAnnotations.class.getAnnotation(CassandraRollback.class);
 
         // when
-        RollbackSettings rollbackSettings = rollbackSettingsFactory.create(rollback, new JavaPropertyResolver());
+        RollbackSettings rollbackSettings = rollbackSettingsFactory.create(rollback, PropertiesPropertyResolver.SYSTEM);
 
         // then
         assertThat(rollbackSettings, instanceOf(BasicRollbackSettings.class));
@@ -51,7 +51,7 @@ public class BasicRollbackSettingsFactoryTest {
         RollbackSettingsFactory rollbackSettingsFactory = new BasicRollbackSettingsFactory();
 
         // when
-        rollbackSettingsFactory.create(annotation, new JavaPropertyResolver());
+        rollbackSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
 
         // then
         // expect IllegalArgumentException

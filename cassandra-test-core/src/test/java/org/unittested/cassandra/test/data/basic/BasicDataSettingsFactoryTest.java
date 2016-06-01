@@ -10,7 +10,7 @@ import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.DataSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -23,7 +23,7 @@ public class BasicDataSettingsFactoryTest {
         CassandraData data = FactoryTestAnnotations.class.getAnnotation(CassandraData.class);
 
         // when
-        DataSettings dataSettings = dataSettingsFactory.create(data, new JavaPropertyResolver());
+        DataSettings dataSettings = dataSettingsFactory.create(data, PropertiesPropertyResolver.SYSTEM);
 
         // then
         assertThat(dataSettings, instanceOf(BasicDataSettings.class));
@@ -43,7 +43,7 @@ public class BasicDataSettingsFactoryTest {
         DataSettingsFactory dataSettingsFactory = new BasicDataSettingsFactory();
 
         // when
-        dataSettingsFactory.create(annotation, new JavaPropertyResolver());
+        dataSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
 
         // then
         // expect IllegalArgumentException

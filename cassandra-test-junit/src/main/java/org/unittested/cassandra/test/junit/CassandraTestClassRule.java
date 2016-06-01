@@ -20,9 +20,8 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
-import org.unittested.cassandra.test.TestSettings;
 import org.unittested.cassandra.test.TestSettingsBuilder;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 
 /**
  * JUnit rule that runs before class setup and after class clean up for Cassandra Test.
@@ -61,7 +60,7 @@ public class CassandraTestClassRule implements TestRule, TestEnvironmentAdapterP
     protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
         return new TestEnvironmentAdapter(
                 new TestSettingsBuilder()
-                        .withPropertyResolver(new JavaPropertyResolver())
+                        .withPropertyResolver(PropertiesPropertyResolver.SYSTEM)
                         .withTestClass(testClass)
                         .build());
     }

@@ -28,7 +28,7 @@ import org.unittested.cassandra.test.annotation.CassandraConnect;
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.ConnectSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -44,7 +44,7 @@ public class BasicConnectSettingsFactoryTest {
         CassandraConnect cassandraConnect = FactoryTestAnnotations.class.getAnnotation(CassandraConnect.class);
 
         // when
-        ConnectSettings connectSettings = connectSettingsFactory.create(cassandraConnect, new JavaPropertyResolver());
+        ConnectSettings connectSettings = connectSettingsFactory.create(cassandraConnect, PropertiesPropertyResolver.SYSTEM);
 
         // then
         assertThat(connectSettings, instanceOf(BasicConnectSettings.class));
@@ -69,7 +69,7 @@ public class BasicConnectSettingsFactoryTest {
         ConnectSettingsFactory connectSettingsFactory = new BasicConnectSettingsFactory();
 
         // when
-        connectSettingsFactory.create(annotation, new JavaPropertyResolver());
+        connectSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
 
         // then
         // expect IllegalArgumentException

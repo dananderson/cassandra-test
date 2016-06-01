@@ -50,8 +50,8 @@ public class BasicCqlSourceLoaderTest {
                 { "select * from table;select * from table;", 2 },
                 { "select * from table;select * from table;select * from table;", 3 },
                 { ";", 0 },
-                { "string:;", 0 },
-                { "string.cql:;", 0 },
+                { "text:;", 0 },
+                { "text.cql:;", 0 },
         };
     }
 
@@ -204,9 +204,9 @@ public class BasicCqlSourceLoaderTest {
     public Object[][] invalidCqlSourceFormatData() {
         return new Object[][] {
                 { "" },
-                { "string:" },
+                { "text:" },
                 { "cql:" },
-                { "string.cql:" },
+                { "text.cql:" },
                 { "file:" },
                 { "file.cql:" },
                 { "classpath:" },

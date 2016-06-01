@@ -28,7 +28,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -115,7 +115,7 @@ public abstract class AbstractTestNGCassandraTest {
     protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
         return new TestEnvironmentAdapter(
                 new TestSettingsBuilder()
-                        .withPropertyResolver(new JavaPropertyResolver())
+                        .withPropertyResolver(PropertiesPropertyResolver.SYSTEM)
                         .withTestClass(testClass)
                         .build());
     }

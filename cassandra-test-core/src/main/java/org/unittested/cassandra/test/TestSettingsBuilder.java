@@ -18,7 +18,6 @@ package org.unittested.cassandra.test;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +29,7 @@ import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.basic.BasicDataSettings;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.property.PropertyResolver;
-import org.unittested.cassandra.test.property.system.JavaPropertyResolver;
+import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.rollback.RollbackSettings;
 import org.unittested.cassandra.test.rollback.basic.BasicRollbackSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
@@ -88,7 +87,7 @@ public class TestSettingsBuilder {
     /**
      * {@link PropertyResolver} for resolving property references in annotations.
      * <p>
-     * If not specified, the {@link JavaPropertyResolver} will be used.
+     * If not specified, the {@link PropertiesPropertyResolver} will be used.
      *
      * @param propertyResolver {@link PropertyResolver}
      * @return this
@@ -239,7 +238,7 @@ public class TestSettingsBuilder {
                 SETTINGS_FACTORY_PROPERTY_MAP.get(settingsType),
                 settingsType,
                 defaultSettingsClass,
-                this.propertyResolver != null ? this.propertyResolver : new JavaPropertyResolver());
+                this.propertyResolver != null ? this.propertyResolver : PropertiesPropertyResolver.SYSTEM);
     }
 
     private <T> T getSettings(AnnotatedElement annotatedElement,
