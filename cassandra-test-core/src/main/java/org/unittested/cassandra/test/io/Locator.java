@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +66,8 @@ import org.unittested.cassandra.test.util.Utils;
 public class Locator {
 
     private static Pattern URL = Pattern.compile("^(\\w+)(?:.(\\w+))?:(.+)$", Pattern.DOTALL | Pattern.MULTILINE);
+    private static Charset UTF_8 = Charset.forName("UTF-8");
+
     private Source source;
     private Content content;
     private String path;
@@ -237,7 +240,7 @@ public class Locator {
         TEXT {
             @Override
             public InputStream getStream(final String path) throws IOException {
-                return new ByteArrayInputStream(path.getBytes(StandardCharsets.UTF_8));
+                return new ByteArrayInputStream(path.getBytes(UTF_8));
             }
 
             @Override
