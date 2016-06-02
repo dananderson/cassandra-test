@@ -28,8 +28,8 @@ import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
-import org.unittested.cassandra.test.junit.CassandraTestClassRule;
-import org.unittested.cassandra.test.junit.CassandraTestMethodRule;
+import org.unittested.cassandra.test.junit.rule.CassandraTestInit;
+import org.unittested.cassandra.test.junit.rule.CassandraTest;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
 /**
@@ -44,10 +44,10 @@ public class JUnit4CassandraRuleSampleTest {
     private Keyspace keyspace;
 
     @ClassRule
-    public static CassandraTestClassRule classRule = new CassandraTestClassRule();
+    public static CassandraTestInit init = new CassandraTestInit();
 
     @Rule
-    public TestRule cassandraTestRule = new CassandraTestMethodRule(classRule, this);
+    public CassandraTest cassandraTest = new CassandraTest(init, this);
 
     @Test
     public void timeseriesTableExists() throws Exception {

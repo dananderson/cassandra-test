@@ -19,6 +19,7 @@ package org.unittested.cassandra.test.spring.sample;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.context.TestExecutionListeners.MergeMode.*;
 
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -39,7 +40,7 @@ import org.unittested.cassandra.test.spring.SpringCassandraTestExecutionListener
 @CassandraData(data = "classpath:sample-data.cql")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 @ContextConfiguration(locations = { "classpath:spring-test-context.xml" })
-@TestExecutionListeners(SpringCassandraTestExecutionListener.class)
+@TestExecutionListeners(value = SpringCassandraTestExecutionListener.class, mergeMode = MERGE_WITH_DEFAULTS)
 public class SpringCassandraSampleTest extends AbstractTestNGSpringContextTests {
 
     @CassandraBean

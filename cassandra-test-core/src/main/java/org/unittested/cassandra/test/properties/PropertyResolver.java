@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.property;
+package org.unittested.cassandra.test.properties;
 
 /**
  * Resolves property references in Cassandra Test annotations.

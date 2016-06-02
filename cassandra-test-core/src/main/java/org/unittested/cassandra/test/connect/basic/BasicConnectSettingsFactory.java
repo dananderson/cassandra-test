@@ -23,7 +23,7 @@ import org.unittested.cassandra.test.annotation.CassandraConnect;
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.ConnectSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 
 public class BasicConnectSettingsFactory implements ConnectSettingsFactory {
 

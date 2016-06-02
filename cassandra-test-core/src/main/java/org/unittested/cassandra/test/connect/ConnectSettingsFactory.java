@@ -18,7 +18,7 @@ package org.unittested.cassandra.test.connect;
 
 import java.lang.annotation.Annotation;
 
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 
 /**
  * Creates a {@link ConnectSettings} instance from a connect annotation.

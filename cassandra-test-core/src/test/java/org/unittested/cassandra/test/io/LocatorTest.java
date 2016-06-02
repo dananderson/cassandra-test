@@ -17,7 +17,7 @@
 package org.unittested.cassandra.test.io;
 
 import static org.unittested.cassandra.test.io.Locator.Source.*;
-import static org.unittested.cassandra.test.io.Locator.Content.*;
+import static org.unittested.cassandra.test.io.Locator.ContentType.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -36,34 +36,40 @@ public class LocatorTest {
         String file = "target/test-classes/cql/sample-data.cql";
 
         return new Object[][] {
+                // CQL statement, no source prefix
                 { cqlInsert, TEXT, CQL, cqlInsert },
-                { "text:" + cqlInsert, TEXT, CQL, cqlInsert },
-                { "text.cql:" + cqlInsert, TEXT, CQL, cqlInsert },
-                { "classpath:" + classpathFile, CLASSPATH, CQL, classpathFile },
-                { "classpath: " + classpathFile, CLASSPATH, CQL, classpathFile },
-                { "classpath.cql:" + classpathFile, CLASSPATH, CQL, classpathFile },
-                { "classpath.cql: " + classpathFile, CLASSPATH, CQL, classpathFile },
-                { "file:" + file, FILE, CQL, file  },
-                { "file: " + file, FILE, CQL, file },
-                { "file.cql:" + file, FILE, CQL, file },
-                { "file.cql: " + file, FILE, CQL, file },
                 { ";", TEXT, CQL, ";" },
+                // text source
+                { "text:" + cqlInsert, TEXT, CQL, cqlInsert },
+                { "text: " + cqlInsert, TEXT, CQL, " " + cqlInsert },
                 { "text:;", TEXT, CQL, ";" },
-                { "text.cql:;", TEXT, CQL, ";" },
+                { "text: ", TEXT, CQL, " " },
+                { "text: =? ", TEXT, CQL, " =? " },
+                { "text:", TEXT, CQL, "" },
+                // classpath source
+                { "classpath:" + classpathFile, CLASSPATH, CQL, classpathFile },
+                // file source
+                { "file:" + file, FILE, CQL, file  },
+                // blank string
+                { "", TEXT, CQL, "" },
+                { " ", TEXT, CQL, "" },
         };
     }
 
     @Test(dataProvider = "cqlSourceData")
     public void fromCqlSource(String cqlSource,
                               Locator.Source expectedSource,
-                              Locator.Content expectedConent,
+                              Locator.ContentType expectedConent,
                               String expectedPath) throws Exception {
-        Locator locator;
+        // given
+        // data provider
 
-        locator = Locator.fromCqlSource(cqlSource);
+        // when
+        Locator locator = Locator.fromCqlSource(cqlSource);
 
+        // then
         assertThat(locator.getSource(), is(expectedSource));
-        assertThat(locator.getContent(), is(expectedConent));
+        assertThat(locator.getContentType(), is(expectedConent));
         assertThat(locator.getReader(), notNullValue());
         assertThat(locator.getStream(), notNullValue());
         assertThat(locator.getPath(), is(expectedPath));
@@ -72,32 +78,16 @@ public class LocatorTest {
     @DataProvider(name = "invalidCqlSourceFormatData")
     public static Object[][] invalidCqlSourceFormatData() {
         return new Object[][] {
-                { "invalid:..." },
-                { "invalid.invalid:..." },
-                { "classpath.invalid:..." },
-                { "cql:not cql" },
-                { "" },
-                { "cql:" },
-                { "text:" },
-                { "text.cql:" },
+                // unknown source
+                { "invalid:path.cql" },
+                // blank paths
                 { "file:" },
-                { "classpath:" },
-                { " " },
-                { "cql: " },
-                { "text: " },
-                { "text.cql: " },
                 { "file: " },
+                { "classpath:" },
                 { "classpath: " },
+                // garbage
+                { "dasdasdasd" },
         };
-    }
-
-    @Test(dataProvider = "invalidCqlSourceFormatData", expectedExceptions = CassandraTestException.class)
-    public void fromUrlWithInvalidCqlSourceFormat(String cqlSource) throws Exception {
-        // given, then
-        Locator.fromUrl(cqlSource);
-
-        // then
-        // CassandraTestException
     }
 
     @Test(dataProvider = "invalidCqlSourceFormatData", expectedExceptions = CassandraTestException.class)
@@ -113,16 +103,14 @@ public class LocatorTest {
     public static Object[][] fileDoesNotExistData() {
         return new Object[][] {
                 { "file:target/dasdlajsdjasdjlasjdlajsdkl" },
-                { "file.cql:target/dasdlajsdjasdjlasjdlajsdkl" },
                 { "classpath:dasdasdasdasdasdasd" },
-                { "classpath.cql:dasdasdasdasdasdasd" },
         };
     }
 
     @Test(dataProvider = "fileDoesNotExistData", expectedExceptions = FileNotFoundException.class)
     public void getReaderWithFileThatDoesNotExist(String cqlSource) throws Exception {
         // given
-        Locator locator = Locator.fromUrl(cqlSource);
+        Locator locator = Locator.fromCqlSource(cqlSource);
 
         // when
         locator.getReader();
@@ -134,7 +122,7 @@ public class LocatorTest {
     @Test(dataProvider = "fileDoesNotExistData", expectedExceptions = FileNotFoundException.class)
     public void getStreamWithFileThatDoesNotExist(String cqlSource) throws Exception {
         // given
-        Locator locator = Locator.fromUrl(cqlSource);
+        Locator locator = Locator.fromCqlSource(cqlSource);
 
         // when
         locator.getStream();
@@ -147,16 +135,14 @@ public class LocatorTest {
     public static Object[][] directoryData() {
         return new Object[][] {
                 { "file:target" },
-                { "file.cql:target" },
                 { "classpath:cql" },
-                { "classpath.cql:cql" },
         };
     }
 
     @Test(dataProvider = "directoryData", expectedExceptions = UnsupportedOperationException.class)
     public void getStreamWithDirectory(String cqlSource) throws Exception {
         // given
-        Locator locator = Locator.fromUrl(cqlSource);
+        Locator locator = Locator.fromCqlSource(cqlSource);
 
         // when
         locator.getStream();
@@ -168,7 +154,7 @@ public class LocatorTest {
     @Test(dataProvider = "directoryData", expectedExceptions = UnsupportedOperationException.class)
     public void getReaderWithDirectory(String cqlSource) throws Exception {
         // given
-        Locator locator = Locator.fromUrl(cqlSource);
+        Locator locator = Locator.fromUri(cqlSource);
 
         // when
         locator.getReader();

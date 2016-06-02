@@ -10,7 +10,7 @@ import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.DataSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

@@ -23,7 +23,7 @@ import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.DataSettingsFactory;
 import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 
 /**
  * Create a {@link DataSettings} from a {@link CassandraData} annotation.

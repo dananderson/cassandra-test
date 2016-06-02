@@ -28,7 +28,7 @@ import org.unittested.cassandra.test.annotation.CassandraConnect;
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.ConnectSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

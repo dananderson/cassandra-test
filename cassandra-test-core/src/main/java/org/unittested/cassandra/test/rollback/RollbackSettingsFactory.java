@@ -18,7 +18,7 @@ package org.unittested.cassandra.test.rollback;
 
 import java.lang.annotation.Annotation;
 
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 import org.unittested.cassandra.test.rollback.basic.BasicRollbackSettings;
 
 /**

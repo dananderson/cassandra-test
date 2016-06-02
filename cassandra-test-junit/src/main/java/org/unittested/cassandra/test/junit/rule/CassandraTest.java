@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.junit;
+package org.unittested.cassandra.test.junit.rule;
 
 import java.lang.reflect.Method;
 
@@ -29,22 +29,28 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
  * JUnit rule that performs before method setup and after method tear down for Cassandra Test.
  *
  * A CassandraTestMethod field must be present and marked with a {@link org.junit.Rule} annotation in a Cassandra Test.
- * CassandraTestMethod depends on {@link CassandraTestClassRule} to be available to provide the test's
+ * CassandraTestMethod depends on {@link CassandraTestInit} to be available to provide the test's
  * {@link org.unittested.cassandra.test.TestEnvironmentAdapter}. In addition, this rule does not have access to the
  * test instance in the {@link #apply(Statement, Description)} call, so the test instance must be passed in for later
  * access.
  */
-public class CassandraTestMethodRule implements TestRule {
+public class CassandraTest implements TestRule {
     
-    private TestEnvironmentAdapterProvider adapterProvider;
+    private CassandraTestInit init;
     private Object testInstance;
-    
-    public CassandraTestMethodRule(TestEnvironmentAdapterProvider adapterProvider, Object testInstance) {
-        this.adapterProvider = adapterProvider;
+    private Object testEnvironmentContext;
+
+    public CassandraTest(CassandraTestInit init, Object testInstance) {
+        this(init, testInstance, null);
+    }
+
+    public CassandraTest(CassandraTestInit init, Object testInstance, Object testEnvironmentContext) {
+        this.init = init;
         this.testInstance = testInstance;
+        this.testEnvironmentContext = testEnvironmentContext;
 
         try {
-            this.adapterProvider.getAdapter().onPrepareTestInstance(this.testInstance, null);
+            this.init.getAdapter().onPrepareTestInstance(this.testInstance, null);
         } catch (Exception e) {
             throw new CassandraTestException("Failed to prepare the test instance!", e);
         }
@@ -55,7 +61,7 @@ public class CassandraTestMethodRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                Object testInstance = CassandraTestMethodRule.this.testInstance;
+                Object testInstance = CassandraTest.this.testInstance;
 
                 if (!testInstance.getClass().equals(description.getTestClass())) {
                     throw new CassandraTestException("Registered test instance class (%s) does not match class of currently executing test (%s).",
@@ -64,14 +70,14 @@ public class CassandraTestMethodRule implements TestRule {
                 }
 
                 Method testMethod = findTestMethod(description);
-                TestEnvironmentAdapter adapter = CassandraTestMethodRule.this.adapterProvider.getAdapter();
+                TestEnvironmentAdapter adapter = CassandraTest.this.init.getAdapter();
 
-                adapter.onBeforeMethod(testInstance, testMethod, null);
+                adapter.onBeforeMethod(testInstance, testMethod, CassandraTest.this.testEnvironmentContext);
 
                 try {
                     base.evaluate();
                 } finally {
-                    adapter.onAfterMethod(testInstance, testMethod, null);
+                    adapter.onAfterMethod(testInstance, testMethod, CassandraTest.this.testEnvironmentContext);
                 }
             }
         };

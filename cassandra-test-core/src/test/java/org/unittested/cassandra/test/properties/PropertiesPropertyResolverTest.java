@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.property.system;
+package org.unittested.cassandra.test.properties;
 
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.PropertyResolver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -79,11 +78,12 @@ public class PropertiesPropertyResolverTest {
         return new Object[][] {
                 { "error" },
                 { "classpath:does/not/exist.properties" },
+                { "text:property=\\uX" }
         };
     }
 
     @Test(dataProvider = "badLocators", expectedExceptions = CassandraTestException.class)
-    public void fromLocatorWithBadLocator(String locator) throws Exception {
+    public void fromUriWithBadLocator(String locator) throws Exception {
         PropertiesPropertyResolver.fromLocator(locator);
     }
 

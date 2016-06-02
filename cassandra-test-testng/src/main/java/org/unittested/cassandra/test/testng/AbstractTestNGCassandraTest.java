@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
+import org.unittested.cassandra.test.TestSettings;
 import org.unittested.cassandra.test.TestSettingsBuilder;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -28,7 +29,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -112,11 +113,15 @@ public abstract class AbstractTestNGCassandraTest {
         return this.keyspaceContainer;
     }
 
-    protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
-        return new TestEnvironmentAdapter(
-                new TestSettingsBuilder()
-                        .withPropertyResolver(PropertiesPropertyResolver.SYSTEM)
-                        .withTestClass(testClass)
-                        .build());
+    TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
+        TestSettingsBuilder defaults = new TestSettingsBuilder()
+                .withDefaultPropertyResolver(PropertiesPropertyResolver.SYSTEM)
+                .withTestClass(testClass);
+
+        return new TestEnvironmentAdapter(createTestSettings(defaults, testClass));
+    }
+
+    protected TestSettings createTestSettings(TestSettingsBuilder defaults, Class<?> testClass) {
+        return defaults.build();
     }
 }

@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 import org.unittested.cassandra.test.FactoryTestAnnotations;
 import org.unittested.cassandra.test.annotation.CassandraForeignKeyspace;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettingsFactory;
 import org.testng.annotations.DataProvider;

@@ -36,7 +36,7 @@ import org.unittested.cassandra.test.keyspace.foreign.ForeignKeyspaceSettingsFac
  * environments that setup a keyspace and schema before running tests.
  * <p>
  * All settings in this annotation can be defined inline or by property references in the form of ${property.name}. Property
- * names are resolved with the {@link org.unittested.cassandra.test.property.PropertyResolver} configured in
+ * names are resolved with the {@link org.unittested.cassandra.test.properties.PropertyResolver} configured in
  * {@link org.unittested.cassandra.test.TestEnvironmentAdapter}. Property references are the way to avoid hard coding
  * keyspace and connection settings in annotations.
  */

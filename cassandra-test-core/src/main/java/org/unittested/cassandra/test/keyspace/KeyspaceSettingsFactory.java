@@ -18,7 +18,7 @@ package org.unittested.cassandra.test.keyspace;
 
 import java.lang.annotation.Annotation;
 
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 
 /**
  * Creates a {@link KeyspaceSettings} instance from a data annotation.

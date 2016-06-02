@@ -20,9 +20,10 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
+import org.unittested.cassandra.test.TestSettings;
 import org.unittested.cassandra.test.TestSettingsBuilder;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 
 /**
  * {@link TestExecutionListener} that provides support for writing tests against a Cassandra database configured by
@@ -80,14 +81,17 @@ public class SpringCassandraTestExecutionListener implements TestExecutionListen
         }
     }
 
-    protected TestEnvironmentAdapter createTestEnvironmentAdapter(TestContext testContext) {
-        PropertyResolver propertyResolver
-                = new SpringEnvironmentPropertyResolver(testContext.getApplicationContext().getEnvironment());
+    TestEnvironmentAdapter createTestEnvironmentAdapter(TestContext testContext) {
+        PropertyResolver propertyResolver = new SpringEnvironmentPropertyResolver(
+                testContext.getApplicationContext().getEnvironment());
+        TestSettingsBuilder builder = new TestSettingsBuilder()
+                .withDefaultPropertyResolver(propertyResolver)
+                .withTestClass(testContext.getTestClass());
 
-        return new TestEnvironmentAdapter(
-                new TestSettingsBuilder()
-                        .withPropertyResolver(propertyResolver)
-                        .withTestClass(testContext.getTestClass())
-                        .build());
+        return new TestEnvironmentAdapter(createTestSettings(builder, testContext));
+    }
+
+    protected TestSettings createTestSettings(TestSettingsBuilder defaults, TestContext testContext) {
+        return defaults.build();
     }
 }

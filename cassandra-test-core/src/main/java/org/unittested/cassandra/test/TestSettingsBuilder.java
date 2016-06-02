@@ -23,13 +23,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.unittested.cassandra.test.annotation.CassandraProperties;
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.basic.BasicConnectSettings;
 import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.basic.BasicDataSettings;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.PropertyResolver;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.rollback.RollbackSettings;
 import org.unittested.cassandra.test.rollback.basic.BasicRollbackSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
@@ -55,6 +56,7 @@ public class TestSettingsBuilder {
     private Class<?> testClass;
 
     private PropertyResolver propertyResolver;
+    private PropertyResolver defaultPropertyResolver = PropertiesPropertyResolver.SYSTEM;
 
     private ConnectSettings connectSettings;
     private KeyspaceSettings keyspaceSettings;
@@ -87,13 +89,25 @@ public class TestSettingsBuilder {
     /**
      * {@link PropertyResolver} for resolving property references in annotations.
      * <p>
-     * If not specified, the {@link PropertiesPropertyResolver} will be used.
+     * If specified, this will be the PropertyResolver that is chosen, taking precedence over PropertyResolvers specified
+     * by a {@link CassandraProperties} annotation or the default PropertyResolver in this builder.
      *
      * @param propertyResolver {@link PropertyResolver}
      * @return this
      */
     public TestSettingsBuilder withPropertyResolver(PropertyResolver propertyResolver) {
         this.propertyResolver = propertyResolver;
+        return this;
+    }
+
+    /**
+     * Default {@link PropertyResolver} used when a {@link CassandraProperties} is not present.
+     *
+     * @param propertyResolver {@link PropertyResolver}
+     * @return this
+     */
+    public TestSettingsBuilder withDefaultPropertyResolver(PropertyResolver propertyResolver) {
+        this.defaultPropertyResolver = propertyResolver;
         return this;
     }
 
@@ -199,32 +213,50 @@ public class TestSettingsBuilder {
      * @return {@link TestSettings}
      */
     public TestSettings build() {
+        PropertyResolver selectedPropertyResolver = this.propertyResolver;
+
+        if (selectedPropertyResolver == null) {
+            if (this.testClass != null && this.testClass.isAnnotationPresent(CassandraProperties.class)) {
+                selectedPropertyResolver = PropertiesPropertyResolver.fromLocator(
+                        this.testClass.getAnnotation(CassandraProperties.class).value());
+            }
+
+            if (selectedPropertyResolver == null) {
+                selectedPropertyResolver = this.defaultPropertyResolver;
+            }
+        }
+
         ConnectSettings selectedConnectSettings = getSettingsOrDefault(
                 ConnectSettings.class,
                 this.defaultConnectSettingsClass,
-                this.connectSettings);
+                this.connectSettings,
+                selectedPropertyResolver);
 
         KeyspaceSettings selectedKeyspaceSettings = getSettingsOrDefault(
                 KeyspaceSettings.class,
                 this.defaultKeyspaceSettingsClass,
-                this.keyspaceSettings);
+                this.keyspaceSettings,
+                selectedPropertyResolver);
 
         DataSettings selectedDataSettings = getSettingsOrDefault(
                 DataSettings.class,
                 this.defaultDataSettingsClass,
-                this.dataSettings);
+                this.dataSettings,
+                selectedPropertyResolver);
 
         RollbackSettings selectedRollbackSettings = getSettingsOrDefault(
                 RollbackSettings.class,
                 this.defaultRollbackSettingsClass,
-                this.rollbackSettings);
+                this.rollbackSettings,
+                selectedPropertyResolver);
 
         return new TestSettings(selectedConnectSettings, selectedKeyspaceSettings, selectedDataSettings, selectedRollbackSettings);
     }
 
     private <T> T getSettingsOrDefault(Class<T> settingsType,
                                        Class<? extends T> defaultSettingsClass,
-                                       T defaultSettings) {
+                                       T defaultSettings,
+                                       PropertyResolver selectedPropertyResolver) {
         if (defaultSettings != null) {
             return defaultSettings;
         }
@@ -238,7 +270,7 @@ public class TestSettingsBuilder {
                 SETTINGS_FACTORY_PROPERTY_MAP.get(settingsType),
                 settingsType,
                 defaultSettingsClass,
-                this.propertyResolver != null ? this.propertyResolver : PropertiesPropertyResolver.SYSTEM);
+                selectedPropertyResolver);
     }
 
     private <T> T getSettings(AnnotatedElement annotatedElement,

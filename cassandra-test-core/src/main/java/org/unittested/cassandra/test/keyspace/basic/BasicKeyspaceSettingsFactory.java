@@ -21,7 +21,7 @@ import java.lang.annotation.Annotation;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.PropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettingsFactory;

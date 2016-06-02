@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
 import org.unittested.cassandra.test.FactoryTestAnnotations;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.rollback.RollbackSettings;
 import org.unittested.cassandra.test.rollback.RollbackSettingsFactory;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.junit;
+package org.unittested.cassandra.test.junit.rule;
 
 import static org.mockito.Mockito.*;
 
@@ -30,19 +30,19 @@ import org.unittested.cassandra.test.TestEnvironmentAdapter;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 
 @RunWith(Parameterized.class)
-public class CassandraTestMethodRuleTest {
+public class CassandraTestTest {
 
     @Test
     public void evaluate() throws Throwable {
         // given
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
-        TestEnvironmentAdapterProvider provider = createProvider(adapter);
-        CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = createDescription(getClass(), "evaluate");
-        Statement statement = rule.apply(mock(Statement.class), description);
+        CassandraTestInit init = createCassandraTestInit(adapter);
+        Description methodDescription = createDescription(getClass(), "evaluate");
+        Statement testMethodInitStatement = createTestMethodInitStatement(init, this, mock(Statement.class), methodDescription);
+        Statement initStatement = init.apply(testMethodInitStatement, mock(Description.class));
 
         // when
-        statement.evaluate();
+        initStatement.evaluate();
 
         // then
         verify(adapter, times(1)).onBeforeMethod(eq(this), Matchers.any(Method.class), eq(null));
@@ -53,17 +53,17 @@ public class CassandraTestMethodRuleTest {
     public void evaluateWithChildStatementFailure() throws Throwable {
         // given
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
-        TestEnvironmentAdapterProvider provider = createProvider(adapter);
-        CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = createDescription(getClass(), "evaluate");
-        Statement baseStatement = mock(Statement.class);
-        Statement statement = rule.apply(baseStatement, description);
+        CassandraTestInit init = createCassandraTestInit(adapter);
+        Description methodDescription = createDescription(getClass(), "evaluate");
+        Statement testMethodCallingStatement = mock(Statement.class);
+        Statement testMethodInitStatement = spy(createTestMethodInitStatement(init, this, testMethodCallingStatement, methodDescription));
+        Statement initStatement = init.apply(testMethodInitStatement, mock(Description.class));
 
-        doThrow(Exception.class).when(baseStatement).evaluate();
+        doThrow(Exception.class).when(testMethodCallingStatement).evaluate();
 
         // when
         try {
-            statement.evaluate();
+            initStatement.evaluate();
         } catch (Exception e) {
             // ignore
         }
@@ -79,8 +79,8 @@ public class CassandraTestMethodRuleTest {
         return new Object [][] {
             { Object.class, "evaluate"},
             { null, "evaluate"},
-            { CassandraTestMethodRuleTest.class, "does not exist" },
-            { CassandraTestMethodRuleTest.class, "createDescription" },
+            { CassandraTestTest.class, "does not exist" },
+            { CassandraTestTest.class, "createDescription" },
         };
     }
 
@@ -94,13 +94,13 @@ public class CassandraTestMethodRuleTest {
     public void evaluateWithTestClassMismatch() throws Throwable {
         // given
         TestEnvironmentAdapter adapter = mock(TestEnvironmentAdapter.class);
-        TestEnvironmentAdapterProvider provider = createProvider(adapter);
-        CassandraTestMethodRule rule = new CassandraTestMethodRule(provider, this);
-        Description description = createDescription(this.paramTestClass, this.paramMethodName);
-        Statement statement = rule.apply(mock(Statement.class), description);
+        CassandraTestInit init = createCassandraTestInit(adapter);
+        Description methodDescription = createDescription(this.paramTestClass, this.paramMethodName);
+        Statement testMethodInitStatement = spy(createTestMethodInitStatement(init, this, mock(Statement.class), methodDescription));
+        Statement initStatement = init.apply(testMethodInitStatement, mock(Description.class));
 
-        // when
-        statement.evaluate();
+                // when
+        initStatement.evaluate();
 
         // then
         // CassandraTestException
@@ -113,19 +113,19 @@ public class CassandraTestMethodRuleTest {
 
         doThrow(new Exception()).when(adapter).onPrepareTestInstance(this, null);
 
-        TestEnvironmentAdapterProvider provider = createProvider(adapter);
+        CassandraTestInit init = createCassandraTestInit(adapter);
 
         // when
-        new CassandraTestMethodRule(provider, this);
+        new CassandraTest(init, this);
 
         // then
         // CassandraTestException
     }
 
-    private TestEnvironmentAdapterProvider createProvider(final TestEnvironmentAdapter adapter) {
-        return new TestEnvironmentAdapterProvider() {
+    private CassandraTestInit createCassandraTestInit(final TestEnvironmentAdapter adapter) {
+        return new CassandraTestInit() {
             @Override
-            public TestEnvironmentAdapter getAdapter() {
+            TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass, Object testEnvironmentContext) {
                 return adapter;
             }
         };
@@ -139,6 +139,18 @@ public class CassandraTestMethodRuleTest {
         when(description.getMethodName()).thenReturn(methodName);
 
         return description;
+    }
+
+    private Statement createTestMethodInitStatement(final CassandraTestInit init,
+                                                final Object testInstance,
+                                                final Statement testMethodCallingStatement,
+                                                final Description description) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                new CassandraTest(init, testInstance).apply(testMethodCallingStatement, description).evaluate();
+            }
+        };
     }
 
 }

@@ -23,7 +23,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.unittested.cassandra.test.annotation.CassandraBean;
-import org.unittested.cassandra.test.property.system.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -93,10 +93,10 @@ public abstract class AbstractCassandraTest {
         return this.keyspaceContainer;
     }
 
-    protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
+    private TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
         return new TestEnvironmentAdapter(
             new TestSettingsBuilder()
-                    .withPropertyResolver(PropertiesPropertyResolver.SYSTEM)
+                    .withDefaultPropertyResolver(PropertiesPropertyResolver.SYSTEM)
                     .withTestClass(testClass)
                     .build());
     }

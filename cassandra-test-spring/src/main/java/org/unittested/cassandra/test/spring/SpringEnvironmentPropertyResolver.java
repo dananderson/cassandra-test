@@ -17,10 +17,10 @@
 package org.unittested.cassandra.test.spring;
 
 import org.springframework.core.env.Environment;
-import org.unittested.cassandra.test.property.AbstractPropertyResolver;
+import org.unittested.cassandra.test.properties.AbstractPropertyResolver;
 
 /**
- * {@link org.unittested.cassandra.test.property.PropertyResolver} that reads properties from a Spring
+ * {@link org.unittested.cassandra.test.properties.PropertyResolver} that reads properties from a Spring
  * {@link Environment}.
  */
 public class SpringEnvironmentPropertyResolver extends AbstractPropertyResolver {

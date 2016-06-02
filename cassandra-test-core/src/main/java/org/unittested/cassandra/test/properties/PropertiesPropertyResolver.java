@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.property.system;
+package org.unittested.cassandra.test.properties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,11 +22,9 @@ import java.util.Properties;
 
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.io.Locator;
-import org.unittested.cassandra.test.property.AbstractPropertyResolver;
-import org.unittested.cassandra.test.property.PropertyResolver;
 
 /**
- * {@link org.unittested.cassandra.test.property.PropertyResolver} that reads properties from a Java {@link Properties} source.
+ * {@link org.unittested.cassandra.test.properties.PropertyResolver} that reads properties from a Java {@link Properties} source.
  */
 public class PropertiesPropertyResolver extends AbstractPropertyResolver {
 
@@ -42,21 +40,22 @@ public class PropertiesPropertyResolver extends AbstractPropertyResolver {
     }
 
     /**
-     * Create a {@link PropertyResolver} from a {@link Locator} URL.
+     * Create a {@link PropertyResolver} from a {@link Locator} URI.
      *
-     * @param locatorUrl Locator URL.
+     * @param locatorUri Locator URI.
      * @return {@link PropertyResolver}
      */
-    public static PropertyResolver fromLocator(String locatorUrl) {
-        Locator locator = Locator.fromUrl(locatorUrl);
+    public static PropertyResolver fromLocator(String locatorUri) {
+        Locator locator = Locator.fromUri(locatorUri);
         InputStream stream = null;
         Properties properties = new Properties();
 
         try {
             stream = locator.getStream();
             properties.load(stream);
-        } catch (IOException e) {
-            throw new CassandraTestException("Failed to load properties file '%s'", locatorUrl, e);
+        } catch (Exception e) {
+            // IOException from getStream, IllegalArgumentException from load (via text parsing)
+            throw new CassandraTestException("Failed to load properties file '%s'", locatorUri, e);
         } finally {
             if (stream != null) {
                 try {

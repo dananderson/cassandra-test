@@ -22,6 +22,8 @@ import org.junit.rules.TestRule;
 import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.annotation.CassandraBean;
+import org.unittested.cassandra.test.junit.rule.CassandraTest;
+import org.unittested.cassandra.test.junit.rule.CassandraTestInit;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -30,15 +32,15 @@ import com.datastax.driver.core.Session;
  * Base class for JUnit-based Cassandra Test tests.
  *
  * This base class is for convenience, avoiding a minimal amount of boiler plate code. Alternatively, test writers can
- * simply include {@link CassandraTestClassRule}, {@link CassandraTestMethodRule} and {@link CassandraBean}.
+ * simply include {@link CassandraTestInit}, {@link CassandraTest} and {@link CassandraBean}.
  */
 public abstract class AbstractJUnit4CassandraTest {
 
     @ClassRule
-    public static CassandraTestClassRule classRule = new CassandraTestClassRule();
+    public static CassandraTestInit init = new CassandraTestInit();
 
     @Rule
-    public TestRule cassandraTestRule = new CassandraTestMethodRule(AbstractJUnit4CassandraTest.classRule, this);
+    public CassandraTest cassandraTest = new CassandraTest(init, this);
 
     @CassandraBean
     private Session session;

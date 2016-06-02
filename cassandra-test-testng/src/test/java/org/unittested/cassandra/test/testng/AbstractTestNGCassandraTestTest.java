@@ -91,7 +91,7 @@ public class AbstractTestNGCassandraTestTest extends AbstractTestNGCassandraTest
     private AbstractTestNGCassandraTest createBase(final TestEnvironmentAdapter adapter) {
         return new AbstractTestNGCassandraTest() {
             @Override
-            protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
+            TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
                 return adapter;
             }
         };

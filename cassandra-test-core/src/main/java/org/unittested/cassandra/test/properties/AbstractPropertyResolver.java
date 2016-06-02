@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.property;
+package org.unittested.cassandra.test.properties;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

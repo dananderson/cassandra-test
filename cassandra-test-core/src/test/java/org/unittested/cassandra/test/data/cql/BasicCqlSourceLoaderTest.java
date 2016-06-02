@@ -51,7 +51,7 @@ public class BasicCqlSourceLoaderTest {
                 { "select * from table;select * from table;select * from table;", 3 },
                 { ";", 0 },
                 { "text:;", 0 },
-                { "text.cql:;", 0 },
+                { "text:", 0 },
         };
     }
 
@@ -180,10 +180,8 @@ public class BasicCqlSourceLoaderTest {
     @DataProvider
     public Object[][] cqlSourceIOExceptionData() {
         return new Object[][] {
-                { "file:&(&%*^%^%^%*&^%" },
-                { "file.cql:&(&%*^%^%^%*&^%" },
-                { "classpath:..." },
-                { "classpath.cql:..." },
+                { "file:dadasdasd" },
+                { "classpath:dasdasd" },
         };
     }
 
@@ -203,14 +201,9 @@ public class BasicCqlSourceLoaderTest {
     @DataProvider
     public Object[][] invalidCqlSourceFormatData() {
         return new Object[][] {
-                { "" },
-                { "text:" },
                 { "cql:" },
-                { "text.cql:" },
                 { "file:" },
-                { "file.cql:" },
                 { "classpath:" },
-                { "classpath.cql:" },
         };
     }
 

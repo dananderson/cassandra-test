@@ -34,6 +34,7 @@ import org.hamcrest.Matcher;
 import org.unittested.cassandra.test.annotation.CassandraConnect;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
+import org.unittested.cassandra.test.annotation.CassandraProperties;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.connect.ConnectSettings;
 import org.unittested.cassandra.test.connect.ConnectSettingsFactory;
@@ -45,6 +46,8 @@ import org.unittested.cassandra.test.data.basic.BasicDataSettings;
 import org.unittested.cassandra.test.data.basic.BasicDataSettingsFactory;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
+import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
+import org.unittested.cassandra.test.properties.PropertyResolver;
 import org.unittested.cassandra.test.rollback.RollbackSettings;
 import org.unittested.cassandra.test.rollback.RollbackSettingsFactory;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
@@ -72,16 +75,21 @@ public class TestSettingsBuilderTest {
     @CassandraRollback(afterMethod = RollbackStrategy.DROP)
     private static class WithRollbackSettings {}
 
+    @CassandraProperties("text:test.property=xxx")
+    private static class WithProperties {}
+
     @CassandraConnect(port = "1234")
     @CassandraData(data = "test")
-    @CassandraKeyspace(keyspace = "test")
+    @CassandraKeyspace(keyspace = "${keyspace}")
     @CassandraRollback(afterMethod = RollbackStrategy.DROP)
+    @CassandraProperties("text:keyspace=test")
     private static class WithSettings {}
 
     @DataProvider
     public static Object[][] testClasses() {
         return new Object[][] {
                 { WithDefaultSettings.class, 9042, Keyspace.NULL, ArrayUtils.EMPTY_STRING_ARRAY, RollbackStrategy.TRUNCATE },
+                { WithProperties.class, 9042, Keyspace.NULL, ArrayUtils.EMPTY_STRING_ARRAY, RollbackStrategy.TRUNCATE },
                 { WithConnectSettings.class, 1234, Keyspace.NULL, ArrayUtils.EMPTY_STRING_ARRAY, RollbackStrategy.TRUNCATE },
                 { WithDataSettings.class, 9042, Keyspace.NULL, ArrayUtils.toArray("test"), RollbackStrategy.TRUNCATE },
                 { WithKeyspaceSettings.class, 9042, "test", ArrayUtils.EMPTY_STRING_ARRAY, RollbackStrategy.TRUNCATE },
@@ -94,7 +102,7 @@ public class TestSettingsBuilderTest {
     public void buildWithTestClass(Class<?> testClass,
                                    int port, String expectedKeyspace,
                                    String [] expectedData,
-                                   RollbackStrategy expectedAfterMethodRolback) throws Exception {
+                                   RollbackStrategy expectedAfterMethodRollback) throws Exception {
         // given
         TestSettingsBuilder builder = new TestSettingsBuilder().withTestClass(testClass);
 
@@ -116,7 +124,7 @@ public class TestSettingsBuilderTest {
         }
 
         assertThat(settings.getRollbackSettings(), instanceOf(BasicRollbackSettings.class));
-        assertThat(settings.getRollbackSettings().getAfterMethod(), is(expectedAfterMethodRolback));
+        assertThat(settings.getRollbackSettings().getAfterMethod(), is(expectedAfterMethodRollback));
 
         assertThat(settings.getKeyspaceSettings(), instanceOf(BasicKeyspaceSettings.class));
         assertThat(settings.getKeyspaceSettings().getKeyspace(), is(expectedKeyspace));
@@ -311,7 +319,7 @@ public class TestSettingsBuilderTest {
     }
 
     @Test(dataProvider = "duplicateSettings", expectedExceptions = CassandraTestException.class)
-    public void fromAnnotatedElementWithDuplicateSettings(Class<?> testClass) throws Exception {
+    public void buildWithDuplicateSettings(Class<?> testClass) throws Exception {
         // given
         TestSettingsBuilder builder = new TestSettingsBuilder().withTestClass(testClass);
 
@@ -320,5 +328,44 @@ public class TestSettingsBuilderTest {
 
         // then
         // CassandraTestException
+    }
+
+    @CassandraKeyspace(keyspace = "${keyspace}")
+    @CassandraProperties("text:keyspace=property_file")
+    private static class KeyspaceFromPropertyFile {}
+
+    @CassandraKeyspace(keyspace = "${keyspace}")
+    private static class KeyspaceFromDefaultPropertyResolver {}
+
+    @DataProvider(name = "propertyOverrides")
+    public static Object[][] propertyOverrides() {
+
+        PropertyResolver defaultPropertyResolver = PropertiesPropertyResolver.fromLocator("text:keyspace=default");
+        PropertyResolver userOverridePropertyResolver = PropertiesPropertyResolver.fromLocator("text:keyspace=user");
+
+        return new Object[][] {
+                { KeyspaceFromPropertyFile.class, null, null, "property_file" },
+                { KeyspaceFromPropertyFile.class, defaultPropertyResolver, null, "property_file" },
+                { KeyspaceFromPropertyFile.class, null, userOverridePropertyResolver, "user" },
+                { KeyspaceFromPropertyFile.class, defaultPropertyResolver, userOverridePropertyResolver, "user" },
+                { KeyspaceFromPropertyFile.class, defaultPropertyResolver, null, "property_file" },
+                { KeyspaceFromDefaultPropertyResolver.class, defaultPropertyResolver, null, "default" },
+                { KeyspaceFromDefaultPropertyResolver.class, defaultPropertyResolver, userOverridePropertyResolver, "user" },
+                { KeyspaceFromDefaultPropertyResolver.class, null, userOverridePropertyResolver, "user" },
+        };
+    }
+
+    @Test(dataProvider = "propertyOverrides")
+    public void buildWithPropertyOverrides(Class<?> testClass,
+                                           PropertyResolver defaultPropertyResolver,
+                                           PropertyResolver userOverridePropertyResolver,
+                                           String expectedKeyspace) throws Exception {
+        TestSettings testSettings = new TestSettingsBuilder()
+                .withTestClass(testClass)
+                .withPropertyResolver(userOverridePropertyResolver)
+                .withDefaultPropertyResolver(defaultPropertyResolver)
+                .build();
+
+        assertThat(testSettings.getKeyspaceSettings().getKeyspace(), is(expectedKeyspace));
     }
 }
