@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.is;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.annotation.CassandraData;
@@ -35,8 +34,8 @@ import org.unittested.cassandra.test.rollback.RollbackStrategy;
 /**
  * Sample usage of Cassandra Test JUnit rules to write tests.
  */
-@CassandraKeyspace(keyspace = "junit_cassandra_test", schema = "classpath:sample-schema.cql")
-@CassandraData(data = "classpath:sample-data.cql")
+@CassandraKeyspace(value = "junit_cassandra_test", schema = "classpath:sample-schema.cql")
+@CassandraData("classpath:sample-data.cql")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class JUnit4CassandraRuleSampleTest {
 

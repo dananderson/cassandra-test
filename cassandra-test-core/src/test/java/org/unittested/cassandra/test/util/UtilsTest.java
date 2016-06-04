@@ -29,7 +29,7 @@ import static org.apache.commons.lang3.ArrayUtils.toArray;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-@CassandraKeyspace(keyspace = Keyspace.NULL)
+@CassandraKeyspace(value = Keyspace.NULL)
 @CassandraRollback(afterMethod = RollbackStrategy.NONE)
 public class UtilsTest extends AbstractCassandraTest {
 

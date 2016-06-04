@@ -46,7 +46,7 @@ public @interface CassandraRollback {
      * If tableInclusions is set, tableExclusions must be empty.
      * <p>
      * The test keyspace is specified by the schema annotation, including {@link CassandraKeyspace},
-     * {@link CassandraForeignKeyspace}, etc.
+     * {@link CassandraImportKeyspace}, etc.
      *
      * @return List of tables to truncate.
      */
@@ -58,7 +58,7 @@ public @interface CassandraRollback {
      * If tableExclusions is set, tableInclusions must be empty.
      * <p>
      * The test keyspace is specified by the schema annotation, including {@link CassandraKeyspace},
-     * {@link CassandraForeignKeyspace}, etc.
+     * {@link CassandraImportKeyspace}, etc.
      *
      * @return List of tables to exclude from truncation.
      */

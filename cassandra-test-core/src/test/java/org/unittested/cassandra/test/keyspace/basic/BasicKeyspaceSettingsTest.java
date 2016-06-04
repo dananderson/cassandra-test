@@ -41,7 +41,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum.*;
 
-@CassandraKeyspace(keyspace = "basic_schema_settings")
+@CassandraKeyspace(value = "basic_schema_settings")
 @CassandraRollback(afterMethod = RollbackStrategy.NONE, afterClass = RollbackStrategy.DROP)
 public class BasicKeyspaceSettingsTest extends AbstractCassandraTest {
 

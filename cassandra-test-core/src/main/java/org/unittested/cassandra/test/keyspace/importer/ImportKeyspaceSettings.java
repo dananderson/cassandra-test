@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.keyspace.foreign;
+package org.unittested.cassandra.test.keyspace.importer;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.unittested.cassandra.test.TestRuntime;
@@ -25,19 +25,19 @@ import org.unittested.cassandra.test.keyspace.AbstractKeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum;
 import org.unittested.cassandra.test.keyspace.state.KeyspaceStateManager;
 
-public class ForeignKeyspaceSettings extends AbstractKeyspaceSettings {
+public class ImportKeyspaceSettings extends AbstractKeyspaceSettings {
 
     private int hashCode;
     private SchemaChangeDetectionEnum schemaChangeDetection;
 
-    public ForeignKeyspaceSettings(String keyspace,
-                                   boolean isCaseSensitiveKeyspace,
-                                   SchemaChangeDetectionEnum schemaChangeDetection,
-                                   String[] protectedTables) {
+    public ImportKeyspaceSettings(String keyspace,
+                                  boolean isCaseSensitiveKeyspace,
+                                  SchemaChangeDetectionEnum schemaChangeDetection,
+                                  String[] protectedTables) {
         super(keyspace, isCaseSensitiveKeyspace, false, protectedTables);
 
         if (keyspace.isEmpty()) {
-            throw new CassandraTestException("CassandraForeignKeyspace requires a keyspace.");
+            throw new CassandraTestException("CassandraImportKeyspace requires a keyspace.");
         }
 
         this.schemaChangeDetection = schemaChangeDetection;
@@ -57,7 +57,7 @@ public class ForeignKeyspaceSettings extends AbstractKeyspaceSettings {
     @Override
     public void sync(final TestRuntime runtime, KeyspaceStateManager keyspaceStateManager) {
         if (!runtime.getKeyspace().exists()) {
-            throw new CassandraTestException("Foreign keyspace does not exists!");
+            throw new CassandraTestException("Import keyspace does not exists!");
         }
 
         Keyspace keyspace = runtime.getKeyspace();

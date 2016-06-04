@@ -30,8 +30,8 @@ import org.unittested.cassandra.test.rollback.RollbackStrategy;
 /**
  * Sample usage of {@link AbstractJUnit4CassandraTest} to write tests.
  */
-@CassandraKeyspace(keyspace = "junit_cassandra_test", schema = "classpath:sample-schema.cql")
-@CassandraData(data = "classpath:sample-data.cql")
+@CassandraKeyspace(value = "junit_cassandra_test", schema = "classpath:sample-schema.cql")
+@CassandraData("classpath:sample-data.cql")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class JUnit4CassandraSampleTest extends AbstractJUnit4CassandraTest {
 

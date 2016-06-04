@@ -66,10 +66,10 @@ public class TestSettingsBuilderTest {
     @CassandraConnect(port = "1234")
     private static class WithConnectSettings {}
 
-    @CassandraData(data = "test")
+    @CassandraData("test")
     private static class WithDataSettings {}
 
-    @CassandraKeyspace(keyspace = "test")
+    @CassandraKeyspace(value = "test")
     private static class WithKeyspaceSettings {}
 
     @CassandraRollback(afterMethod = RollbackStrategy.DROP)
@@ -79,8 +79,8 @@ public class TestSettingsBuilderTest {
     private static class WithProperties {}
 
     @CassandraConnect(port = "1234")
-    @CassandraData(data = "test")
-    @CassandraKeyspace(keyspace = "${keyspace}")
+    @CassandraData("test")
+    @CassandraKeyspace(value = "${keyspace}")
     @CassandraRollback(afterMethod = RollbackStrategy.DROP)
     @CassandraProperties("text:keyspace=test")
     private static class WithSettings {}
@@ -301,11 +301,11 @@ public class TestSettingsBuilderTest {
     private static class WithDuplicateRollbackSettings { }
 
     @Schema
-    @CassandraKeyspace(keyspace = "test")
+    @CassandraKeyspace("test")
     private static class WithDuplicateKeyspaceSettings { }
 
     @Data
-    @CassandraData(data = "test")
+    @CassandraData("test")
     private static class WithDuplicateDataSettings { }
 
     @DataProvider
@@ -330,11 +330,11 @@ public class TestSettingsBuilderTest {
         // CassandraTestException
     }
 
-    @CassandraKeyspace(keyspace = "${keyspace}")
+    @CassandraKeyspace("${keyspace}")
     @CassandraProperties("text:keyspace=property_file")
     private static class KeyspaceFromPropertyFile {}
 
-    @CassandraKeyspace(keyspace = "${keyspace}")
+    @CassandraKeyspace("${keyspace}")
     private static class KeyspaceFromDefaultPropertyResolver {}
 
     @DataProvider(name = "propertyOverrides")

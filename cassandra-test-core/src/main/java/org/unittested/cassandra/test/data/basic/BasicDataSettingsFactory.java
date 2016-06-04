@@ -38,6 +38,6 @@ public class BasicDataSettingsFactory implements DataSettingsFactory {
 
         CassandraData cassandraData = (CassandraData)annotation;
 
-        return new BasicDataSettings(cassandraData.data(), new BasicCqlResourceLoader());
+        return new BasicDataSettings(cassandraData.value(), new BasicCqlResourceLoader());
     }
 }

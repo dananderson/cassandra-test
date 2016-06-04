@@ -36,8 +36,8 @@ import org.unittested.cassandra.test.spring.SpringCassandraTestExecutionListener
 /**
  * Sample usage of {@link SpringCassandraTestExecutionListener} to write tests.
  */
-@CassandraKeyspace(keyspace = "spring_cassandra_test", schema = "classpath:sample-schema.cql")
-@CassandraData(data = "classpath:sample-data.cql")
+@CassandraKeyspace(value = "spring_cassandra_test", schema = "classpath:sample-schema.cql")
+@CassandraData("classpath:sample-data.cql")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 @ContextConfiguration(locations = { "classpath:spring-test-context.xml" })
 @TestExecutionListeners(value = SpringCassandraTestExecutionListener.class, mergeMode = MERGE_WITH_DEFAULTS)

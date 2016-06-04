@@ -64,7 +64,7 @@ public @interface CassandraData {
      *
      * @return Data source list.
      */
-    String [] data();
+    String [] value();
 
     /**
      * PRIVATE - DO NOT SET.

@@ -31,7 +31,7 @@ import org.unittested.cassandra.test.rollback.RollbackStrategy;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.KeyspaceMetadata;
 
-@CassandraKeyspace(keyspace = "keyspace_container_test")
+@CassandraKeyspace(value = "keyspace_container_test")
 @CassandraRollback(afterMethod = RollbackStrategy.NONE, afterClass = RollbackStrategy.DROP)
 public class KeyspaceContainerTest extends AbstractCassandraTest {
 

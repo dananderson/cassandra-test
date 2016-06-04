@@ -41,7 +41,7 @@ public class BasicKeyspaceSettingsFactory implements KeyspaceSettingsFactory {
         CassandraKeyspace cassandraKeyspace = (CassandraKeyspace)annotation;
 
         return new BasicKeyspaceSettings(
-                propertyResolver.resolve(cassandraKeyspace.keyspace()),
+                propertyResolver.resolve(cassandraKeyspace.value()),
                 Boolean.parseBoolean(propertyResolver.resolve(cassandraKeyspace.isCaseSensitiveKeyspace())),
                 Boolean.parseBoolean(propertyResolver.resolve(cassandraKeyspace.autoCreateKeyspace())),
                 propertyResolver.resolve(cassandraKeyspace.schema()),

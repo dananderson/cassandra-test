@@ -21,11 +21,11 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
 @CassandraKeyspace(
-        keyspace = "rollback_settings_test",
+        value = "rollback_settings_test",
         schema = { "create table a (x int primary key);", "create table b (x int primary key);", "create table p (x int primary key);" },
         protectedTables = "p")
 @CassandraRollback(afterClass = DROP)
-@CassandraData(data = "insert into p(x) values (1000); insert into a(x) values (1000); insert into b(x) values (1000);")
+@CassandraData("insert into p(x) values (1000); insert into a(x) values (1000); insert into b(x) values (1000);")
 public class BasicRollbackSettingsTest extends AbstractCassandraTest {
 
     public static final String [] EMPTY = EMPTY_STRING_ARRAY;

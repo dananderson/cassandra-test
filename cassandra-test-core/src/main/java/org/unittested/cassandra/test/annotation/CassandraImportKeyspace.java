@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetection;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettingsFactory;
-import org.unittested.cassandra.test.keyspace.foreign.ForeignKeyspaceSettingsFactory;
+import org.unittested.cassandra.test.keyspace.importer.ImportKeyspaceSettingsFactory;
 
 /**
  * Test keyspace that has been setup outside of the Cassandra Test environment.
@@ -43,14 +43,14 @@ import org.unittested.cassandra.test.keyspace.foreign.ForeignKeyspaceSettingsFac
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface CassandraForeignKeyspace {
+public @interface CassandraImportKeyspace {
 
     /**
      * The test keyspace.
      *
      * @return The test keyspace.
      */
-    String keyspace();
+    String value();
 
     /**
      * Is the keyspace ID case sensitive?
@@ -85,5 +85,5 @@ public @interface CassandraForeignKeyspace {
      *
      * @return {@link KeyspaceSettingsFactory} class.
      */
-    Class<? extends KeyspaceSettingsFactory> __keyspaceSettingsFactory() default ForeignKeyspaceSettingsFactory.class;
+    Class<? extends KeyspaceSettingsFactory> __keyspaceSettingsFactory() default ImportKeyspaceSettingsFactory.class;
 }

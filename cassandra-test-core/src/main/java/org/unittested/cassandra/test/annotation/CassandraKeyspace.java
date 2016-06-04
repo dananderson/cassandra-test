@@ -53,7 +53,7 @@ public @interface CassandraKeyspace {
      *
      * @return The test keyspace.
      */
-    String keyspace();
+    String value();
 
     /**
      * Is the keyspace ID case sensitive?

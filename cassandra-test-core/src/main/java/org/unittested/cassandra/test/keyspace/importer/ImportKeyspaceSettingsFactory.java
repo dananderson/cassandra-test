@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.keyspace.foreign;
+package org.unittested.cassandra.test.keyspace.importer;
 
 import java.lang.annotation.Annotation;
 
-import org.unittested.cassandra.test.annotation.CassandraForeignKeyspace;
+import org.unittested.cassandra.test.annotation.CassandraImportKeyspace;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.properties.PropertyResolver;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettingsFactory;
 
-public class ForeignKeyspaceSettingsFactory implements KeyspaceSettingsFactory {
+public class ImportKeyspaceSettingsFactory implements KeyspaceSettingsFactory {
 
     @Override
     public KeyspaceSettings create(final Annotation annotation, final PropertyResolver propertyResolver) {
-        if (!(annotation instanceof CassandraForeignKeyspace)) {
-            throw new CassandraTestException("Expected annotation of type @CassandraForeignKeyspace, but got %s", annotation);
+        if (!(annotation instanceof CassandraImportKeyspace)) {
+            throw new CassandraTestException("Expected annotation of type @CassandraImportKeyspace, but got %s", annotation);
         }
 
-        CassandraForeignKeyspace schema = (CassandraForeignKeyspace)annotation;
+        CassandraImportKeyspace schema = (CassandraImportKeyspace)annotation;
 
-        return new ForeignKeyspaceSettings(
-                propertyResolver.resolve(schema.keyspace()),
+        return new ImportKeyspaceSettings(
+                propertyResolver.resolve(schema.value()),
                 Boolean.parseBoolean(propertyResolver.resolve(schema.isCaseSensitiveKeyspace())),
                 SchemaChangeDetectionEnum.valueOf(propertyResolver.resolve(schema.schemaChangeDetection().toUpperCase())),
                 propertyResolver.resolve(schema.protectedTables()));

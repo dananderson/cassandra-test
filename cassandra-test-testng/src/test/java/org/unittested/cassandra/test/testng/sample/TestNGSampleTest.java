@@ -30,8 +30,8 @@ import org.unittested.cassandra.test.testng.AbstractTestNGCassandraTest;
 /**
  * Sample usage of {@link AbstractTestNGCassandraTest} to write tests.
  */
-@CassandraKeyspace(keyspace = "testng_cassandra_test", schema = "classpath:sample-schema.cql")
-@CassandraData(data = "classpath:sample-data.cql")
+@CassandraKeyspace(value = "testng_cassandra_test", schema = "classpath:sample-schema.cql")
+@CassandraData("classpath:sample-data.cql")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 

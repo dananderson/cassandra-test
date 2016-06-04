@@ -30,7 +30,7 @@ import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
-@CassandraKeyspace(keyspace = "data_settings_test", schema = "CREATE TABLE a (x int PRIMARY KEY);")
+@CassandraKeyspace(value = "data_settings_test", schema = "CREATE TABLE a (x int PRIMARY KEY);")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class BasicDataSettingsTest extends AbstractCassandraTest {
 

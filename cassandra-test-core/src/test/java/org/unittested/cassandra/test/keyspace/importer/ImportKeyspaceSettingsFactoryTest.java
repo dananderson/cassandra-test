@@ -1,4 +1,4 @@
-package org.unittested.cassandra.test.keyspace.foreign;
+package org.unittested.cassandra.test.keyspace.importer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.is;
 import java.lang.annotation.Annotation;
 
 import org.unittested.cassandra.test.FactoryTestAnnotations;
-import org.unittested.cassandra.test.annotation.CassandraForeignKeyspace;
+import org.unittested.cassandra.test.annotation.CassandraImportKeyspace;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
@@ -16,24 +16,24 @@ import org.unittested.cassandra.test.keyspace.KeyspaceSettingsFactory;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class ForeignKeyspaceSettingsFactoryTest {
+public class ImportKeyspaceSettingsFactoryTest {
 
     @Test
     public void create() throws Exception {
         // given
-        KeyspaceSettingsFactory keyspaceSettingsFactory = new ForeignKeyspaceSettingsFactory();
-        CassandraForeignKeyspace immutable = FactoryTestAnnotations.class.getAnnotation(CassandraForeignKeyspace.class);
+        KeyspaceSettingsFactory keyspaceSettingsFactory = new ImportKeyspaceSettingsFactory();
+        CassandraImportKeyspace immutable = FactoryTestAnnotations.class.getAnnotation(CassandraImportKeyspace.class);
 
         // when
         KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(immutable, PropertiesPropertyResolver.SYSTEM);
 
         // then
-        assertThat(keyspaceSettings, instanceOf(ForeignKeyspaceSettings.class));
-        ForeignKeyspaceSettings foreignSchemaSettings = (ForeignKeyspaceSettings)keyspaceSettings;
-        assertThat(foreignSchemaSettings.hashCode(), is(723417303));
-        assertThat(foreignSchemaSettings.getKeyspace(), is("test"));
-        assertThat(foreignSchemaSettings.canDropKeyspace(), is(false));
-        assertThat(foreignSchemaSettings.getProtectedTables(), arrayContaining("p"));
+        assertThat(keyspaceSettings, instanceOf(ImportKeyspaceSettings.class));
+        ImportKeyspaceSettings importKeyspaceSettings = (ImportKeyspaceSettings)keyspaceSettings;
+        assertThat(importKeyspaceSettings.hashCode(), is(723417303));
+        assertThat(importKeyspaceSettings.getKeyspace(), is("test"));
+        assertThat(importKeyspaceSettings.canDropKeyspace(), is(false));
+        assertThat(importKeyspaceSettings.getProtectedTables(), arrayContaining("p"));
     }
 
     @DataProvider
@@ -47,7 +47,7 @@ public class ForeignKeyspaceSettingsFactoryTest {
     @Test(dataProvider = "invalidAnnotations", expectedExceptions = CassandraTestException.class)
     public void createWithInvalidAnnotations(Annotation annotation) throws Exception {
         // given
-        KeyspaceSettingsFactory keyspaceSettingsFactory = new ForeignKeyspaceSettingsFactory();
+        KeyspaceSettingsFactory keyspaceSettingsFactory = new ImportKeyspaceSettingsFactory();
 
         // when
         keyspaceSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);

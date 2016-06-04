@@ -28,8 +28,8 @@ import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
 import com.datastax.driver.core.exceptions.DriverException;
 
-@CassandraKeyspace(keyspace = "test", schema = "classpath:cql/sample-schema.cql")
-@CassandraData(data = "classpath:cql/sample-data.cql")
+@CassandraKeyspace(value = "test", schema = "classpath:cql/sample-schema.cql")
+@CassandraData("classpath:cql/sample-data.cql")
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class TableTest extends AbstractCassandraTest {
 

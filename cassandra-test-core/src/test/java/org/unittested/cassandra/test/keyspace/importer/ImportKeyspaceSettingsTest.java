@@ -1,4 +1,4 @@
-package org.unittested.cassandra.test.keyspace.foreign;
+package org.unittested.cassandra.test.keyspace.importer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -27,9 +27,9 @@ import org.mockito.Matchers;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-@CassandraKeyspace(keyspace = "immutable_schema_settings_test")
+@CassandraKeyspace(value = "immutable_schema_settings_test")
 @CassandraRollback(afterMethod = RollbackStrategy.NONE, afterClass = RollbackStrategy.DROP)
-public class ForeignKeyspaceSettingsTest extends AbstractCassandraTest {
+public class ImportKeyspaceSettingsTest extends AbstractCassandraTest {
 
     @DataProvider
     public static Object[][] syncConfiguration() {
@@ -121,7 +121,7 @@ public class ForeignKeyspaceSettingsTest extends AbstractCassandraTest {
 
     @Test(expectedExceptions = CassandraTestException.class)
     public void nullKeyspace() throws Exception {
-        new ForeignKeyspaceSettings(Keyspace.NULL, false, KEYSPACE, ArrayUtils.EMPTY_STRING_ARRAY);
+        new ImportKeyspaceSettings(Keyspace.NULL, false, KEYSPACE, ArrayUtils.EMPTY_STRING_ARRAY);
     }
 
     @Test(expectedExceptions = CassandraTestException.class)
@@ -141,7 +141,7 @@ public class ForeignKeyspaceSettingsTest extends AbstractCassandraTest {
 
     private TestRuntime createRuntime(Keyspace keyspace,
                                       SchemaChangeDetectionEnum schemaChangeDetection) throws Exception {
-        KeyspaceSettings keyspaceSettings = new ForeignKeyspaceSettings(
+        KeyspaceSettings keyspaceSettings = new ImportKeyspaceSettings(
                 keyspace.getName(),
                 keyspace.isCaseSensitiveName(),
                 schemaChangeDetection,
