@@ -1,13 +1,13 @@
 # Cassandra Test
 [![Build Status](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](http://mvnrepository.com/artifact/org.unittested/cassandra-test-junit/1.0.0)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](http://mvnrepository.com/artifact/org.unittested/cassandra-test-testng/1.0.1)
 [![codecov.io](https://codecov.io/github/dananderson/cassandra-test/coverage.svg?branch=master)](https://codecov.io/github/dananderson/cassandra-test?branch=master)
 
 Cassandra Test is a unit test and integration test framework featuring support for multiple test environments, schema management, table data loading and connection management.
 
 ```java
-@CassandraKeyspace(keyspace = "testng_cassandra_test", schema = "classpath:sample-schema.cql")
-@CassandraData(data = "classpath:sample-data.cql")
+@CassandraKeyspace(value = "testng_cassandra_test", schema = "classpath:sample-schema.cql")
+@CassandraData("classpath:sample-data.cql")
 public class TestNGSampleTest extends AbstractTestNGCassandraTest {
 
     @Test
@@ -27,7 +27,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
     <dependency>
       <groupId>org.unittested</groupId>
       <artifactId>cassandra-test-testng</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 ```
 [JUnit](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-junit)
@@ -35,7 +35,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
     <dependency>
       <groupId>org.unittested</groupId>
       <artifactId>cassandra-test-junit</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 ```
 [Spring Test](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-spring)
@@ -43,7 +43,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
     <dependency>
       <groupId>org.unittested</groupId>
       <artifactId>cassandra-test-spring</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 ```
 
