@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.unittested</groupId>
     <artifactId>cassandra-test-project</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <groupId>org.unittested</groupId>
   <artifactId>cassandra-test-core</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <name>Core - ${project.groupId}:${project.artifactId}</name>
   <description>Cassandra Test test environment agnostic components.</description>

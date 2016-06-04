@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.unittested</groupId>
     <artifactId>cassandra-test-project</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <groupId>org.unittested</groupId>
   <artifactId>cassandra-test-spring</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <name>Spring Test - ${project.groupId}:${project.artifactId}</name>
   <description>Cassandra Test bindings for the Spring Test environment.</description>
