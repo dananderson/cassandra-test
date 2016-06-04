@@ -25,26 +25,25 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.Keyspace;
-import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.unittested.cassandra.test.resource.Resource;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 
-public class BasicCqlSourceLoaderTest {
+public class BasicCqlResourceLoaderTest {
 
     @DataProvider
-    public Object[][] loadCqlSourceData() {
+    public Object[][] cqlStatementResources() {
         return new Object[][] {
                 { "select * from table;", 1 },
                 { "select * from table;select * from table;", 2 },
@@ -55,15 +54,15 @@ public class BasicCqlSourceLoaderTest {
         };
     }
 
-    @Test(dataProvider = "loadCqlSourceData")
-    public void loadCqlSource(String cqlSource, int expectedExecuteCallCount) throws Exception {
+    @Test(dataProvider = "cqlStatementResources")
+    public void loadResource(String cqlOrUrl, int expectedExecuteCallCount) throws Exception {
         // given
-        BasicCqlSourceLoader basicCqlSourceLoader = new BasicCqlSourceLoader();
+        BasicCqlResourceLoader basicCqlSourceLoader = new BasicCqlResourceLoader();
         ArgumentCaptor<Statement> statements = ArgumentCaptor.forClass(Statement.class);
         TestRuntime runtime = createRuntime(statements);
 
         // when
-        basicCqlSourceLoader.loadCqlSource(runtime, cqlSource);
+        basicCqlSourceLoader.loadCqlResource(runtime, Resource.fromCqlOrUrl(cqlOrUrl));
 
         // then
         verify(runtime.getKeyspace().getSession(), times(expectedExecuteCallCount)).execute(Matchers.any(Statement.class));
@@ -74,7 +73,7 @@ public class BasicCqlSourceLoaderTest {
     }
 
     @DataProvider
-    public Object[][] consistencyData() {
+    public Object[][] consistencyCommands() {
         return new Object[][] {
                 {
                         "consistency ALL;select * from table;",
@@ -95,15 +94,15 @@ public class BasicCqlSourceLoaderTest {
         };
     }
 
-    @Test(dataProvider = "consistencyData")
-    public void consistency(String cqlSource, List<ConsistencyLevel> expectedConsistency) throws Exception {
+    @Test(dataProvider = "consistencyCommands")
+    public void consistencyCommands(String cqlOrUrl, List<ConsistencyLevel> expectedConsistency) throws Exception {
         // given
-        BasicCqlSourceLoader basicCqlSourceLoader = new BasicCqlSourceLoader();
+        BasicCqlResourceLoader basicCqlSourceLoader = new BasicCqlResourceLoader();
         ArgumentCaptor<Statement> statements = ArgumentCaptor.forClass(Statement.class);
         TestRuntime runtime = createRuntime(statements);
 
         // when
-        basicCqlSourceLoader.loadCqlSource(runtime, cqlSource);
+        basicCqlSourceLoader.loadCqlResource(runtime, Resource.fromCqlOrUrl(cqlOrUrl));
 
         // then
         verify(runtime.getKeyspace().getSession(), times(expectedConsistency.size())).execute(Matchers.any(Statement.class));
@@ -115,7 +114,7 @@ public class BasicCqlSourceLoaderTest {
     }
 
     @DataProvider
-    public Object[][] serialConsistencyData() {
+    public Object[][] serialConsistencyCommands() {
         return new Object[][] {
                 {
                         "consistency LOCAL_SERIAL;select * from table;",
@@ -137,15 +136,15 @@ public class BasicCqlSourceLoaderTest {
         };
     }
 
-    @Test(dataProvider = "serialConsistencyData")
-    public void serialConsistency(String cqlSource, List<ConsistencyLevel> expectedSerialConsistency) throws Exception {
+    @Test(dataProvider = "serialConsistencyCommands")
+    public void serialConsistencyCommands(String cqlOrUrl, List<ConsistencyLevel> expectedSerialConsistency) throws Exception {
         // given
-        BasicCqlSourceLoader basicCqlSourceLoader = new BasicCqlSourceLoader();
+        BasicCqlResourceLoader basicCqlSourceLoader = new BasicCqlResourceLoader();
         ArgumentCaptor<Statement> statements = ArgumentCaptor.forClass(Statement.class);
         TestRuntime runtime = createRuntime(statements);
 
         // when
-        basicCqlSourceLoader.loadCqlSource(runtime, cqlSource);
+        basicCqlSourceLoader.loadCqlResource(runtime, Resource.fromCqlOrUrl(cqlOrUrl));
 
         // then
         verify(runtime.getKeyspace().getSession(), times(expectedSerialConsistency.size())).execute(Matchers.any(Statement.class));
@@ -157,67 +156,24 @@ public class BasicCqlSourceLoaderTest {
     }
 
     @DataProvider
-    public Object[][] illegalConsistencyStatementData() {
+    public Object[][] illegalConsistencyCommands() {
         return new Object[][] {
                 { "consistency xxx;" },
                 { "consistency default;" },
         };
     }
 
-    @Test(dataProvider = "illegalConsistencyStatementData", expectedExceptions = IllegalArgumentException.class)
-    public void illegalConsistencyStatement(String cqlSource) throws Exception {
+    @Test(dataProvider = "illegalConsistencyCommands", expectedExceptions = IllegalArgumentException.class)
+    public void illegalConsistencyCommands(String cqlOrUrl) throws Exception {
         // given
-        BasicCqlSourceLoader basicCqlSourceLoader = new BasicCqlSourceLoader();
+        BasicCqlResourceLoader basicCqlSourceLoader = new BasicCqlResourceLoader();
         TestRuntime runtime = createRuntime();
 
         // when
-        basicCqlSourceLoader.loadCqlSource(runtime, cqlSource);
+        basicCqlSourceLoader.loadCqlResource(runtime, Resource.fromCqlOrUrl(cqlOrUrl));
 
         // then
         // CqlException
-    }
-
-    @DataProvider
-    public Object[][] cqlSourceIOExceptionData() {
-        return new Object[][] {
-                { "file:dadasdasd" },
-                { "classpath:dasdasd" },
-        };
-    }
-
-    @Test(dataProvider = "cqlSourceIOExceptionData", expectedExceptions = IOException.class)
-    public void cqlSourceIOException(String cqlSource) throws Exception {
-        // given
-        BasicCqlSourceLoader basicCqlSourceLoader = new BasicCqlSourceLoader();
-        TestRuntime runtime = createRuntime();
-
-        // when
-        basicCqlSourceLoader.loadCqlSource(runtime, cqlSource);
-
-        // then
-        // IOException
-    }
-
-    @DataProvider
-    public Object[][] invalidCqlSourceFormatData() {
-        return new Object[][] {
-                { "cql:" },
-                { "file:" },
-                { "classpath:" },
-        };
-    }
-
-    @Test(dataProvider = "invalidCqlSourceFormatData", expectedExceptions = CassandraTestException.class)
-    public void invalidCqlSourceFormat(String cqlSource) throws Exception {
-        // given
-        BasicCqlSourceLoader basicCqlSourceLoader = new BasicCqlSourceLoader();
-        TestRuntime runtime = createRuntime();
-
-        // when
-        basicCqlSourceLoader.loadCqlSource(runtime, cqlSource);
-
-        // then
-        // CassandraTestException
     }
 
     private TestRuntime createRuntime() {

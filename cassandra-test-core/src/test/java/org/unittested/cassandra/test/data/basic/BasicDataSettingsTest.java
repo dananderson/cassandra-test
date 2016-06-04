@@ -26,7 +26,7 @@ import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.data.DataSettings;
-import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
+import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
 import org.testng.annotations.Test;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
@@ -43,7 +43,7 @@ public class BasicDataSettingsTest extends AbstractCassandraTest {
     @Test
     public void load() throws Exception {
         // given
-        DataSettings dataSettings = new BasicDataSettings(DATA, new BasicCqlSourceLoader());
+        DataSettings dataSettings = new BasicDataSettings(DATA, new BasicCqlResourceLoader());
         TestRuntime runtime = createRuntime();
 
         assertThat(tableCount("a"), is(0L));

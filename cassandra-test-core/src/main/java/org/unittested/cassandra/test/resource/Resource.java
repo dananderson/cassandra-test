@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.unittested.cassandra.test.io;
+package org.unittested.cassandra.test.resource;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -36,30 +36,23 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.util.Utils;
 
 /**
- * Represents a URI to a text resources.
+ * Text resource loader.
  *
- * Locator URIs are standard URIs used to describe files on the filesystem or in the classpath. Locators are meant to
- * point to text files containing CQL statements. In most cases, locator URIs will be used in Cassandra Test annotations.
+ * Provides access to an {@link InputStream} or {@link Reader} for a text resource. Resource abstracts the source of the
+ * resource, such as file or class path, using the protocol of the resource's URL.
  * <p>
- * Locators call the the scheme/protocol a "source", which can be classpath or file. Locators to classpath
- * and filesystem files must be URL encoded; however, spaces in the locator are allowed for ease of use.
+ * The content type of the resource is assumed to be a text resource. In most cases, Cassandra Test interprets the
+ * text resource as CQL statements. {@link org.unittested.cassandra.test.resource.Resource.ContentType#CQL}
  * <p>
- * Content type of the resource is determined by the contentType query parameter. If the query parameter is not present,
- * the file extension is used. Otherwise, content type of CQL is assumed. Currently, the only supported content type is
- * CQL.
- * <p>
- * Examples Locators
+ * Supported Protocols
  * <ul>
- *     <li>file:path/to/file.cql</li>
- *     <li>file://path/to/file.cql</li>
- *     <li>classpath://path/to/file.cql</li>
- *     <li>classpath:path/to/file.cql</li>
+ *     <li>file:[path] or file://[path] - Filesystem file.</li>
+ *     <li>classpath:[path] or classpath://[path] - Class path file.</li>
  * </ul>
- *
- * @see org.unittested.cassandra.test.io.Locator.Source
- * @see org.unittested.cassandra.test.io.Locator.ContentType
+ * The resource URL format uses URL encoded spaces, but literal spaces are supported as well. For example, file://path/to/my file.txt
+ * will point to path/to/my file.txt on the filesystem.
  */
-public class Locator {
+public class Resource {
 
     private static Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -68,84 +61,28 @@ public class Locator {
     private String path;
 
     /**
-     * Create a {@link Locator} from a locator URI.
+     * Create a {@link Resource} from a CQL statement or resource URL.
      *
-     * @param locatorUri Locator URI.
-     * @return {@link Locator}
+     * @param cqlOrUrl CQL statement or resource URL.
+     * @return {@link Resource}
      */
-    public static Locator fromUri(String locatorUri) {
-        // Handle text "URI"s as a special case. Do not decode.
-        if (locatorUri.startsWith("text:")) {
-            return new Locator(Source.TEXT, ContentType.CQL, StringUtils.removeStart(locatorUri, "text:"));
+    public static Resource fromCqlOrUrl(String cqlOrUrl) {
+        if (StringUtils.isBlank(cqlOrUrl)) {
+            return new Resource(Source.TEXT, ContentType.CQL, "");
         }
 
-        URI uri;
-
-        // Tolerate spaces in the URI because it is just easier that way.
-        locatorUri = StringUtils.replace(locatorUri, " ", "%20");
-
-        // Basic URI parsing and validation.
-        try {
-            uri = URI.create(locatorUri);
-        } catch (Exception e) {
-            throw new CassandraTestException("Invalid URI format for locator. '%s'", locatorUri, e);
+        if (Utils.isCqlLike(cqlOrUrl)) {
+            return new Resource(Source.TEXT, ContentType.CQL, cqlOrUrl);
         }
 
-        if (!uri.isAbsolute()) {
-            throw new CassandraTestException("Locator is missing protocol/scheme prefix. '%s'", locatorUri);
-        }
-
-        // Get and validate the protocol/scheme is supported.
-        Source source;
-
-        try {
-            source = Source.valueOf(uri.getScheme().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new CassandraTestException("Invalid protocol/scheme prefix. '%s'", uri.getScheme(), e);
-        }
-
-        // Remove the query string from the scheme specific part. Since filenames appear in the scheme specific part,
-        // URI may not parse out the whole filename. Go into the raw data and strip out the query string to get the path.
-        String path = StringUtils.substringBefore(uri.getRawSchemeSpecificPart(), "?");
-
-        // If the locator is file://blah, the scheme specific part will be prefixed with //. Remove it.
-        path = StringUtils.stripStart(path, "//");
-
-        // Finally, URL decode the path.
-        try {
-            path = URLDecoder.decode(path, UTF_8.name());
-        } catch (Exception e) {
-            throw new CassandraTestException("Failed to decode path in URI. '%s'", locatorUri, e);
-        }
-
-        if (StringUtils.isBlank(path)) {
-            throw new CassandraTestException("Path is blank. '%s", locatorUri);
-        }
-
-        return new Locator(source, ContentType.CQL, path);
+        return new Resource(cqlOrUrl);
     }
 
-    /**
-     * Create a {@link Locator} from a CQL source string.
-     * <p>
-     * The string can contain ; delimited CQL statements OR a locator URI.
-     *
-     * @param cqlSource CQL source string.
-     * @return {@link Locator}
-     */
-    public static Locator fromCqlSource(String cqlSource) {
-        if (StringUtils.isBlank(cqlSource)) {
-            return new Locator(Source.TEXT, ContentType.CQL, "");
-        }
-
-        if (Utils.isCqlLike(cqlSource)) {
-            return new Locator(Source.TEXT, ContentType.CQL, cqlSource);
-        }
-
-        return fromUri(cqlSource);
+    public Resource(String url) {
+        parseUrl(url);
     }
 
-    private Locator(Source source, ContentType contentType, String path) {
+    public Resource(Source source, ContentType contentType, String path) {
         this.source = source;
         this.contentType = contentType;
         this.path = path;
@@ -154,7 +91,7 @@ public class Locator {
     /**
      * Get the resource source.
      *
-     * @return {@link org.unittested.cassandra.test.io.Locator.Source}
+     * @return {@link Resource.Source}
      */
     public Source getSource() {
         return this.source;
@@ -198,8 +135,65 @@ public class Locator {
         return this.source.getReader(this.path);
     }
 
+    private void parseUrl(String url) {
+        // Handle text "URI"s as a special case. Do not decode.
+        if (url.startsWith("text:")) {
+            this.source = Source.TEXT;
+            this.contentType = ContentType.CQL;
+            this.path = StringUtils.removeStart(url, "text:");
+            return;
+        }
+
+        URI uri;
+
+        // Tolerate spaces in the URI because it is just easier that way.
+        url = StringUtils.replace(url, " ", "%20");
+
+        // Basic URI parsing and validation.
+        try {
+            uri = URI.create(url);
+        } catch (Exception e) {
+            throw new CassandraTestException("Invalid URL format. URL = '%s'", url, e);
+        }
+
+        if (!uri.isAbsolute()) {
+            throw new CassandraTestException("URL is missing protocol/scheme prefix. URL = '%s'", url);
+        }
+
+        // Get and validate the protocol/scheme is supported.
+        Source urlSource;
+
+        try {
+            urlSource = Source.valueOf(uri.getScheme().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new CassandraTestException("Invalid protocol URL prefix of '%s'", uri.getScheme(), e);
+        }
+
+        // Remove the query string from the scheme specific part. Since filenames appear in the scheme specific part,
+        // URI may not parse out the whole filename. Go into the raw data and strip out the query string to get the path.
+        String urlPath = StringUtils.substringBefore(uri.getRawSchemeSpecificPart(), "?");
+
+        // If the URL is file://blah, the scheme specific part will be prefixed with //. Remove it.
+        urlPath = StringUtils.stripStart(urlPath, "//");
+
+        // Finally, URL decode the path.
+        try {
+            urlPath = URLDecoder.decode(urlPath, UTF_8.name());
+        } catch (Exception e) {
+            throw new CassandraTestException("Failed to decode path in URL. URL = '%s'", url, e);
+        }
+
+        if (StringUtils.isBlank(urlPath)) {
+            throw new CassandraTestException("Path is blank. URL = '%s", url);
+        }
+
+        this.source = urlSource;
+        this.contentType = ContentType.CQL;
+        this.path = urlPath;
+    }
+
     /**
-     * The source to go to get an {@link InputStream} for the text resource.
+     * The protocol or how to get an {@link InputStream} for the text resource.
      */
     public enum Source {
 
@@ -225,7 +219,7 @@ public class Locator {
                     }
 
                     if (file.isDirectory()) {
-                        throw new UnsupportedOperationException("Directory locators are not supported. Classpath file = '"
+                        throw new UnsupportedOperationException("Directory URLs are not supported. Classpath file = '"
                                 + path + "'");
                     }
                 }
@@ -243,7 +237,7 @@ public class Locator {
                 File file = new File(path);
 
                 if (file.isDirectory()) {
-                    throw new UnsupportedOperationException("Directory locators are not supported. File = '"
+                    throw new UnsupportedOperationException("Directory URLs are not supported. File = '"
                         + path + "'");
                 }
 

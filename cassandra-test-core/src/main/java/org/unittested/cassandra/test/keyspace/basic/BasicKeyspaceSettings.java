@@ -23,9 +23,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.Keyspace;
+import org.unittested.cassandra.test.resource.Resource;
 import org.unittested.cassandra.test.util.Utils;
-import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
-import org.unittested.cassandra.test.data.cql.CqlSourceLoader;
+import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
+import org.unittested.cassandra.test.data.cql.CqlResourceLoader;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.keyspace.AbstractKeyspaceSettings;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum;
@@ -40,12 +41,12 @@ public class BasicKeyspaceSettings extends AbstractKeyspaceSettings {
     private String [] schema;
     private boolean autoCreateKeyspace;
     private SchemaChangeDetectionEnum schemaChangeDetection;
-    private CqlSourceLoader cqlSourceLoader;
+    private CqlResourceLoader cqlResourceLoader;
     private int hashCode;
 
     public BasicKeyspaceSettings() {
         this(Keyspace.NULL, false, false, ArrayUtils.EMPTY_STRING_ARRAY, SchemaChangeDetectionEnum.NONE,
-                ArrayUtils.EMPTY_STRING_ARRAY, new BasicCqlSourceLoader());
+                ArrayUtils.EMPTY_STRING_ARRAY, new BasicCqlResourceLoader());
     }
 
     public BasicKeyspaceSettings(String keyspace,
@@ -54,12 +55,12 @@ public class BasicKeyspaceSettings extends AbstractKeyspaceSettings {
                                  String[] schema,
                                  SchemaChangeDetectionEnum schemaChangeDetection,
                                  String[] protectedTables,
-                                 CqlSourceLoader cqlSourceLoader) {
+                                 CqlResourceLoader cqlResourceLoader) {
         super(keyspace, isCaseSensitiveKeyspace, true, protectedTables);
         this.schema = schema;
         this.autoCreateKeyspace = autoCreateKeyspace;
         this.schemaChangeDetection = schemaChangeDetection;
-        this.cqlSourceLoader = cqlSourceLoader;
+        this.cqlResourceLoader = cqlResourceLoader;
         this.hashCode = new HashCodeBuilder(17, 37)
                 .append(keyspace)
                 .append(isCaseSensitiveKeyspace)
@@ -111,12 +112,14 @@ public class BasicKeyspaceSettings extends AbstractKeyspaceSettings {
         keyspace.use();
 
         if (installSchema) {
-            for (String cqlSource : this.schema) {
+            for (String cqlOrUrl : this.schema) {
                 LOG.trace("Loading cql source.");
+                Resource resource = Resource.fromCqlOrUrl(cqlOrUrl);
+
                 try {
-                    this.cqlSourceLoader.loadCqlSource(runtime, cqlSource);
+                    this.cqlResourceLoader.loadCqlResource(runtime, resource);
                 } catch (IOException e) {
-                    throw new CassandraTestException("Bad schema: %s", cqlSource, e);
+                    throw new CassandraTestException("Failed to load schema from '%s'", cqlOrUrl, e);
                 }
             }
 

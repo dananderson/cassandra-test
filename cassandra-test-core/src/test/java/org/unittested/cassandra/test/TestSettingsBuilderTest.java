@@ -340,8 +340,8 @@ public class TestSettingsBuilderTest {
     @DataProvider(name = "propertyOverrides")
     public static Object[][] propertyOverrides() {
 
-        PropertyResolver defaultPropertyResolver = PropertiesPropertyResolver.fromLocator("text:keyspace=default");
-        PropertyResolver userOverridePropertyResolver = PropertiesPropertyResolver.fromLocator("text:keyspace=user");
+        PropertyResolver defaultPropertyResolver = PropertiesPropertyResolver.fromUrl("text:keyspace=default");
+        PropertyResolver userOverridePropertyResolver = PropertiesPropertyResolver.fromUrl("text:keyspace=user");
 
         return new Object[][] {
                 { KeyspaceFromPropertyFile.class, null, null, "property_file" },

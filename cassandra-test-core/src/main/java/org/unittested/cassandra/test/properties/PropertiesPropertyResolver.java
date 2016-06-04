@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.unittested.cassandra.test.exception.CassandraTestException;
-import org.unittested.cassandra.test.io.Locator;
+import org.unittested.cassandra.test.resource.Resource;
 
 /**
  * {@link org.unittested.cassandra.test.properties.PropertyResolver} that reads properties from a Java {@link Properties} source.
@@ -40,22 +40,22 @@ public class PropertiesPropertyResolver extends AbstractPropertyResolver {
     }
 
     /**
-     * Create a {@link PropertyResolver} from a {@link Locator} URI.
+     * Create a {@link PropertyResolver} from a {@link Resource} URL.
      *
-     * @param locatorUri Locator URI.
+     * @param url URL to properties file.
      * @return {@link PropertyResolver}
      */
-    public static PropertyResolver fromLocator(String locatorUri) {
-        Locator locator = Locator.fromUri(locatorUri);
+    public static PropertyResolver fromUrl(String url) {
+        Resource resource = new Resource(url);
         InputStream stream = null;
         Properties properties = new Properties();
 
         try {
-            stream = locator.getStream();
+            stream = resource.getStream();
             properties.load(stream);
         } catch (Exception e) {
             // IOException from getStream, IllegalArgumentException from load (via text parsing)
-            throw new CassandraTestException("Failed to load properties file '%s'", locatorUri, e);
+            throw new CassandraTestException("Failed to load properties file '%s'", url, e);
         } finally {
             if (stream != null) {
                 try {

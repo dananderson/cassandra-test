@@ -19,23 +19,23 @@ package org.unittested.cassandra.test.data.cql;
 import java.io.IOException;
 
 import org.unittested.cassandra.test.TestRuntime;
-import org.unittested.cassandra.test.io.Locator;
+import org.unittested.cassandra.test.resource.Resource;
 
 import com.datastax.driver.core.Statement;
 
-public class BasicCqlSourceLoader implements CqlSourceLoader {
+public class BasicCqlResourceLoader implements CqlResourceLoader {
 
-    public BasicCqlSourceLoader() {
+    public BasicCqlResourceLoader() {
 
     }
 
     @Override
-    public void loadCqlSource(TestRuntime runtime, String cqlSource) throws IOException {
+    public void loadCqlResource(TestRuntime runtime, Resource resource) throws IOException {
         StatementReader reader = null;
 
         try {
             ConsistencyStatement consistency = null;
-            reader = createStatementReader(cqlSource);
+            reader = new CqlStatementReader(resource.getReader());
 
             while (reader.hasMore()) {
                 Statement statement = reader.one();
@@ -54,10 +54,5 @@ public class BasicCqlSourceLoader implements CqlSourceLoader {
                 reader.close();
             }
         }
-    }
-
-    private StatementReader createStatementReader(String cqlSource) throws IOException {
-        Locator locator = Locator.fromCqlSource(cqlSource);
-        return new CqlStatementReader(locator.getReader());
     }
 }

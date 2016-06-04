@@ -26,7 +26,8 @@ import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.connect.basic.BasicConnectSettings;
-import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
+import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
+import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum;
 import org.unittested.cassandra.test.keyspace.KeyspaceSettings;
@@ -142,6 +143,9 @@ public class BasicKeyspaceSettingsTest extends AbstractCassandraTest {
         Keyspace keyspace = new Keyspace(getCluster().connect(), Keyspace.NULL);
         TestRuntime runtime = createRuntime(keyspace, true, KEYSPACE);
         KeyspaceStateManager keyspaceStateManager = mock(KeyspaceStateManager.class);
+        when(keyspaceStateManager.hasKeyspaceCqlSignatureChanged(
+                Matchers.anyInt(), Matchers.anyInt()))
+                .thenReturn(true);
 
         // when
         runtime.getTestSettings().getKeyspaceSettings().sync(runtime, keyspaceStateManager);
@@ -150,17 +154,38 @@ public class BasicKeyspaceSettingsTest extends AbstractCassandraTest {
         verifyZeroInteractions(keyspaceStateManager);
     }
 
+    @Test(expectedExceptions = CassandraTestException.class)
+    public void syncWithResourceException() throws Exception {
+        // given
+        Keyspace keyspace = getKeyspace();
+        TestRuntime runtime = createRuntime(keyspace, true, KEYSPACE, ArrayUtils.toArray("file://does_not_exist"));
+        KeyspaceStateManager keyspaceStateManager = mock(KeyspaceStateManager.class);
+
+        // when
+        runtime.getTestSettings().getKeyspaceSettings().sync(runtime, keyspaceStateManager);
+
+        // then
+        // CassandraTestException
+    }
+
     private TestRuntime createRuntime(Keyspace keyspace,
                                       boolean autoCreateKeyspace,
                                       SchemaChangeDetectionEnum schemaChangeDetection) throws Exception {
+        return createRuntime(keyspace, autoCreateKeyspace, schemaChangeDetection, SCHEMA);
+    }
+
+    private TestRuntime createRuntime(Keyspace keyspace,
+                                      boolean autoCreateKeyspace,
+                                      SchemaChangeDetectionEnum schemaChangeDetection,
+                                      String [] schema) throws Exception {
         KeyspaceSettings keyspaceSettings = new BasicKeyspaceSettings(
                 keyspace.getName(),
                 keyspace.isCaseSensitiveName(),
                 autoCreateKeyspace,
-                SCHEMA,
+                schema,
                 schemaChangeDetection,
                 ArrayUtils.EMPTY_STRING_ARRAY,
-                new BasicCqlSourceLoader());
+                new BasicCqlResourceLoader());
 
         TestRuntime runtime = mock(TestRuntime.class);
 

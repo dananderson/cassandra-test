@@ -77,27 +77,25 @@ public @interface CassandraKeyspace {
     String autoCreateKeyspace() default "true";
 
     /**
-     * Schema data source list.
+     * Schema source list.
      * <p>
-     * Each schema data source can be a CQL statement, semi-colon (;) delimited set of CQL statements or a schema data
-     * source locator. The schema data source locator takes the form of protocol.contentType: {value}.
+     * Each schema source string entry can be either CQL statements or a URL pointing to a text file with CQL statements.
+     * The format for the CQL statements is similar to cql files accepted by cqlsh. {@link org.unittested.cassandra.test.resource.Resource.ContentType#CQL}
+     * contains more info on the format.
      * <p>
-     * Supported Protocols
+     * CQL statements in CassandraKeyspace should be limited to schema creation and modification (CREATE, ALTER, etc are OK).
+     * Generally, data insertion statements should go in to CassandraData, but this is not strictly enforced.
+     * <p>
+     * Example Data Source Strings
      * <ul>
-     *     <li>string - String literal.</li>
-     *     <li>file - Path to file on the filesystem.</li>
-     *     <li>classpath - Path to file in the classpath.</li>
+     *     <li>create keyspace ks with replication = {'class': 'SimpleStrategy', 'replication_factor': '1'} and durable_writes = true;</li>
+     *     <li>file:schema.cql</li>
+     *     <li>file://schema.cql</li>
+     *     <li>classpath:schema.cql</li>
+     *     <li>classpath://schema.cql</li>
      * </ul>
-     * <p>
-     * Supported Content Types
-     * <ul>
-     *     <li>cql - Semi-colon (;) delimited set of CQL statements.</li>
-     * </ul>
-     * <p>
-     * CQL statements should be limited to schema creation or altering. It is recommended that data related CQL statements
-     * go into {@link CassandraData} data sources.
      *
-     * @return Schema data source list.
+     * @return Data source list.
      */
     String [] schema() default {};
 

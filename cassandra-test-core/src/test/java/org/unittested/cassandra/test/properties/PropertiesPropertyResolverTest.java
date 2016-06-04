@@ -61,9 +61,9 @@ public class PropertiesPropertyResolverTest {
     }
 
     @Test(dataProvider = "validInputs")
-    public void resolveFromLocator(String input, String expectedOutput) throws Exception {
+    public void resolveFromUrl(String input, String expectedOutput) throws Exception {
         // given
-        PropertyResolver propertyResolver = PropertiesPropertyResolver.fromLocator(
+        PropertyResolver propertyResolver = PropertiesPropertyResolver.fromUrl(
                 "classpath:properties-property-resolver-test.properties");
 
         // when
@@ -74,7 +74,7 @@ public class PropertiesPropertyResolverTest {
     }
 
     @DataProvider
-    public static Object[][] badLocators() {
+    public static Object[][] invalidUrls() {
         return new Object[][] {
                 { "error" },
                 { "classpath:does/not/exist.properties" },
@@ -82,9 +82,9 @@ public class PropertiesPropertyResolverTest {
         };
     }
 
-    @Test(dataProvider = "badLocators", expectedExceptions = CassandraTestException.class)
-    public void fromUriWithBadLocator(String locator) throws Exception {
-        PropertiesPropertyResolver.fromLocator(locator);
+    @Test(dataProvider = "invalidUrls", expectedExceptions = CassandraTestException.class)
+    public void fromUrlWithInvalidInput(String url) throws Exception {
+        PropertiesPropertyResolver.fromUrl(url);
     }
 
     @Test

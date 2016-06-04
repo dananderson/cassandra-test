@@ -21,7 +21,7 @@ import java.lang.annotation.Annotation;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.data.DataSettings;
 import org.unittested.cassandra.test.data.DataSettingsFactory;
-import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
+import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.properties.PropertyResolver;
 
@@ -38,6 +38,6 @@ public class BasicDataSettingsFactory implements DataSettingsFactory {
 
         CassandraData cassandraData = (CassandraData)annotation;
 
-        return new BasicDataSettings(cassandraData.data(), new BasicCqlSourceLoader());
+        return new BasicDataSettings(cassandraData.data(), new BasicCqlResourceLoader());
     }
 }

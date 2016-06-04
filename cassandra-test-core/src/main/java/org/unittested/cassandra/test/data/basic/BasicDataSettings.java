@@ -21,22 +21,23 @@ import java.io.IOException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.data.DataSettings;
-import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
-import org.unittested.cassandra.test.data.cql.CqlSourceLoader;
+import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
+import org.unittested.cassandra.test.data.cql.CqlResourceLoader;
 import org.unittested.cassandra.test.exception.CassandraTestException;
+import org.unittested.cassandra.test.resource.Resource;
 
 public class BasicDataSettings implements DataSettings {
 
     private String [] data;
-    private CqlSourceLoader cqlSourceLoader;
+    private CqlResourceLoader cqlResourceLoader;
 
     public BasicDataSettings() {
-        this(ArrayUtils.EMPTY_STRING_ARRAY, new BasicCqlSourceLoader());
+        this(ArrayUtils.EMPTY_STRING_ARRAY, new BasicCqlResourceLoader());
     }
 
-    public BasicDataSettings(String[] data, CqlSourceLoader cqlSourceLoader) {
+    public BasicDataSettings(String[] data, CqlResourceLoader cqlResourceLoader) {
         this.data = data;
-        this.cqlSourceLoader = cqlSourceLoader;
+        this.cqlResourceLoader = cqlResourceLoader;
     }
 
     @Override
@@ -48,11 +49,14 @@ public class BasicDataSettings implements DataSettings {
     public void load(TestRuntime runtime) {
         runtime.getKeyspace().use();
 
-        for (String cqlSource : this.data) {
+        for (String cqlOrUrl : this.data) {
+
+            Resource resource = Resource.fromCqlOrUrl(cqlOrUrl);
+
             try {
-                this.cqlSourceLoader.loadCqlSource(runtime, cqlSource);
+                this.cqlResourceLoader.loadCqlResource(runtime, resource);
             } catch(IOException e) {
-                throw new CassandraTestException("Bad CQL source from data: %s", cqlSource, e);
+                throw new CassandraTestException("Failed to load data from '%s'", cqlOrUrl, e);
             }
         }
     }

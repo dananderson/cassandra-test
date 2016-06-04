@@ -22,6 +22,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.unittested.cassandra.test.resource.Resource;
+
 /**
  * Specify a properties file to resolve property references in Cassandra Test annotations.
  *
@@ -34,15 +36,21 @@ import java.lang.annotation.Target;
 public @interface CassandraProperties {
 
     /**
-     * Property file locator.
+     * URL pointing to a Java properties file resource.
      * <p>
-     * Locator is in the {@link org.unittested.cassandra.test.io.Locator} format used by Cassandra Test to reference
-     * files.
+     * Accepted URL formats defined in {@link Resource}
      * <p>
-     * Example locator for a classpath properties file, classpath:props.properties, and a filesystem properties
-     * file, file:path/props.properties.
+     * Example URLs
+     * <ul>
+     *     <li>classpath:cassandra.properties</li>
+     *     <li>classpath//:cassandra.properties</li>
+     *     <li>file:cassandra.properties</li>
+     *     <li>file//:cassandra.properties</li>
+     *     <li>classpath:my%20test%20data.properties</li>
+     *     <li>classpath:my test data.properties (spaces OK)</li>
+     * </ul>
      *
-     * @return Property file locator.
+     * @return URL pointing to a Java properties file resource.
      */
     String value();
 }

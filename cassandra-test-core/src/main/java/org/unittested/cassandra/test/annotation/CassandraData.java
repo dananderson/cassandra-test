@@ -45,21 +45,22 @@ public @interface CassandraData {
     /**
      * Data source list.
      * <p>
-     * Each data source can be a CQL statement, semi-colon (;) delimited set of CQL statements or a data source locator.
-     * The data source locator takes the form of protocol.contentType: {value}.
+     * Each data source string entry can be either CQL statements or a URL pointing to a text file with CQL statements.
+     * The format for the CQL statements is similar to cql files accepted by cqlsh. {@link org.unittested.cassandra.test.resource.Resource.ContentType#CQL}
+     * contains more info on the format.
      * <p>
-     * Supported Protocols
-     * <ul>
-     *     <li>string - String literal.</li>
-     *     <li>file - Path to file on the filesystem.</li>
-     *     <li>classpath - Path to file in the classpath.</li>
-     * </ul>
-     * Supported Content Types
-     * <ul>
-     *     <li>cql - Semi-colon (;) delimited set of CQL statements.</li>
-     * </ul>
+     * CQL statements in CassandraData should be limited to data insertion (INSERT, BATCH, USE, etc are OK). Schema
+     * altering statements should appear in CassandraKeyspace schema.
      * <p>
-     * Schema altering CQL statements should not appear in data sources.
+     * Example Data Source Strings
+     * <ul>
+     *     <li>INSERT INTO x(id) VALUES (1);</li>
+     *     <li>INSERT INTO x(id) VALUES (1);INSERT INTO x(id) VALUES (2);</li>
+     *     <li>file:data.cql</li>
+     *     <li>file://data.cql</li>
+     *     <li>classpath:data.cql</li>
+     *     <li>classpath://data.cql</li>
+     * </ul>
      *
      * @return Data source list.
      */

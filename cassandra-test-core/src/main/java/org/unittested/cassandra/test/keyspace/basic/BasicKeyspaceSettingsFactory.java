@@ -19,7 +19,7 @@ package org.unittested.cassandra.test.keyspace.basic;
 import java.lang.annotation.Annotation;
 
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
-import org.unittested.cassandra.test.data.cql.BasicCqlSourceLoader;
+import org.unittested.cassandra.test.data.cql.BasicCqlResourceLoader;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.properties.PropertyResolver;
 import org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum;
@@ -47,6 +47,6 @@ public class BasicKeyspaceSettingsFactory implements KeyspaceSettingsFactory {
                 propertyResolver.resolve(cassandraKeyspace.schema()),
                 SchemaChangeDetectionEnum.valueOf(propertyResolver.resolve(cassandraKeyspace.schemaChangeDetection())),
                 propertyResolver.resolve(cassandraKeyspace.protectedTables()),
-                new BasicCqlSourceLoader());
+                new BasicCqlResourceLoader());
     }
 }

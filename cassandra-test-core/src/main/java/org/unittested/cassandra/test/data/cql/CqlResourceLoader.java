@@ -19,11 +19,12 @@ package org.unittested.cassandra.test.data.cql;
 import java.io.IOException;
 
 import org.unittested.cassandra.test.TestRuntime;
+import org.unittested.cassandra.test.resource.Resource;
 
 /**
  * TODO: Document this interface.
  */
-public interface CqlSourceLoader {
+public interface CqlResourceLoader {
 
-    void loadCqlSource(TestRuntime runtime, String cqlSource) throws IOException;
+    void loadCqlResource(TestRuntime runtime, Resource resource) throws IOException;
 }
