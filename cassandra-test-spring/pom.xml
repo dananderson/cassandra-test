@@ -32,7 +32,7 @@
 
   <dependencies>
 
-    <!-- Compile scope dependencies. -->
+    <!-- compile scope -->
 
     <dependency>
       <groupId>org.unittested</groupId>
@@ -41,7 +41,7 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- Compile scope dependencies. -->
+    <!-- provided scope -->
 
     <dependency>
       <groupId>org.springframework</groupId>
@@ -57,7 +57,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- Test scope dependencies. -->
+    <!-- test scope -->
 
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -73,41 +73,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Import test jar for TestNG TestListener in core. -->
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-core</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <compilerArgument>-Xlint:all</compilerArgument>
-          <showWarnings>true</showWarnings>
-          <showDeprecation>true</showDeprecation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
