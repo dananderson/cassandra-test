@@ -44,7 +44,7 @@ public class BasicConnectSettingsFactoryTest {
         CassandraConnect cassandraConnect = FactoryTestAnnotations.class.getAnnotation(CassandraConnect.class);
 
         // when
-        ConnectSettings connectSettings = connectSettingsFactory.create(cassandraConnect, PropertiesPropertyResolver.SYSTEM);
+        ConnectSettings connectSettings = connectSettingsFactory.create(cassandraConnect, PropertiesPropertyResolver.DEFAULT);
 
         // then
         assertThat(connectSettings, instanceOf(BasicConnectSettings.class));
@@ -69,7 +69,7 @@ public class BasicConnectSettingsFactoryTest {
         ConnectSettingsFactory connectSettingsFactory = new BasicConnectSettingsFactory();
 
         // when
-        connectSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
+        connectSettingsFactory.create(annotation, PropertiesPropertyResolver.DEFAULT);
 
         // then
         // expect IllegalArgumentException

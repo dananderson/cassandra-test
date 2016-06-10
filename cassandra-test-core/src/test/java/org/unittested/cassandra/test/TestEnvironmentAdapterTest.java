@@ -51,7 +51,7 @@ public class TestEnvironmentAdapterTest {
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
 
         // when
-        adapter.onBeforeClass(MockTest.class, null);
+        adapter.onBeforeClass(MockTest.class);
 
         // then
         verify(testSettings.getConnectSettings(), times(1)).connect();
@@ -79,10 +79,10 @@ public class TestEnvironmentAdapterTest {
         when(session.getCluster()).thenReturn(cluster);
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
 
-        adapter.onBeforeClass(MockTest.class, null);
+        adapter.onBeforeClass(MockTest.class);
 
         // when
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onPrepareTestInstance(test);
 
         // then
         assertThat(test.cluster, is(cluster));
@@ -112,10 +112,10 @@ public class TestEnvironmentAdapterTest {
         when(session.getCluster()).thenReturn(cluster);
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
 
-        adapter.onBeforeClass(MockTest.class, null);
+        adapter.onBeforeClass(MockTest.class);
 
         // when
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onPrepareTestInstance(test);
 
         // then
         // CassandraTestException
@@ -127,7 +127,7 @@ public class TestEnvironmentAdapterTest {
         TestEnvironmentAdapter adapter = new TestEnvironmentAdapter(createSettings());
 
         // when
-        adapter.onPrepareTestInstance(this, null);
+        adapter.onPrepareTestInstance(this);
 
         // then
         // no exception on uninitialized adapter (onBeforeClass not called).
@@ -145,11 +145,11 @@ public class TestEnvironmentAdapterTest {
         when(session.getCluster()).thenReturn(cluster);
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
 
-        adapter.onBeforeClass(MockTest.class, null);
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onBeforeClass(MockTest.class);
+        adapter.onPrepareTestInstance(test);
 
         // when
-        adapter.onAfterClass(MockTest.class, null);
+        adapter.onAfterClass(MockTest.class);
 
         // then
         verify(cluster, times(1)).close();
@@ -171,12 +171,12 @@ public class TestEnvironmentAdapterTest {
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
         when(testSettings.getRollbackSettings()).thenThrow(new RuntimeException());
 
-        adapter.onBeforeClass(MockTest.class, null);
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onBeforeClass(MockTest.class);
+        adapter.onPrepareTestInstance(test);
 
         try {
             // when
-            adapter.onAfterClass(MockTest.class, null);
+            adapter.onAfterClass(MockTest.class);
         } catch (Exception e) {
             // then
             verify(cluster, times(1)).close();
@@ -193,7 +193,7 @@ public class TestEnvironmentAdapterTest {
         TestEnvironmentAdapter adapter = new TestEnvironmentAdapter(createSettings());
 
         // when
-        adapter.onAfterClass(MockTest.class, null);
+        adapter.onAfterClass(MockTest.class);
 
         // then
         // no exception on uninitialized adapter (onBeforeClass not called).
@@ -212,11 +212,11 @@ public class TestEnvironmentAdapterTest {
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
         when(testSettings.getKeyspaceSettings().getKeyspace()).thenReturn("test");
 
-        adapter.onBeforeClass(MockTest.class, null);
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onBeforeClass(MockTest.class);
+        adapter.onPrepareTestInstance(test);
 
         // when
-        adapter.onBeforeMethod(test, test.getMethod(), null);
+        adapter.onBeforeMethod(test, test.getMethod());
 
         // then
         assertThat(adapter.getRuntime().getTestMethod(), is(test.getMethod()));
@@ -234,7 +234,7 @@ public class TestEnvironmentAdapterTest {
         MockTest test = new MockTest();
 
         // when
-        adapter.onBeforeMethod(test, test.getMethod(), null);
+        adapter.onBeforeMethod(test, test.getMethod());
 
         // then
         // CassandraTestException
@@ -252,11 +252,11 @@ public class TestEnvironmentAdapterTest {
         when(session.getCluster()).thenReturn(cluster);
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
 
-        adapter.onBeforeClass(MockTest.class, null);
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onBeforeClass(MockTest.class);
+        adapter.onPrepareTestInstance(test);
 
         // when
-        adapter.onAfterMethod(test, test.getMethod(), null);
+        adapter.onAfterMethod(test, test.getMethod());
 
         // then
         assertThat(adapter.getRuntime().getTestMethod(), nullValue());
@@ -277,12 +277,12 @@ public class TestEnvironmentAdapterTest {
         when(testSettings.getConnectSettings().connect()).thenReturn(session);
         when(testSettings.getRollbackSettings()).thenThrow(new RuntimeException());
 
-        adapter.onBeforeClass(MockTest.class, null);
-        adapter.onPrepareTestInstance(test, null);
+        adapter.onBeforeClass(MockTest.class);
+        adapter.onPrepareTestInstance(test);
 
         try {
             // when
-            adapter.onAfterMethod(test, test.getMethod(), null);
+            adapter.onAfterMethod(test, test.getMethod());
         } catch (Exception e) {
             // then
             assertThat(adapter.getRuntime().getTestMethod(), nullValue());
@@ -299,7 +299,7 @@ public class TestEnvironmentAdapterTest {
         MockTest test = new MockTest();
 
         // when
-        adapter.onAfterMethod(test, test.getMethod(), null);
+        adapter.onAfterMethod(test, test.getMethod());
 
         // then
         // no exception on uninitialized adapter (onBeforeClass not called).

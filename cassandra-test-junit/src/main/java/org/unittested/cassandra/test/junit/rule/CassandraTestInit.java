@@ -77,7 +77,7 @@ public class CassandraTestInit implements TestRule {
 
     TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass, Object testEnvironmentContext) {
         TestSettingsBuilder defaults = new TestSettingsBuilder()
-                .withDefaultPropertyResolver(PropertiesPropertyResolver.SYSTEM)
+                .withDefaultPropertyResolver(PropertiesPropertyResolver.DEFAULT)
                 .withTestClass(testClass);
 
         return new TestEnvironmentAdapter(createTestSettings(defaults, testClass, testEnvironmentContext));

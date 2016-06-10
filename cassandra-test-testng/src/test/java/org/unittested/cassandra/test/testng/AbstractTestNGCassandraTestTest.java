@@ -51,11 +51,11 @@ public class AbstractTestNGCassandraTestTest extends AbstractTestNGCassandraTest
         base.afterClass();
 
         // then
-        verify(adapter, times(1)).onBeforeClass(base.getClass(), null);
-        verify(adapter, times(1)).onPrepareTestInstance(base, null);
-        verify(adapter, times(1)).onBeforeMethod(base, testMethod, null);
-        verify(adapter, times(1)).onAfterMethod(base, testMethod, null);
-        verify(adapter, times(1)).onAfterClass(base.getClass(), null);
+        verify(adapter, times(1)).onBeforeClass(base.getClass());
+        verify(adapter, times(1)).onPrepareTestInstance(base);
+        verify(adapter, times(1)).onBeforeMethod(base, testMethod);
+        verify(adapter, times(1)).onAfterMethod(base, testMethod);
+        verify(adapter, times(1)).onAfterClass(base.getClass());
         verifyNoMoreInteractions(adapter);
     }
 

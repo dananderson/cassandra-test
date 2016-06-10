@@ -89,7 +89,7 @@ public class PropertiesPropertyResolverTest {
 
     @Test
     public void systemProperties() throws Exception {
-        assertThat(PropertiesPropertyResolver.SYSTEM.resolve("${java.class.path}"), is(not("${java.class.path}")));
+        assertThat(PropertiesPropertyResolver.DEFAULT.resolve("${java.class.path}"), is(not("${java.class.path}")));
     }
 
     @Test(expectedExceptions = NullPointerException.class)

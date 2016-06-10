@@ -83,6 +83,20 @@ public class TestEnvironmentAdapter {
     }
 
     /**
+     * Handle setup of the test class.
+     * <p>
+     * The test environment calls this once prior to test instance creation. Setup is limited to access to
+     * the test class only. All test instance setup should be in {@link #onPrepareTestInstance(Object)}. The
+     * setup is structured like this to support different behaviors of test environments.
+     *
+     * @param testClass Test class.
+     * @throws Exception on test setup failure
+     */
+    public void onBeforeClass(Class<?> testClass) throws Exception {
+        onBeforeClass(testClass, null);
+    }
+
+    /**
      * Handle setup of the test instance.
      * <p>
      * The test environment calls this once when the test instance is created and before the test methods start
@@ -101,6 +115,19 @@ public class TestEnvironmentAdapter {
 
         populateCassandraBeanFields(test, this.runtime);
         this.runtime.updateTest(test);
+    }
+
+    /**
+     * Handle setup of the test instance.
+     * <p>
+     * The test environment calls this once when the test instance is created and before the test methods start
+     * running. Instance setup is performed here, including assigning fields with the {@link CassandraBean} annotation.
+     *
+     * @param test Test instance.
+     * @throws Exception on test setup failure
+     */
+    public void onPrepareTestInstance(Object test) throws Exception {
+        onPrepareTestInstance(test, null);
     }
 
     /**
@@ -129,6 +156,19 @@ public class TestEnvironmentAdapter {
     }
 
     /**
+     * Handle clean up of the test instance and class.
+     * <p>
+     * The test environment calls this once after all test methods have run. The Cassandra keyspace is cleaned up and
+     * the connection is closed.
+     *
+     * @param testClass Test class.
+     * @throws Exception on test clean up failure
+     */
+    public void onAfterClass(Class<?> testClass) throws Exception {
+        onAfterClass(testClass, null);
+    }
+
+    /**
      * Handle setup before a test method runs.
      * <p>
      * The test environment calls this before each test method that is run. The keyspace, schema and data are examined
@@ -154,6 +194,21 @@ public class TestEnvironmentAdapter {
     }
 
     /**
+     * Handle setup before a test method runs.
+     * <p>
+     * The test environment calls this before each test method that is run. The keyspace, schema and data are examined
+     * to check that the Cassandra state is consistent with the current configuration. This method will ensure that
+     * the Cassandra state is synced with the configuration.
+     *
+     * @param test Test instance.
+     * @param testMethod Test method.
+     * @throws Exception on test setup failure
+     */
+    public void onBeforeMethod(Object test, Method testMethod) throws Exception {
+        onBeforeMethod(test, testMethod, null);
+    }
+
+    /**
      * Handle tear down after a test method runs.
      * <p>
      * The test environment calls this after each test method that is run. Rollback of Cassandra data is performed here.
@@ -175,6 +230,19 @@ public class TestEnvironmentAdapter {
         } finally {
             this.runtime.updateTestMethod(null);
         }
+    }
+
+    /**
+     * Handle tear down after a test method runs.
+     * <p>
+     * The test environment calls this after each test method that is run. Rollback of Cassandra data is performed here.
+     *
+     * @param test Test instance.
+     * @param testMethod Test method.
+     * @throws Exception on test clean up failure
+     */
+    public void onAfterMethod(Object test, Method testMethod) throws Exception {
+        onAfterMethod(test, testMethod, null);
     }
 
     /**

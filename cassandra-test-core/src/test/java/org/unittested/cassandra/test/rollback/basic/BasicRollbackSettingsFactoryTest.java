@@ -26,7 +26,7 @@ public class BasicRollbackSettingsFactoryTest {
         CassandraRollback rollback = FactoryTestAnnotations.class.getAnnotation(CassandraRollback.class);
 
         // when
-        RollbackSettings rollbackSettings = rollbackSettingsFactory.create(rollback, PropertiesPropertyResolver.SYSTEM);
+        RollbackSettings rollbackSettings = rollbackSettingsFactory.create(rollback, PropertiesPropertyResolver.DEFAULT);
 
         // then
         assertThat(rollbackSettings, instanceOf(BasicRollbackSettings.class));
@@ -51,7 +51,7 @@ public class BasicRollbackSettingsFactoryTest {
         RollbackSettingsFactory rollbackSettingsFactory = new BasicRollbackSettingsFactory();
 
         // when
-        rollbackSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
+        rollbackSettingsFactory.create(annotation, PropertiesPropertyResolver.DEFAULT);
 
         // then
         // expect IllegalArgumentException

@@ -50,7 +50,7 @@ public class CassandraTest implements TestRule {
         this.testEnvironmentContext = testEnvironmentContext;
 
         try {
-            this.init.getAdapter().onPrepareTestInstance(this.testInstance, null);
+            this.init.getAdapter().onPrepareTestInstance(this.testInstance, testEnvironmentContext);
         } catch (Exception e) {
             throw new CassandraTestException("Failed to prepare the test instance!", e);
         }

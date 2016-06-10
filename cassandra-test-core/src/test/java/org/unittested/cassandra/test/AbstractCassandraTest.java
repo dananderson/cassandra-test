@@ -52,13 +52,13 @@ public abstract class AbstractCassandraTest {
 
     @BeforeClass(alwaysRun = true, dependsOnMethods = "beforeClass")
     public void prepareTestInstance() throws Exception {
-        this.adapter.onPrepareTestInstance(this, null);
+        this.adapter.onPrepareTestInstance(this);
     }
 
     @AfterClass(alwaysRun = true)
     public void afterClass() throws Exception {
         if (this.adapter != null) {
-            this.adapter.onAfterClass(getClass(), null);
+            this.adapter.onAfterClass(getClass());
             this.adapter = null;
         }
     }
@@ -66,14 +66,14 @@ public abstract class AbstractCassandraTest {
     @BeforeMethod(alwaysRun = true)
     public void beforeMethod(Method testMethod) throws Exception {
         if (this.adapter != null) {
-            this.adapter.onBeforeMethod(this, testMethod, null);
+            this.adapter.onBeforeMethod(this, testMethod);
         }
     }
 
     @AfterMethod(alwaysRun = true)
     public void afterMethod(Method testMethod) throws Exception {
         if (this.adapter != null) {
-            this.adapter.onAfterMethod(this, testMethod, null);
+            this.adapter.onAfterMethod(this, testMethod);
         }
     }
 
@@ -96,7 +96,7 @@ public abstract class AbstractCassandraTest {
     private TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
         return new TestEnvironmentAdapter(
             new TestSettingsBuilder()
-                    .withDefaultPropertyResolver(PropertiesPropertyResolver.SYSTEM)
+                    .withDefaultPropertyResolver(PropertiesPropertyResolver.DEFAULT)
                     .withTestClass(testClass)
                     .build());
     }

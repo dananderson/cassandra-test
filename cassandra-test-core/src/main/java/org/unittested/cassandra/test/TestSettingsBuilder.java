@@ -56,7 +56,7 @@ public class TestSettingsBuilder {
     private Class<?> testClass;
 
     private PropertyResolver propertyResolver;
-    private PropertyResolver defaultPropertyResolver = PropertiesPropertyResolver.SYSTEM;
+    private PropertyResolver defaultPropertyResolver = PropertiesPropertyResolver.DEFAULT;
 
     private ConnectSettings connectSettings;
     private KeyspaceSettings keyspaceSettings;

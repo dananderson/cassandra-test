@@ -23,7 +23,7 @@ public class BasicDataSettingsFactoryTest {
         CassandraData data = FactoryTestAnnotations.class.getAnnotation(CassandraData.class);
 
         // when
-        DataSettings dataSettings = dataSettingsFactory.create(data, PropertiesPropertyResolver.SYSTEM);
+        DataSettings dataSettings = dataSettingsFactory.create(data, PropertiesPropertyResolver.DEFAULT);
 
         // then
         assertThat(dataSettings, instanceOf(BasicDataSettings.class));
@@ -43,7 +43,7 @@ public class BasicDataSettingsFactoryTest {
         DataSettingsFactory dataSettingsFactory = new BasicDataSettingsFactory();
 
         // when
-        dataSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
+        dataSettingsFactory.create(annotation, PropertiesPropertyResolver.DEFAULT);
 
         // then
         // expect IllegalArgumentException

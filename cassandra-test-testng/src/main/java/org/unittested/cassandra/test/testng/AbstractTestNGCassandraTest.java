@@ -65,20 +65,20 @@ public abstract class AbstractTestNGCassandraTest {
             throw new CassandraTestException("Failed to create a TestEnvironmentAdapter.");
         }
 
-        this.adapter.onBeforeClass(getClass(), null);
+        this.adapter.onBeforeClass(getClass());
     }
 
     @BeforeClass(alwaysRun = true, dependsOnMethods = "beforeClass")
     public void prepareTestInstance() throws Exception {
         if (this.adapter != null) {
-            this.adapter.onPrepareTestInstance(this, null);
+            this.adapter.onPrepareTestInstance(this);
         }
     }
 
     @AfterClass(alwaysRun = true)
     public void afterClass() throws Exception {
         if (this.adapter != null) {
-            this.adapter.onAfterClass(getClass(), null);
+            this.adapter.onAfterClass(getClass());
             this.adapter = null;
         }
     }
@@ -86,14 +86,14 @@ public abstract class AbstractTestNGCassandraTest {
     @BeforeMethod(alwaysRun = true)
     public void beforeMethod(Method testMethod) throws Exception {
         if (this.adapter != null) {
-            this.adapter.onBeforeMethod(this, testMethod, null);
+            this.adapter.onBeforeMethod(this, testMethod);
         }
     }
 
     @AfterMethod(alwaysRun = true)
     public void afterMethod(Method testMethod) throws Exception {
         if (this.adapter != null) {
-            this.adapter.onAfterMethod(this, testMethod, null);
+            this.adapter.onAfterMethod(this, testMethod);
         }
     }
 
@@ -115,7 +115,7 @@ public abstract class AbstractTestNGCassandraTest {
 
     TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
         TestSettingsBuilder defaults = new TestSettingsBuilder()
-                .withDefaultPropertyResolver(PropertiesPropertyResolver.SYSTEM)
+                .withDefaultPropertyResolver(PropertiesPropertyResolver.DEFAULT)
                 .withTestClass(testClass);
 
         return new TestEnvironmentAdapter(createTestSettings(defaults, testClass));

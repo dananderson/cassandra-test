@@ -31,7 +31,7 @@ public class PropertiesPropertyResolver extends AbstractPropertyResolver {
     /**
      * {@link PropertyResolver} from Java System {@link Properties}.
      */
-    public static final PropertyResolver SYSTEM = new PropertiesPropertyResolver(System.getProperties());
+    public static final PropertyResolver DEFAULT = new PropertiesPropertyResolver(System.getProperties());
 
     private Properties properties;
 

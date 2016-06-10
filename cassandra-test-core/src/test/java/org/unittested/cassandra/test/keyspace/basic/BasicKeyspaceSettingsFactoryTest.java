@@ -41,7 +41,7 @@ public class BasicKeyspaceSettingsFactoryTest {
         CassandraKeyspace cassandraKeyspace = FactoryTestAnnotations.class.getAnnotation(CassandraKeyspace.class);
 
         // when
-        KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(cassandraKeyspace, PropertiesPropertyResolver.SYSTEM);
+        KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(cassandraKeyspace, PropertiesPropertyResolver.DEFAULT);
 
         // then
         assertThat(keyspaceSettings, instanceOf(BasicKeyspaceSettings.class));
@@ -66,7 +66,7 @@ public class BasicKeyspaceSettingsFactoryTest {
         KeyspaceSettingsFactory keyspaceSettingsFactory = new BasicKeyspaceSettingsFactory();
 
         // when
-        keyspaceSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
+        keyspaceSettingsFactory.create(annotation, PropertiesPropertyResolver.DEFAULT);
 
         // then
         // expect IllegalArgumentException

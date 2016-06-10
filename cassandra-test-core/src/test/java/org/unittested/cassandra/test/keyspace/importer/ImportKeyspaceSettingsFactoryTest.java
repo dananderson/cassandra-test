@@ -25,7 +25,7 @@ public class ImportKeyspaceSettingsFactoryTest {
         CassandraImportKeyspace immutable = FactoryTestAnnotations.class.getAnnotation(CassandraImportKeyspace.class);
 
         // when
-        KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(immutable, PropertiesPropertyResolver.SYSTEM);
+        KeyspaceSettings keyspaceSettings = keyspaceSettingsFactory.create(immutable, PropertiesPropertyResolver.DEFAULT);
 
         // then
         assertThat(keyspaceSettings, instanceOf(ImportKeyspaceSettings.class));
@@ -50,7 +50,7 @@ public class ImportKeyspaceSettingsFactoryTest {
         KeyspaceSettingsFactory keyspaceSettingsFactory = new ImportKeyspaceSettingsFactory();
 
         // when
-        keyspaceSettingsFactory.create(annotation, PropertiesPropertyResolver.SYSTEM);
+        keyspaceSettingsFactory.create(annotation, PropertiesPropertyResolver.DEFAULT);
 
         // then
         // expect IllegalArgumentException
