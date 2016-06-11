@@ -9,20 +9,20 @@ cache:
 
 env:
   - CASSANDRA_VERSION=3.5 CASSANDRA_DRIVER_VERSION=3.0.2 CODE_COVERAGE="-P coverage"
-  - CASSANDRA_VERSION=3.0.0 CASSANDRA_DRIVER_VERSION=3.0.0
-  - CASSANDRA_VERSION=2.2.0 CASSANDRA_DRIVER_VERSION=2.1.0
-  - CASSANDRA_VERSION=2.2.0 CASSANDRA_DRIVER_VERSION=2.1.10.2
-  - CASSANDRA_VERSION=2.1.0 CASSANDRA_DRIVER_VERSION=2.1.0
-  - CASSANDRA_VERSION=2.0.4 CASSANDRA_DRIVER_VERSION=2.0.2
-  - CASSANDRA_VERSION=2.0.4 CASSANDRA_DRIVER_VERSION=2.0.12.2
+#  - CASSANDRA_VERSION=3.0.0 CASSANDRA_DRIVER_VERSION=3.0.0
+#  - CASSANDRA_VERSION=2.2.0 CASSANDRA_DRIVER_VERSION=2.1.0
+#  - CASSANDRA_VERSION=2.2.0 CASSANDRA_DRIVER_VERSION=2.1.10.2
+#  - CASSANDRA_VERSION=2.1.0 CASSANDRA_DRIVER_VERSION=2.1.0
+#  - CASSANDRA_VERSION=2.0.4 CASSANDRA_DRIVER_VERSION=2.0.2
+#  - CASSANDRA_VERSION=2.0.4 CASSANDRA_DRIVER_VERSION=2.0.12.2
 
 before_install:
-  - pip install --user ccm
   - pip install --user codecov
-  - export PATH=$PATH:$HOME/.local/bin
-  - jdk_switcher use oraclejdk8
-  - ccm create -v binary:$CASSANDRA_VERSION -n 1 -s -b --vnodes cassandra_test
-  - jdk_switcher use $TRAVIS_JDK_VERSION
+#  - pip install --user ccm
+#  - export PATH=$PATH:$HOME/.local/bin
+#  - jdk_switcher use oraclejdk8
+#  - ccm create -v binary:$CASSANDRA_VERSION -n 1 -s -b --vnodes cassandra_test
+#  - jdk_switcher use $TRAVIS_JDK_VERSION
 
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dcassandra.driver.version=$CASSANDRA_DRIVER_VERSION -B -V
 
@@ -32,3 +32,6 @@ after_success: if [[ $CODE_COVERAGE ]]; then codecov; fi
 
 jdk:
   - openjdk6
+
+services:
+  - cassandra
