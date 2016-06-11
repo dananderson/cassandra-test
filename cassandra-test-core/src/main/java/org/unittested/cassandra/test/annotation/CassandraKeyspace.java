@@ -37,11 +37,6 @@ import org.unittested.cassandra.test.keyspace.basic.BasicKeyspaceSettingsFactory
  * is dropped, re-created and schema is installed. Schema can change if the test method alters the schema or
  * {@link CassandraRollback} drops the keyspace. In conjunction with CassandraRollback settings, the keyspace schema
  * integrity ensures each test method runs against consistent Cassandra state.
- * <p>
- * All settings in this annotation can be defined inline or by property references in the form of ${property.name}. Property
- * names are resolved with the {@link org.unittested.cassandra.test.properties.PropertyResolver} configured in
- * {@link org.unittested.cassandra.test.TestEnvironmentAdapter}. Property references are the way to avoid hard coding
- * keyspace and connection settings in annotations.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -50,6 +45,8 @@ public @interface CassandraKeyspace {
 
     /**
      * The test keyspace.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return The test keyspace.
      */
@@ -59,6 +56,8 @@ public @interface CassandraKeyspace {
      * Is the keyspace ID case sensitive?
      * <p>
      * Supported Values: "true", "false"
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return {@link Boolean}
      */
@@ -71,6 +70,8 @@ public @interface CassandraKeyspace {
      * default keyspace properties.
      * <p>
      * If false, a create keyspace CQL statement for the test keyspace must appear in the schema property.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return {@link Boolean}
      */
@@ -94,6 +95,7 @@ public @interface CassandraKeyspace {
      *     <li>classpath:schema.cql</li>
      *     <li>classpath://schema.cql</li>
      * </ul>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return Data source list.
      */

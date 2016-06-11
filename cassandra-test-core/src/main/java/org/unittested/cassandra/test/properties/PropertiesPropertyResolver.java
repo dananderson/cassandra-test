@@ -29,9 +29,16 @@ import org.unittested.cassandra.test.resource.Resource;
 public class PropertiesPropertyResolver extends AbstractPropertyResolver {
 
     /**
-     * {@link PropertyResolver} from Java System {@link Properties}.
+     * Default properties file URL.
      */
-    public static final PropertyResolver DEFAULT = new PropertiesPropertyResolver(System.getProperties());
+    public static final String DEFAULT_PROPERTIES_URL = "classpath:cassandra-test.properties";
+
+    /**
+     * Default {@link PropertyResolver} composed of {@link #DEFAULT_PROPERTIES_URL} from the class path and
+     * System {@link Properties}. If the default properties file does not exist, this PropertyResolver will only
+     * contain System Properties.
+     */
+    public static final PropertyResolver DEFAULT = createDefault(DEFAULT_PROPERTIES_URL);
 
     private Properties properties;
 
@@ -43,18 +50,18 @@ public class PropertiesPropertyResolver extends AbstractPropertyResolver {
      * Create a {@link PropertyResolver} from a {@link Resource} URL.
      *
      * @param url URL to properties file.
+     * @param withSystemDefaults If true, System {@link Properties} will be included in the PropertyResolver.
      * @return {@link PropertyResolver}
      */
-    public static PropertyResolver fromUrl(String url) {
+    public static PropertyResolver fromUrl(String url, boolean withSystemDefaults) {
         Resource resource = new Resource(url);
         InputStream stream = null;
-        Properties properties = new Properties();
+        Properties properties = withSystemDefaults ? new Properties(System.getProperties()) : new Properties();
 
         try {
             stream = resource.getStream();
             properties.load(stream);
         } catch (Exception e) {
-            // IOException from getStream, IllegalArgumentException from load (via text parsing)
             throw new CassandraTestException("Failed to load properties file '%s'", url, e);
         } finally {
             if (stream != null) {
@@ -69,8 +76,16 @@ public class PropertiesPropertyResolver extends AbstractPropertyResolver {
         return new PropertiesPropertyResolver(properties);
     }
 
+    private static PropertyResolver createDefault(String defaultPropertiesUrl) {
+        try {
+            return fromUrl(defaultPropertiesUrl, true);
+        } catch (Exception e) {
+            return new PropertiesPropertyResolver(System.getProperties());
+        }
+    }
+
     @Override
-    protected String getProperty(final String propertyName, final String defaultValue) {
+    public String getProperty(String propertyName, String defaultValue) {
         return this.properties.getProperty(propertyName, defaultValue);
     }
 }

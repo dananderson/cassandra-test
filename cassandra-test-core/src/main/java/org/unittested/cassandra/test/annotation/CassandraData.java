@@ -31,11 +31,6 @@ import org.unittested.cassandra.test.data.basic.BasicDataSettingsFactory;
  * Data sources will be executed before each test method in the test class to ensure that each test runs against a
  * consistent data set. When a test method is finished, {@link CassandraRollback} clears any data populated by
  * CassandraData or the test run itself.
- * <p>
- * All settings in this annotation can be defined inline or by property references in the form of ${property.name}. Property
- * names are resolved with the {@link org.unittested.cassandra.test.properties.PropertyResolver} configured in
- * {@link org.unittested.cassandra.test.TestEnvironmentAdapter}. Property references are the way to avoid hard coding
- * keyspace and connection settings in annotations.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -61,6 +56,7 @@ public @interface CassandraData {
      *     <li>classpath:data.cql</li>
      *     <li>classpath://data.cql</li>
      * </ul>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return Data source list.
      */

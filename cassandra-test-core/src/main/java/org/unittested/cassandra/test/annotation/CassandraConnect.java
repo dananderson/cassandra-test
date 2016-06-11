@@ -30,11 +30,6 @@ import org.unittested.cassandra.test.connect.basic.BasicConnectSettingsFactory;
  *
  * Specifies how the {@link com.datastax.driver.core.Cluster} and {@link com.datastax.driver.core.Session} driver
  * connection objects will be configured for this test.
- * <p>
- * All settings in this annotation can be defined inline or by property references in the form of ${property.name}. Property
- * names are resolved with the {@link org.unittested.cassandra.test.properties.PropertyResolver} configured in
- * {@link org.unittested.cassandra.test.TestEnvironmentAdapter}. Property references are the way to avoid hard coding
- * keyspace and connection settings in annotations.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -44,7 +39,9 @@ public @interface CassandraConnect {
     /**
      * Cassandra node address(es).
      * <p>
-     * Comma separated lists of addresses are accepeted.
+     * Comma separated list of addresses is supported. For example, host = { "127.0.0.1, 127.0.0.2" }
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return Cassandra node address(es).
      */
@@ -52,6 +49,8 @@ public @interface CassandraConnect {
 
     /**
      * Cassandra binary port.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return {@link Integer}
      */
@@ -61,6 +60,8 @@ public @interface CassandraConnect {
      * Cassandra username.
      * <p>
      * If the username is not specified, no authentication will be used to connect to Cassandra.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return Username.
      */
@@ -68,6 +69,8 @@ public @interface CassandraConnect {
 
     /**
      * Cassandra password.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return Password.
      */

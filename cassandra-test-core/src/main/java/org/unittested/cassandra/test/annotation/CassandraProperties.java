@@ -25,10 +25,14 @@ import java.lang.annotation.Target;
 import org.unittested.cassandra.test.resource.Resource;
 
 /**
- * Specify a properties file to resolve property references in Cassandra Test annotations.
+ * Properties file to load.
  *
- * If CassandraProperties is not set, default properties will be selected by the test environment. For most environments,
- * System properties are used as the default property set.
+ * Properties are primarily used to resolve property references in Cassandra Test annotation values. Property references
+ * take the form of ${property.name} embedded in a string. Property references are supported in annotation values to
+ * avoid hard coding connection and keyspace information in annotations.
+ * <p>
+ * If CassandraProperties is not specified by a test, properties will be loaded from /cassandra-test.properties if it
+ * exists in the classpath.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -36,21 +40,10 @@ import org.unittested.cassandra.test.resource.Resource;
 public @interface CassandraProperties {
 
     /**
-     * URL pointing to a Java properties file resource.
-     * <p>
-     * Accepted URL formats defined in {@link Resource}
-     * <p>
-     * Example URLs
-     * <ul>
-     *     <li>classpath:cassandra.properties</li>
-     *     <li>classpath//:cassandra.properties</li>
-     *     <li>file:cassandra.properties</li>
-     *     <li>file//:cassandra.properties</li>
-     *     <li>classpath:my%20test%20data.properties</li>
-     *     <li>classpath:my test data.properties (spaces OK)</li>
-     * </ul>
+     * Properties file URL.
      *
-     * @return URL pointing to a Java properties file resource.
+     * @return Properties file URL.
+     * @see Resource
      */
     String value();
 }

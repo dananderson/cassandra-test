@@ -41,12 +41,12 @@ public class BasicKeyspaceSettingsFactory implements KeyspaceSettingsFactory {
         CassandraKeyspace cassandraKeyspace = (CassandraKeyspace)annotation;
 
         return new BasicKeyspaceSettings(
-                propertyResolver.resolve(cassandraKeyspace.value()),
-                Boolean.parseBoolean(propertyResolver.resolve(cassandraKeyspace.isCaseSensitiveKeyspace())),
-                Boolean.parseBoolean(propertyResolver.resolve(cassandraKeyspace.autoCreateKeyspace())),
-                propertyResolver.resolve(cassandraKeyspace.schema()),
-                SchemaChangeDetectionEnum.valueOf(propertyResolver.resolve(cassandraKeyspace.schemaChangeDetection())),
-                propertyResolver.resolve(cassandraKeyspace.protectedTables()),
+                propertyResolver.resolveReferences(cassandraKeyspace.value()),
+                Boolean.parseBoolean(propertyResolver.resolveReferences(cassandraKeyspace.isCaseSensitiveKeyspace())),
+                Boolean.parseBoolean(propertyResolver.resolveReferences(cassandraKeyspace.autoCreateKeyspace())),
+                propertyResolver.resolveReferences(cassandraKeyspace.schema()),
+                SchemaChangeDetectionEnum.valueOf(propertyResolver.resolveReferences(cassandraKeyspace.schemaChangeDetection())),
+                propertyResolver.resolveReferences(cassandraKeyspace.protectedTables()),
                 new BasicCqlResourceLoader());
     }
 }

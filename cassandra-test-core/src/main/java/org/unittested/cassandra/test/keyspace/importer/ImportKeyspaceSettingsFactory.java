@@ -36,9 +36,9 @@ public class ImportKeyspaceSettingsFactory implements KeyspaceSettingsFactory {
         CassandraImportKeyspace schema = (CassandraImportKeyspace)annotation;
 
         return new ImportKeyspaceSettings(
-                propertyResolver.resolve(schema.value()),
-                Boolean.parseBoolean(propertyResolver.resolve(schema.isCaseSensitiveKeyspace())),
-                SchemaChangeDetectionEnum.valueOf(propertyResolver.resolve(schema.schemaChangeDetection().toUpperCase())),
-                propertyResolver.resolve(schema.protectedTables()));
+                propertyResolver.resolveReferences(schema.value()),
+                Boolean.parseBoolean(propertyResolver.resolveReferences(schema.isCaseSensitiveKeyspace())),
+                SchemaChangeDetectionEnum.valueOf(propertyResolver.resolveReferences(schema.schemaChangeDetection().toUpperCase())),
+                propertyResolver.resolveReferences(schema.protectedTables()));
     }
 }

@@ -17,6 +17,7 @@
 package org.unittested.cassandra.test.properties;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import org.unittested.cassandra.test.exception.CassandraTestException;
@@ -35,9 +36,11 @@ public class PropertiesPropertyResolverTest {
                 { "${a}", "a_value" },
                 { "${b.c}", "bc_value" },
                 { "${d_e}", "de_value" },
-                { "  ${a}", "a_value" },
-                { "${a}  ", "a_value" },
-                { "  ${a}   ", "a_value" },
+                { "  ${a}", "  a_value" },
+                { "${a}  ", "a_value  " },
+                { "  ${a}   ", "  a_value   " },
+                { "${a},${b.c},${d_e}", "a_value,bc_value,de_value" },
+                { " ${a} ,  ${b.c}  ,   ${d_e}    ", " a_value ,  bc_value  ,   de_value    " },
                 // properties don't exist
                 { "${xxx}", "${xxx}" },
                 { "  ${xxx}", "  ${xxx}" },
@@ -49,25 +52,25 @@ public class PropertiesPropertyResolverTest {
     }
 
     @Test(dataProvider = "validInputs")
-    public void resolveFromProperties(String input, String expectedOutput) throws Exception {
+    public void resolveReferencesFromProperties(String input, String expectedOutput) throws Exception {
         // given
         PropertyResolver propertyResolver = new PropertiesPropertyResolver(getProperties());
 
         // when
-        String output = propertyResolver.resolve(input);
+        String output = propertyResolver.resolveReferences(input);
 
         // then
         assertThat(output, is(expectedOutput));
     }
 
     @Test(dataProvider = "validInputs")
-    public void resolveFromUrl(String input, String expectedOutput) throws Exception {
+    public void resolveReferencesFromUrl(String input, String expectedOutput) throws Exception {
         // given
         PropertyResolver propertyResolver = PropertiesPropertyResolver.fromUrl(
-                "classpath:properties-property-resolver-test.properties");
+                "classpath:properties-property-resolver-test.properties", false);
 
         // when
-        String output = propertyResolver.resolve(input);
+        String output = propertyResolver.resolveReferences(input);
 
         // then
         assertThat(output, is(expectedOutput));
@@ -84,12 +87,12 @@ public class PropertiesPropertyResolverTest {
 
     @Test(dataProvider = "invalidUrls", expectedExceptions = CassandraTestException.class)
     public void fromUrlWithInvalidInput(String url) throws Exception {
-        PropertiesPropertyResolver.fromUrl(url);
+        PropertiesPropertyResolver.fromUrl(url, true);
     }
 
     @Test
     public void systemProperties() throws Exception {
-        assertThat(PropertiesPropertyResolver.DEFAULT.resolve("${java.class.path}"), is(not("${java.class.path}")));
+        assertThat(PropertiesPropertyResolver.DEFAULT.resolveReferences("${java.class.path}"), is(not("${java.class.path}")));
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -98,7 +101,7 @@ public class PropertiesPropertyResolverTest {
         PropertyResolver propertyResolver = new PropertiesPropertyResolver(getProperties());
 
         // when
-        propertyResolver.resolve((String)null);
+        propertyResolver.resolveReferences((String)null);
 
         // then
         // throws NullPointerException
@@ -110,10 +113,35 @@ public class PropertiesPropertyResolverTest {
         PropertyResolver propertyResolver = new PropertiesPropertyResolver(getProperties());
 
         // when
-        propertyResolver.resolve((String [])null);
+        propertyResolver.resolveReferences((String[])null);
 
         // then
         // throws NullPointerException
+    }
+
+    @Test
+    public void createDefault() throws Exception {
+        PropertyResolver propertyResolver = createDefault("classpath:cassandra-test.properties");
+
+        assertThat(propertyResolver, notNullValue());
+        assertThat(propertyResolver.resolveReferences("${cassandra.test.host}"), is("127.0.0.1"));
+        assertThat(propertyResolver.resolveReferences("${cassandra.test.port}"), is("9042"));
+    }
+
+    @Test
+    public void createDefaultWithoutDefaultPropertiesFile() throws Exception {
+        PropertyResolver propertyResolver = createDefault("classpath:xxx");
+
+        assertThat(propertyResolver, notNullValue());
+        assertThat(propertyResolver.resolveReferences("${cassandra.test.host}"), is("${cassandra.test.host}"));
+    }
+
+    private PropertyResolver createDefault(String propertiesUrl) throws Exception {
+        Method createDefault = PropertiesPropertyResolver.class.getDeclaredMethod("createDefault", String.class);
+
+        createDefault.setAccessible(true);
+
+        return (PropertyResolver)createDefault.invoke(null, propertiesUrl);
     }
 
     private Properties getProperties() throws Exception {

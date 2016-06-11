@@ -24,35 +24,48 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractPropertyResolver implements PropertyResolver {
 
-    protected static final Pattern PROPERTY_NAME = Pattern.compile("^\\s*\\$\\{(.+)\\}\\s*$");
+    protected static final Pattern PROPERTY_REFERENCE = Pattern.compile("\\$\\{(.+?)\\}");
 
     @Override
-    public String resolve(final String annotationValue) {
-        if (annotationValue == null) {
-            throw new NullPointerException("annotationValue must be set.");
+    public String resolveReferences(String text) {
+        if (text == null) {
+            throw new NullPointerException("'text' cannot be null.");
         }
 
-        Matcher m = PROPERTY_NAME.matcher(annotationValue);
+        Matcher m = PROPERTY_REFERENCE.matcher(text);
+        StringBuilder buffer = new StringBuilder();
+        int bufferIndex = 0;
 
-        if (m.matches()) {
-            return getProperty(m.group(1), annotationValue);
+        while (m.find()) {
+            if (bufferIndex < m.start()) {
+                buffer.append(text.substring(bufferIndex, m.start()));
+                bufferIndex = m.start();
+            }
+
+            String reference = text.substring(m.start(), m.end());
+
+            buffer.append(getProperty(m.group(1), reference));
+            bufferIndex += reference.length();
         }
 
-        return annotationValue;
+        if (bufferIndex > 0) {
+            return buffer.append(text.substring(bufferIndex, text.length())).toString();
+        }
+
+        return text;
     }
 
     @Override
-    public String[] resolve(final String[] annotationValue) {
-        if (annotationValue == null) {
+    public String[] resolveReferences(String[] text) {
+        if (text == null) {
             throw new NullPointerException("annotationValue array must be set.");
         }
 
-        for (int i = 0; i < annotationValue.length; i++) {
-            annotationValue[i] = resolve(annotationValue[i]);
+        for (int i = 0; i < text.length; i++) {
+            text[i] = resolveReferences(text[i]);
         }
 
-        return annotationValue;
+        return text;
     }
 
-    abstract protected String getProperty(String propertyName, String defaultValue);
 }

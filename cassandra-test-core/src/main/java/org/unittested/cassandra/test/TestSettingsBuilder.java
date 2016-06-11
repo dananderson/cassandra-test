@@ -218,7 +218,7 @@ public class TestSettingsBuilder {
         if (selectedPropertyResolver == null) {
             if (this.testClass != null && this.testClass.isAnnotationPresent(CassandraProperties.class)) {
                 selectedPropertyResolver = PropertiesPropertyResolver.fromUrl(
-                        this.testClass.getAnnotation(CassandraProperties.class).value());
+                        this.testClass.getAnnotation(CassandraProperties.class).value(), true);
             }
 
             if (selectedPropertyResolver == null) {

@@ -40,9 +40,9 @@ public class BasicConnectSettingsFactory implements ConnectSettingsFactory {
         CassandraConnect cassandraConnect = (CassandraConnect)annotation;
 
         return new BasicConnectSettings(
-                Utils.expandCommaDelimitedEntries(propertyResolver.resolve(cassandraConnect.host())),
-                Integer.parseInt(propertyResolver.resolve(cassandraConnect.port())),
-                propertyResolver.resolve(cassandraConnect.username()),
-                propertyResolver.resolve(cassandraConnect.password()));
+                Utils.expandCommaDelimitedEntries(propertyResolver.resolveReferences(cassandraConnect.host())),
+                Integer.parseInt(propertyResolver.resolveReferences(cassandraConnect.port())),
+                propertyResolver.resolveReferences(cassandraConnect.username()),
+                propertyResolver.resolveReferences(cassandraConnect.password()));
     }
 }

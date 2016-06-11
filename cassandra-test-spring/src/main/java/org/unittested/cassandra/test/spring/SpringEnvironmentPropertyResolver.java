@@ -32,7 +32,7 @@ public class SpringEnvironmentPropertyResolver extends AbstractPropertyResolver 
     }
 
     @Override
-    protected String getProperty(final String propertyName, final String defaultValue) {
+    public String getProperty(final String propertyName, final String defaultValue) {
         return this.environment.getProperty(propertyName, defaultValue);
     }
 }

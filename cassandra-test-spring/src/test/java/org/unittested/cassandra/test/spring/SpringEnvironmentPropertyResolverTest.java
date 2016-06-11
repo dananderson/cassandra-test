@@ -16,7 +16,7 @@ public class SpringEnvironmentPropertyResolverTest {
         SpringEnvironmentPropertyResolver resolver = new SpringEnvironmentPropertyResolver(environment);
 
         // when
-        String value = resolver.resolve("${key}");
+        String value = resolver.resolveReferences("${key}");
 
         // then
         assertThat(value, is("value"));
@@ -30,7 +30,7 @@ public class SpringEnvironmentPropertyResolverTest {
         SpringEnvironmentPropertyResolver resolver = new SpringEnvironmentPropertyResolver(environment);
 
         // when
-        String [] value = resolver.resolve(new String [] { "${key1}", "${key2}" });
+        String [] value = resolver.resolveReferences(new String[]{"${key1}", "${key2}"});
 
         // then
         assertThat(value, arrayContaining("value1", "value2"));

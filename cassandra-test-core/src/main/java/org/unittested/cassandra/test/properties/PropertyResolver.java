@@ -17,30 +17,39 @@
 package org.unittested.cassandra.test.properties;
 
 /**
- * Resolves property references in Cassandra Test annotations.
+ * Interface for resolving properties.
  *
- * Cassandra Test annotation values can contain property references in the form of ${property.name}. A PropertyResolver
- * identifies property references and the implementation resolves the property to a string value.
+ * This interface is primarily used for resolving property references in Cassandra Test annotation values. Property references
+ * are in the form of ${property.name}.
  * <p>
- * Custom PropertyResolver implementations can be registered with {@link org.unittested.cassandra.test.TestEnvironmentAdapter}.
+ * Custom PropertyResolver implementations can be registered with {@link org.unittested.cassandra.test.TestSettingsBuilder}.
  */
 public interface PropertyResolver {
 
     /**
-     * Resolves any property references in the given annotationValue.
+     * Resolves any property references in the given string.
      * <p>
-     * If a property references does not exist, annotationValue is returned unaltered.
+     * If a property references does not exist, text is returned unaltered.
      *
-     * @param annotationValue Raw annotation string value.
+     * @param text String to resolve.
      * @return Property value or input.
      */
-    String resolve(String annotationValue);
+    String resolveReferences(String text);
 
     /**
-     * Resolve a list of annotation values.
+     * Resolve a list of string values.
      *
-     * @param annotationValue Raw annotation string array value.
+     * @param text String to resolve.
      * @return Property values or input for each array item.
      */
-    String [] resolve(String [] annotationValue);
+    String [] resolveReferences(String[] text);
+
+    /**
+     * Get a property by name.
+     *
+     * @param propertyName Property name.
+     * @param defaultValue If the property does not exist, this value is returned.
+     * @return Value for propertyName.
+     */
+    String getProperty(String propertyName, String defaultValue);
 }

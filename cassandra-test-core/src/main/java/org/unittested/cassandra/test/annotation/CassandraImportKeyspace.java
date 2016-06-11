@@ -34,11 +34,6 @@ import org.unittested.cassandra.test.keyspace.importer.ImportKeyspaceSettingsFac
  * tests are not allowed to alter the keyspace schema. If a test alters the keyspace schema, the tests will fail with a
  * {@link org.unittested.cassandra.test.exception.CassandraTestException}. This annotation is a good choice for test
  * environments that setup a keyspace and schema before running tests.
- * <p>
- * All settings in this annotation can be defined inline or by property references in the form of ${property.name}. Property
- * names are resolved with the {@link org.unittested.cassandra.test.properties.PropertyResolver} configured in
- * {@link org.unittested.cassandra.test.TestEnvironmentAdapter}. Property references are the way to avoid hard coding
- * keyspace and connection settings in annotations.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -47,6 +42,8 @@ public @interface CassandraImportKeyspace {
 
     /**
      * The test keyspace.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return The test keyspace.
      */
@@ -56,6 +53,8 @@ public @interface CassandraImportKeyspace {
      * Is the keyspace ID case sensitive?
      * <p>
      * Supported Values: "true", "false"
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return {@link Boolean}
      */
@@ -65,6 +64,8 @@ public @interface CassandraImportKeyspace {
      * Schema change detection method.
      * <p>
      * Supported Values: String values in {@link SchemaChangeDetection}
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return {@link org.unittested.cassandra.test.keyspace.SchemaChangeDetectionEnum}
      */
@@ -72,6 +73,8 @@ public @interface CassandraImportKeyspace {
 
     /**
      * Tables that should never be truncated on a rollback.
+     * <p>
+     * Property references can appear in this value. For more information on properties, see {@link CassandraProperties}.
      *
      * @return List of protected tables.
      */
