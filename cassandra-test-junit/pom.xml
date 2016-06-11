@@ -19,12 +19,12 @@
   <parent>
     <groupId>org.unittested</groupId>
     <artifactId>cassandra-test-project</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
   </parent>
 
   <groupId>org.unittested</groupId>
   <artifactId>cassandra-test-junit</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
 
   <name>JUnit - ${project.groupId}:${project.artifactId}</name>
   <description>Cassandra Test bindings for the JUnit test environment.</description>
