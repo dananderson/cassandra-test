@@ -1,3 +1,8 @@
+## 1.0.2
+- Added internal CQL file caching in the scope of a test.
+- Properties can be put into class path file /cassandra-test.properties and loaded automatically. @CassandraProperties can still be used for tests that uses a different properties file location.
+- Allow embedded property references in annotations.
+- Test environment context in TestEnvironmentAdapter events is now optional.
 ## 1.0.1
 - Overriding TestSettings is now consistent across environments.
 - Clean up urls and resource loading.

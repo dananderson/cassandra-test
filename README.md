@@ -1,6 +1,6 @@
 # Cassandra Test
 [![Build Status](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](http://mvnrepository.com/artifact/org.unittested/cassandra-test-testng/1.0.1)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](http://mvnrepository.com/artifact/org.unittested/cassandra-test-testng/1.0.2)
 [![codecov.io](https://codecov.io/github/dananderson/cassandra-test/coverage.svg?branch=master)](https://codecov.io/github/dananderson/cassandra-test?branch=master)
 
 Cassandra Test is a unit test and integration test framework featuring support for multiple test environments, schema management, table data loading and connection management.
@@ -27,7 +27,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
     <dependency>
       <groupId>org.unittested</groupId>
       <artifactId>cassandra-test-testng</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
 ```
 [JUnit](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-junit)
@@ -35,7 +35,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
     <dependency>
       <groupId>org.unittested</groupId>
       <artifactId>cassandra-test-junit</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
 ```
 [Spring Test](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-spring)
@@ -43,7 +43,7 @@ Cassandra Test in your project, choose the artifactId that matches your test env
     <dependency>
       <groupId>org.unittested</groupId>
       <artifactId>cassandra-test-spring</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
     </dependency>
 ```
 
