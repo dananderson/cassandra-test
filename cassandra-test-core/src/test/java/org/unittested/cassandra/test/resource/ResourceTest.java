@@ -27,6 +27,9 @@ import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 public class ResourceTest {
 
     @DataProvider
@@ -167,5 +170,14 @@ public class ResourceTest {
 
         // then
         // UnsupportedOperationException
+    }
+
+    @Test
+    public void equalsAndHashCode() throws Exception {
+        EqualsVerifier.forClass(Resource.class)
+                .usingGetClass()
+                .allFieldsShouldBeUsed()
+                .suppress(Warning.NONFINAL_FIELDS)
+                .verify();
     }
 }

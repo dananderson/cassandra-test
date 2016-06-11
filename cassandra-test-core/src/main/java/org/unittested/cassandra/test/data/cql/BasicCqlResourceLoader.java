@@ -17,36 +17,48 @@
 package org.unittested.cassandra.test.data.cql;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.unittested.cassandra.test.TestRuntime;
 import org.unittested.cassandra.test.resource.Resource;
 
+import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 
 public class BasicCqlResourceLoader implements CqlResourceLoader {
 
-    public BasicCqlResourceLoader() {
+    private Map<Resource, Collection<Statement>> cache;
 
+    public BasicCqlResourceLoader() {
+        this(true);
+    }
+
+    public BasicCqlResourceLoader(boolean enableCache) {
+        this.cache = (enableCache ? new HashMap<Resource, Collection<Statement>>() : null);
     }
 
     @Override
     public void loadCqlResource(TestRuntime runtime, Resource resource) throws IOException {
         StatementReader reader = null;
+        ConsistencyStatement consistency = null;
 
         try {
-            ConsistencyStatement consistency = null;
-            reader = new CqlStatementReader(resource.getReader());
+            if (this.cache == null) {
+                reader = new CqlStatementReader(resource.getReader());
 
-            while (reader.hasMore()) {
-                Statement statement = reader.one();
+                while (reader.hasMore()) {
+                    consistency = executeStatement(runtime.getKeyspace().getSession(), reader.one(), consistency);
+                }
+            } else {
+                if (!this.cache.containsKey(resource)) {
+                    reader = new CqlStatementReader(resource.getReader());
+                    this.cache.put(resource, reader.all());
+                }
 
-                if (statement instanceof ConsistencyStatement) {
-                    consistency = (ConsistencyStatement)statement;
-                } else {
-                    if (consistency != null) {
-                        consistency.applyConsistency(statement);
-                    }
-                    runtime.getKeyspace().getSession().execute(statement);
+                for (Statement statement : this.cache.get(resource)) {
+                    consistency = executeStatement(runtime.getKeyspace().getSession(), statement, consistency);
                 }
             }
         } finally {
@@ -54,5 +66,19 @@ public class BasicCqlResourceLoader implements CqlResourceLoader {
                 reader.close();
             }
         }
+    }
+
+    private ConsistencyStatement executeStatement(Session session, Statement statement, ConsistencyStatement consistency) {
+        if (statement instanceof ConsistencyStatement) {
+            return (ConsistencyStatement)statement;
+        }
+
+        if (consistency != null) {
+            consistency.applyConsistency(statement);
+        }
+
+        session.execute(statement);
+
+        return consistency;
     }
 }

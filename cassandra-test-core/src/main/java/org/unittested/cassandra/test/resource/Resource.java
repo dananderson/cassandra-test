@@ -54,10 +54,9 @@ import org.unittested.cassandra.test.util.Utils;
  */
 public class Resource {
 
-    private static Charset UTF_8 = Charset.forName("UTF-8");
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private Source source;
-    private ContentType contentType;
     private String path;
 
     /**
@@ -68,11 +67,11 @@ public class Resource {
      */
     public static Resource fromCqlOrUrl(String cqlOrUrl) {
         if (StringUtils.isBlank(cqlOrUrl)) {
-            return new Resource(Source.TEXT, ContentType.CQL, "");
+            return new Resource(Source.TEXT, "");
         }
 
         if (Utils.isCqlLike(cqlOrUrl)) {
-            return new Resource(Source.TEXT, ContentType.CQL, cqlOrUrl);
+            return new Resource(Source.TEXT, cqlOrUrl);
         }
 
         return new Resource(cqlOrUrl);
@@ -82,9 +81,8 @@ public class Resource {
         parseUrl(url);
     }
 
-    public Resource(Source source, ContentType contentType, String path) {
+    public Resource(Source source, String path) {
         this.source = source;
-        this.contentType = contentType;
         this.path = path;
     }
 
@@ -103,7 +101,7 @@ public class Resource {
      * @return {@link ContentType}
      */
     public ContentType getContentType() {
-        return this.contentType;
+        return ContentType.CQL;
     }
 
     /**
@@ -139,7 +137,6 @@ public class Resource {
         // Handle text "URI"s as a special case. Do not decode.
         if (url.startsWith("text:")) {
             this.source = Source.TEXT;
-            this.contentType = ContentType.CQL;
             this.path = StringUtils.removeStart(url, "text:");
             return;
         }
@@ -188,8 +185,26 @@ public class Resource {
         }
 
         this.source = urlSource;
-        this.contentType = ContentType.CQL;
         this.path = urlPath;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Resource resource = (Resource)o;
+
+        if (source != resource.source) return false;
+        return !(path != null ? !path.equals(resource.path) : resource.path != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = source != null ? source.hashCode() : 0;
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        return result;
     }
 
     /**

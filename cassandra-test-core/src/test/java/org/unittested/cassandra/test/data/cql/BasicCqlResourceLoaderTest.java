@@ -21,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,7 +56,7 @@ public class BasicCqlResourceLoaderTest {
     }
 
     @Test(dataProvider = "cqlStatementResources")
-    public void loadResource(String cqlOrUrl, int expectedExecuteCallCount) throws Exception {
+    public void loadCqlResource(String cqlOrUrl, int expectedExecuteCallCount) throws Exception {
         // given
         BasicCqlResourceLoader basicCqlSourceLoader = new BasicCqlResourceLoader();
         ArgumentCaptor<Statement> statements = ArgumentCaptor.forClass(Statement.class);
@@ -70,6 +71,40 @@ public class BasicCqlResourceLoaderTest {
             assertThat(statement.getConsistencyLevel(), nullValue());
             assertThat(statement.getSerialConsistencyLevel(), nullValue());
         }
+    }
+
+    @Test
+    public void loadCqlResourceWithCache() throws Exception {
+        // given
+        BasicCqlResourceLoader basicCqlResourceLoader = new BasicCqlResourceLoader(true);
+        ArgumentCaptor<Statement> statements = ArgumentCaptor.forClass(Statement.class);
+        TestRuntime runtime = createRuntime(statements);
+        Resource resource = spy(Resource.fromCqlOrUrl("select * from table;"));
+
+        // when
+        basicCqlResourceLoader.loadCqlResource(runtime, resource);
+        basicCqlResourceLoader.loadCqlResource(runtime, resource);
+
+        // then
+        verify(runtime.getKeyspace().getSession(), times(2)).execute(Matchers.any(Statement.class));
+        verify(resource, times(1)).getReader();
+    }
+
+    @Test
+    public void loadCqlResourceWithoutCache() throws Exception {
+        // given
+        BasicCqlResourceLoader basicCqlResourceLoader = new BasicCqlResourceLoader(false);
+        ArgumentCaptor<Statement> statements = ArgumentCaptor.forClass(Statement.class);
+        TestRuntime runtime = createRuntime(statements);
+        Resource resource = spy(Resource.fromCqlOrUrl("select * from table;"));
+
+        // when
+        basicCqlResourceLoader.loadCqlResource(runtime, resource);
+        basicCqlResourceLoader.loadCqlResource(runtime, resource);
+
+        // then
+        verify(runtime.getKeyspace().getSession(), times(2)).execute(Matchers.any(Statement.class));
+        verify(resource, times(2)).getReader();
     }
 
     @DataProvider
