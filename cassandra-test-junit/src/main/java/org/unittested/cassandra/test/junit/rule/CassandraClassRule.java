@@ -28,21 +28,16 @@ import org.unittested.cassandra.test.properties.PropertiesPropertyResolver;
 /**
  * JUnit rule that runs before class setup and after class clean up for Cassandra Test.
  *
- * A CassandraTestInit field must be present and marked with a {@link org.junit.ClassRule} annotation in a
- * Cassandra Test. This rule works in conjunction with {@link CassandraTest} to integrate Cassandra Test
+ * A CassandraClassRule field must be present and marked with a {@link org.junit.ClassRule} annotation in a
+ * Cassandra Test. This rule works in conjunction with {@link CassandraRule} to integrate Cassandra Test
  * with JUnit.
  */
-public class CassandraTestInit implements TestRule {
+public class CassandraClassRule implements TestRule {
 
     private TestEnvironmentAdapter adapter;
-    private Object testEnvironmentContext;
 
-    public CassandraTestInit() {
-        this(null);
-    }
+    public CassandraClassRule() {
 
-    public CassandraTestInit(Object testEnvironmentContext) {
-        this.testEnvironmentContext = testEnvironmentContext;
     }
 
     public Statement apply(final Statement base, final Description description) {
@@ -51,39 +46,40 @@ public class CassandraTestInit implements TestRule {
             public void evaluate() throws Throwable {
                 Class<?> testClass = description.getTestClass();
 
-                CassandraTestInit.this.adapter = CassandraTestInit.this.createTestEnvironmentAdapter(
-                        testClass,
-                        CassandraTestInit.this.testEnvironmentContext);
+                CassandraClassRule.this.adapter = CassandraClassRule.this.createTestEnvironmentAdapter(testClass);
 
-                if (CassandraTestInit.this.adapter == null) {
+                if (CassandraClassRule.this.adapter == null) {
                     throw new CassandraTestException("Failed to create a TestEnvironmentAdapter.");
                 }
 
-                CassandraTestInit.this.adapter.onBeforeClass(testClass, CassandraTestInit.this.testEnvironmentContext);
-
                 try {
-                    base.evaluate();
+                    CassandraClassRule.this.adapter.onBeforeClass(testClass);
+
+                    try {
+                        base.evaluate();
+                    } finally {
+                        CassandraClassRule.this.adapter.onAfterClass(testClass);
+                    }
                 } finally {
-                    CassandraTestInit.this.adapter.onAfterClass(testClass, CassandraTestInit.this.testEnvironmentContext);
-                    CassandraTestInit.this.adapter = null;
+                    CassandraClassRule.this.adapter = null;
                 }
             }
         };
     }
 
-    public TestEnvironmentAdapter getAdapter() {
+    TestEnvironmentAdapter getAdapter() {
         return this.adapter;
     }
 
-    TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass, Object testEnvironmentContext) {
+    protected TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {
         TestSettingsBuilder defaults = new TestSettingsBuilder()
                 .withDefaultPropertyResolver(PropertiesPropertyResolver.DEFAULT)
                 .withTestClass(testClass);
 
-        return new TestEnvironmentAdapter(createTestSettings(defaults, testClass, testEnvironmentContext));
+        return new TestEnvironmentAdapter(createTestSettings(defaults, testClass));
     }
 
-    protected TestSettings createTestSettings(TestSettingsBuilder defaults, Class<?> testClass, Object testEnvironmentContext) {
+    protected TestSettings createTestSettings(TestSettingsBuilder defaults, Class<?> testClass) {
         return defaults.build();
     }
 }

@@ -22,13 +22,11 @@ import static org.hamcrest.Matchers.is;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.unittested.cassandra.test.Keyspace;
-import org.unittested.cassandra.test.annotation.CassandraBean;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
-import org.unittested.cassandra.test.junit.rule.CassandraTestInit;
-import org.unittested.cassandra.test.junit.rule.CassandraTest;
+import org.unittested.cassandra.test.junit.rule.CassandraClassRule;
+import org.unittested.cassandra.test.junit.rule.CassandraRule;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
 /**
@@ -39,22 +37,19 @@ import org.unittested.cassandra.test.rollback.RollbackStrategy;
 @CassandraRollback(afterClass = RollbackStrategy.DROP)
 public class JUnit4CassandraRuleSampleTest {
 
-    @CassandraBean
-    private Keyspace keyspace;
-
     @ClassRule
-    public static CassandraTestInit init = new CassandraTestInit();
+    public static CassandraClassRule classRule = new CassandraClassRule();
 
     @Rule
-    public CassandraTest cassandraTest = new CassandraTest(init, this);
+    public CassandraRule cassandraRule = new CassandraRule(classRule);
 
     @Test
     public void timeseriesTableExists() throws Exception {
-        assertThat(this.keyspace.tableExists("timeseries"), is(true));
+        assertThat(this.cassandraRule.getKeyspace().tableExists("timeseries"), is(true));
     }
 
     @Test
     public void timeseriesRowCount() throws Exception {
-        assertThat(this.keyspace.getTable("timeseries").getCount(), is(3L));
+        assertThat(this.cassandraRule.getKeyspace().getTable("timeseries").getCount(), is(3L));
     }
 }

@@ -61,6 +61,8 @@ public class UtilsTest extends AbstractCassandraTest {
         return new Object[][] {
                 { "test", is("\"test\"") },
                 { "Test", is("\"Test\"") },
+                { "\"Test", is("\"\"Test\"") },
+                { "Test\"", is("\"Test\"\"") },
                 { quotedText, sameInstance(quotedText) },
         };
     }

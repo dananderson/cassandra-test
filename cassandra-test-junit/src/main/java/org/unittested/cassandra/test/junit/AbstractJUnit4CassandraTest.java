@@ -18,12 +18,10 @@ package org.unittested.cassandra.test.junit;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.rules.TestRule;
 import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.KeyspaceContainer;
-import org.unittested.cassandra.test.annotation.CassandraBean;
-import org.unittested.cassandra.test.junit.rule.CassandraTest;
-import org.unittested.cassandra.test.junit.rule.CassandraTestInit;
+import org.unittested.cassandra.test.junit.rule.CassandraClassRule;
+import org.unittested.cassandra.test.junit.rule.CassandraRule;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -32,45 +30,33 @@ import com.datastax.driver.core.Session;
  * Base class for JUnit-based Cassandra Test tests.
  *
  * This base class is for convenience, avoiding a minimal amount of boiler plate code. Alternatively, test writers can
- * simply include {@link CassandraTestInit}, {@link CassandraTest} and {@link CassandraBean}.
+ * simply include JUnit rules {@link CassandraClassRule} and {@link CassandraRule}.
  */
 public abstract class AbstractJUnit4CassandraTest {
 
     @ClassRule
-    public static CassandraTestInit init = new CassandraTestInit();
+    public static CassandraClassRule classRule = new CassandraClassRule();
 
     @Rule
-    public CassandraTest cassandraTest = new CassandraTest(init, this);
-
-    @CassandraBean
-    private Session session;
-
-    @CassandraBean
-    private Cluster cluster;
-
-    @CassandraBean
-    private Keyspace keyspace;
-
-    @CassandraBean
-    private KeyspaceContainer keyspaceContainer;
+    public CassandraRule cassandraRule = new CassandraRule(classRule);
 
     public AbstractJUnit4CassandraTest() {
 
     }
 
     protected Cluster getCluster() {
-        return this.cluster;
+        return this.cassandraRule.getCluster();
     }
 
     protected Session getSession() {
-        return this.session;
+        return this.cassandraRule.getSession();
     }
 
     protected Keyspace getKeyspace() {
-        return this.keyspace;
+        return this.cassandraRule.getKeyspace();
     }
 
     protected KeyspaceContainer getKeyspaceContainer() {
-        return this.keyspaceContainer;
+        return this.cassandraRule.getKeyspaceContainer();
     }
 }
