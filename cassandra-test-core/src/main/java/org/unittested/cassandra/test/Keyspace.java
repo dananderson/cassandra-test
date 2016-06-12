@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.unittested.cassandra.test.util.Utils;
 
 import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Session;
@@ -165,7 +166,7 @@ public class Keyspace {
         Collection<Table> result = new ArrayList<Table>(tables.size());
 
         for (TableMetadata t : tables) {
-            result.add(new Table(t.getName(), this));
+            result.add(new Table(t.getName(), true, this));
         }
 
         return Collections.unmodifiableCollection(result);
@@ -174,7 +175,7 @@ public class Keyspace {
     /**
      * Does a table exist in this keyspace?
      *
-     * @param table Table name.
+     * @param table Case sensitive table name.
      * @return {@link Boolean}
      */
     public boolean tableExists(String table) {
@@ -184,17 +185,17 @@ public class Keyspace {
 
         KeyspaceMetadata keyspaceMetadata = this.container.getKeyspaceMetadata(this.name);
 
-        return (keyspaceMetadata != null && keyspaceMetadata.getTable(table) != null);
+        return (keyspaceMetadata != null && keyspaceMetadata.getTable(Utils.quote(table)) != null);
     }
 
     /**
      * Get a table by name.
      *
-     * @param table Table name
+     * @param table Case sensitive table name.
      * @return {@link Table}
      */
     public Table getTable(String table) {
-        return new Table(table, this);
+        return new Table(table, true, this);
     }
 
     /**

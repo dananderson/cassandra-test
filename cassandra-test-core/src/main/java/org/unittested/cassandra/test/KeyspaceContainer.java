@@ -17,6 +17,7 @@
 package org.unittested.cassandra.test;
 
 import org.unittested.cassandra.test.exception.CassandraTestException;
+import org.unittested.cassandra.test.util.Utils;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.KeyspaceMetadata;
@@ -44,7 +45,7 @@ public class KeyspaceContainer {
     /**
      * Does a keyspace exist in this cluster?
      *
-     * @param name Keyspace name.
+     * @param name Case sensitive keyspace name.
      * @return {@link Boolean}
      */
     public boolean keyspaceExists(String name) {
@@ -73,6 +74,6 @@ public class KeyspaceContainer {
             return null;
         }
 
-        return this.cluster.getMetadata().getKeyspace(name);
+        return this.cluster.getMetadata().getKeyspace(Utils.quote(name));
     }
 }

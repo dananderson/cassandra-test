@@ -179,6 +179,22 @@ public class TableTest extends AbstractCassandraTest {
         assertThat(getTestTable().getRows(1L), hasSize(1));
     }
 
+    @DataProvider
+    public static Object[][] caseSensitivityParameters() {
+        return new Object[][] {
+                { new Table("test", true, null), false, "test" },
+                { new Table("test", false, null), false, "test" },
+                { new Table("Test", true, null), true, "Test" },
+                { new Table("Test", false, null), false, "test" },
+        };
+    }
+
+    @Test(dataProvider = "caseSensitivityParameters")
+    public void caseSensitivity(Table table, boolean expectedSensitivity, String exepectedName) throws Exception {
+        assertThat(table.isCaseSensitiveName(), is(expectedSensitivity));
+        assertThat(table.getName(), is(exepectedName));
+    }
+
     private Table getTestTable() {
         return getKeyspace().getTable("test_table");
     }

@@ -17,6 +17,7 @@
 package org.unittested.cassandra.test.util;
 
 
+import org.hamcrest.Matcher;
 import org.unittested.cassandra.test.AbstractCassandraTest;
 import org.unittested.cassandra.test.Keyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
@@ -51,5 +52,34 @@ public class UtilsTest extends AbstractCassandraTest {
     @Test(dataProvider = "expandCommaDelimitedEntries")
     public void expandCommaDelimitedEntries(String [] input, String [] output) throws Exception {
         assertThat(Utils.expandCommaDelimitedEntries(input), arrayContaining(output));
+    }
+
+    @DataProvider(name = "quoteParameters")
+    public static Object[][] quoteParameters() {
+        String quotedText = "\"Test\"";
+
+        return new Object[][] {
+                { "test", is("\"test\"") },
+                { "Test", is("\"Test\"") },
+                { quotedText, sameInstance(quotedText) },
+        };
+    }
+
+    @Test(dataProvider = "quoteParameters")
+    public void quote(String text, Matcher<String> expectedResult) throws Exception {
+        assertThat(Utils.quote(text), expectedResult);
+    }
+
+    @DataProvider(name = "quoteIllegalParameters")
+    public static Object[][] quoteIllegalParameters() {
+        return new Object[][] {
+                { null },
+                { "" },
+        };
+    }
+
+    @Test(dataProvider = "quoteIllegalParameters", expectedExceptions = IllegalArgumentException.class)
+    public void quoteIllegalArgumentException(String text) throws Exception {
+        Utils.quote(text);
     }
 }

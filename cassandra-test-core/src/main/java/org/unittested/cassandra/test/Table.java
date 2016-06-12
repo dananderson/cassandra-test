@@ -19,6 +19,7 @@ package org.unittested.cassandra.test;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.unittested.cassandra.test.util.DriverCompatibility;
 
 import com.datastax.driver.core.Row;
@@ -36,7 +37,11 @@ public class Table {
     private Keyspace keyspace;
 
     public Table(String name, Keyspace keyspace) {
-        this.name = name;
+        this(name, false, keyspace);
+    }
+
+    public Table(String name, boolean isCaseSensitiveName, Keyspace keyspace) {
+        this.name = isCaseSensitiveName ? name : name.toLowerCase();
         this.keyspace = keyspace;
     }
 
@@ -56,6 +61,15 @@ public class Table {
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Is the table name case sensitive?
+     *
+     * @return {@link Boolean}
+     */
+    public boolean isCaseSensitiveName() {
+        return !StringUtils.isAllLowerCase(this.name);
     }
 
     /**

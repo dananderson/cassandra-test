@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.datastax.driver.core.Session;
 
 /**
@@ -79,4 +81,27 @@ public final class Utils {
         return output.toArray(new String[output.size()]);
     }
 
+    /**
+     * Add quotes to a string.
+     * <p>
+     * Certain driver APIs require case sensitive CQL IDs to be quoted, necessitating this method.
+     * <p>
+     * Note, {@link com.datastax.driver.core.Metadata#quote(String)} is not used due to a bug in earlier versions of
+     * the driver.
+     *
+     * @param id String to quote.
+     * @return The id argument wrapped in quotes. If id is already quoted, id is returned.
+     * @throws IllegalArgumentException if id is null or the empty string.
+     */
+    public static String quote(String id) {
+        if (StringUtils.isEmpty(id)) {
+            throw new IllegalArgumentException("Cannot quote null or empty string.");
+        }
+
+        if (id.startsWith("\"") && id.endsWith("\"")) {
+            return id;
+        }
+
+        return '"' + id + '"';
+    }
 }
