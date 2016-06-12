@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.*;
 
 import java.net.InetSocketAddress;
 
@@ -104,5 +105,49 @@ public class BasicConnectSettingsTest {
 
         // then
         // CassandraTestException
+    }
+
+    @Test(expectedExceptions = CassandraTestException.class)
+    public void connectFailureAndClose() throws Exception {
+        Cluster cluster = mock(Cluster.class);
+        ConnectSettings connectSettings = createConnectSettings(cluster);
+
+        doThrow(new RuntimeException()).when(cluster).connect();
+
+        try {
+            connectSettings.connect();
+        } finally {
+            verify(cluster, times(1)).connect();
+            verify(cluster, times(1)).close();
+        }
+    }
+
+    @Test(expectedExceptions = CassandraTestException.class)
+    public void connectFailureAndCloseFailure() throws Exception {
+        Cluster cluster = mock(Cluster.class);
+        ConnectSettings connectSettings = createConnectSettings(cluster);
+
+        doThrow(new RuntimeException()).when(cluster).connect();
+        doThrow(new RuntimeException()).when(cluster).close();
+
+        try {
+            connectSettings.connect();
+        } finally {
+            verify(cluster, times(1)).connect();
+            verify(cluster, times(1)).close();
+        }
+    }
+
+    private ConnectSettings createConnectSettings(Cluster mockCluster) {
+        final Cluster.Builder builder = mock(Cluster.Builder.class);
+
+        doReturn(mockCluster).when(builder).build();
+
+        return new BasicConnectSettings() {
+            @Override
+            public Cluster.Builder getClusterBuilder() {
+                return builder;
+            }
+        };
     }
 }
