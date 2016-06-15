@@ -1,60 +1,212 @@
 # Cassandra Test
 [![Build Status](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)](https://travis-ci.org/dananderson/cassandra-test.svg?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.unittested/cassandra-test-project/badge.svg)](http://mvnrepository.com/artifact/org.unittested/cassandra-test-testng/1.0.2)
 [![codecov.io](https://codecov.io/github/dananderson/cassandra-test/coverage.svg?branch=master)](https://codecov.io/github/dananderson/cassandra-test?branch=master)
 
-Cassandra Test is a unit test and integration test framework featuring support for multiple test environments, schema management, table data loading and connection management.
+Cassandra Test is a Java test framework for writing unit tests and integration tests against a Cassandra database.
+
+## Features
+
+- Connection management
+- Keyspace and schema management
+- Data loading from CQL files
+- Rollbacks
+- TestNG, JUnit 4 and Spring Test support
+- Backwards compatible with Java 6+, Cassandra 2.x & 3.x and Java Driver 2.x & 3.x
+- Highly configurable
+
+
+## Getting Cassandra Test
+
+Cassandra Test publishes an artifact for each supported test framework.
+
+| Test Framework | Cassandra Test Artifact |
+| - | - |
+| TestNG | [org.unittested:cassandra-test-testng:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-testng%7C1.0.2%7Cjar) |
+| JUnit 4 | [org.unittested:cassandra-test-junit:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-junit%7C1.0.2%7Cjar) |
+| Spring Test | [org.unittested:cassandra-test-spring:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-spring%7C1.0.2%7Cjar) |
+
+If your environment requires a custom integration, use the Cassandra Test Core artifact: [org.unittested:cassandra-test-core:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-core%7C1.0.2%7Cjar). The **TestEnvironmentAdapter** can be used to connect test life cycle events to Cassandra Test.
+
+## Writing Tests
+
+### Using Test Framework Bindings
+
+Each test framework has a slightly different way to bind with Cassandra Test. Once bound, any test in any test framework can use Cassandra Test annotations to configure Cassandra behavior.
+
+#### TestNG
+
+In the TestNG environment, tests can extend **AbstractTestNGCassandraTest** to be a Cassandra Test. **Session** and **Cluster** connection objects are available through this base class.
 
 ```java
-@CassandraKeyspace(value = "testng_cassandra_test", schema = "classpath:sample-schema.cql")
-@CassandraData("classpath:sample-data.cql")
-public class TestNGSampleTest extends AbstractTestNGCassandraTest {
-
+public class MyTest extends AbstractTestNGCassandraTest {
     @Test
-    public void timeseriesRowCount() throws Exception {
-        assertThat(getKeyspace().getTable("timeseries).getCount(), is(3L));
+    public cassandraTest() {
+        ...
+    }
+}
+```
+#### JUnit 4
+
+In the JUnit 4 environment, multiple binding options are available.
+
+First, tests can extend **AbstractJUnit4CassandraTest** to be a Cassandra Test. **Session** and **Cluster** connection objects are available through this base class.
+
+
+```java
+public class MyTest extends AbstractJUnit4CassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
     }
 }
 ```
 
-## Getting Cassandra Test
+Second, tests can use **CassandraClassRule** and **CassandraRule** to be a Cassandra Test. **Session** and **Cluster** connection objects are available through the **CassandraRule** instance.
 
-Cassandra Test modules are organized by the supported test environments: TestNG, JUnit and Spring Test. To include
-Cassandra Test in your project, choose the artifactId that matches your test environment.
+```java
+public class MyTest {
+    @ClassRule
+    public static CassandraClassRule classRule = new CassandraClassRule();
 
-[TestNG](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-testng)
+    @Rule
+    public CassandraRule cassandraRule = new CassandraRule(classRule);
+
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
 ```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-testng</artifactId>
-      <version>1.0.2</version>
-    </dependency>
+#### Spring Test
+
+In the Spring Test environment, tests add **SpringCassandraTestExecutionListener** to be a Cassandra Test. **Session** and **Cluster** connection objects are available through the Autowire-like annotation @CassandraBean.
+
+```java
+@TestExecutionListeners(value = SpringCassandraTestExecutionListener.class, mergeMode = MERGE_WITH_DEFAULTS)
+public class MyTest extends AbstractTestNGSpringContextTests {
+
+    @CassandraBean
+    private Session session;
+
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
 ```
-[JUnit](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-junit)
+
+### Configuration
+
+Cassandra Tests can be configured through Java annotations.
+
+#### Connection
+
+When a test is bound to Cassandra Test, the test will automatically try to connect to a Cassandra cluster
+at 127.0.0.1:9042 with no authentication. If the connection requires a different configuration, @CassandraConnect
+can be used.
+
+```java
+@Connect(host = "127.0.0.2", user = "cassandra", password = "cassandra")
+public class MyTest extends AbstractTestNGCassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
 ```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-junit</artifactId>
-      <version>1.0.2</version>
-    </dependency>
+#### Keyspace and Schema
+
+The primary use case for Cassandra Test is to run tests against a single keyspace. Cassandra Test manages this
+keyspace by installing schema, detecting schema modifications and rebuilding schema as necessary to maintain
+consistent state across tests.
+
+The @CassandraKeyspace annotation gives Cassandra Test full control of a keyspace. The annotation describes
+how to create the keyspace and how to create it's schema. If Cassandra Test detects that a keyspace has been
+altered from this state, Cassandra Test will drop and re-create the keyspace before the next test run.
+
+```java
+@CassandraKeyspace(value = "my_keyspace", schema = "classpath:my_keyspace_schema.cql")
+public class MyTest extends AbstractTestNGCassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
 ```
-[Spring Test](https://github.com/dananderson/cassandra-test/tree/master/casandra-test-spring)
+
+The @CassandraImportKeyspace annotation declares a schema and keyspace that has been configured outside of
+the control of Cassandra Test. Cassandra Test cannot re-create or drop this keyspace. If a test modifies the
+keyspace schema in any way, the test automatically fails.
+
+```java
+@CassandraImportKeyspace("my_keyspace")
+public class MyTest extends AbstractTestNGCassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
 ```
-    <dependency>
-      <groupId>org.unittested</groupId>
-      <artifactId>cassandra-test-spring</artifactId>
-      <version>1.0.2</version>
-    </dependency>
+
+#### Data Loading
+
+Table data can be loaded using the @CassandraData annotation. Currently, data loading supports CQL files containing
+CQL statements delimited by ";". The format is exactly the same as CQL files executable by cqlsh.
+
+```java
+@CassandraKeyspace(value = "my_keyspace", schema = "classpath:my_keyspace_schema.cql")
+@CassandraData("classpath:my_keyspace_table_data.cql")
+public class MyTest extends AbstractTestNGCassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
+```
+
+#### Rollback
+
+When a test completes, Cassandra Test will perform a pseudo-rollback or clean up of the keyspace. The clean up
+can be truncation of keyspace tables or dropping the keyspace. The rollback behavior is configured through the
+@CassandraRollback annotation.
+
+```java
+@CassandraKeyspace(value = "my_keyspace", schema = "classpath:my_keyspace_schema.cql")
+@CassandraData("classpath:my_keyspace_table_data.cql")
+@CassandraRollback(afterClass=RollbackStrategy.DROP)
+public class MyTest extends AbstractTestNGCassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
+```
+
+#### Properties
+
+For larger projects, hard coding keyspace names and hosts in annotations may not be clean or practical. Cassandra Test
+supports property references in annotations to address the problem. Properties are sourced from a Java properties file. By
+default, /cassandra-test.properties from the class path is used. Otherwise, a properties file can be specified with the @CassandraProperties
+annotation.
+
+```java
+@CassandraImportKeyspace("${cassandra.test.keyspace}")
+public class MyTest extends AbstractTestNGCassandraTest {
+    @Test
+    public cassandraTest() {
+        ...
+    }
+}
 ```
 
 ## Compatibility
 Cassandra Test has been built and tested with:
 
-| Technology            | Supported Versions           |
-| --------------------- | ---------------------------- |
-| Datastax Java Driver  | 2.0.2+, 2.1.0+, 3.0.0+       |
-| Apache Cassandra      | 2.0.4+ 2.1.0+ 2.2.0+ 3.0.0+  |
-| Java                  | 6+                           |
+| Technology            | Supported Versions              |
+| --------------------- | ----------------------------    |
+| Datastax Java Driver  | 2.0.2+, 2.1.0+, 3.0.0+          |
+| Apache Cassandra      | 2.0.4+, 2.1.0+, 2.2.0+, 3.0.0+  |
+| Java                  | 6+                              |
 
 ## License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
