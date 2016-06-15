@@ -20,7 +20,7 @@ Cassandra Test is a Java test framework for writing unit tests and integration t
 Cassandra Test publishes an artifact for each supported test framework.
 
 | Test Framework | Cassandra Test Artifact |
-| - | - |
+| --- | --- |
 | TestNG | [org.unittested:cassandra-test-testng:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-testng%7C1.0.2%7Cjar) |
 | JUnit 4 | [org.unittested:cassandra-test-junit:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-junit%7C1.0.2%7Cjar) |
 | Spring Test | [org.unittested:cassandra-test-spring:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-spring%7C1.0.2%7Cjar) |
