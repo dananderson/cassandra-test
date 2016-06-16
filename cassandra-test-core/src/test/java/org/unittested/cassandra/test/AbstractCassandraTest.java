@@ -39,9 +39,6 @@ public abstract class AbstractCassandraTest {
     @CassandraBean
     private Keyspace keyspace;
 
-    @CassandraBean
-    private KeyspaceContainer keyspaceContainer;
-
     private TestEnvironmentAdapter adapter;
 
     @BeforeClass(alwaysRun = true)
@@ -87,10 +84,6 @@ public abstract class AbstractCassandraTest {
 
     protected Keyspace getKeyspace() {
         return this.keyspace;
-    }
-
-    protected KeyspaceContainer getKeyspaceContainer() {
-        return this.keyspaceContainer;
     }
 
     private TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {

@@ -31,7 +31,6 @@ import java.lang.annotation.Target;
  * Supported Types
  * <ul>
  *     <li>{@link org.unittested.cassandra.test.Keyspace}</li>
- *     <li>{@link org.unittested.cassandra.test.KeyspaceContainer}</li>
  *     <li>{@link org.unittested.cassandra.test.TestSettings}</li>
  *     <li>{@link com.datastax.driver.core.Session}</li>
  *     <li>{@link com.datastax.driver.core.Cluster}</li>

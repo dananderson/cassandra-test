@@ -27,6 +27,8 @@ import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
+import com.datastax.driver.core.Metadata;
+
 @CassandraKeyspace(value = "CaseSensitive", isCaseSensitiveKeyspace = "true", schema = "CREATE TABLE \"Group\" (id INT PRIMARY KEY);")
 @CassandraData(value = "INSERT INTO \"Group\"(id) VALUES (1); INSERT INTO \"Group\"(id) VALUES (2);")
 @CassandraRollback(afterMethod = RollbackStrategy.NONE, afterClass = RollbackStrategy.DROP)
@@ -34,11 +36,11 @@ public class CaseSensitiveKeyspaceAndTableTest extends AbstractCassandraTest {
 
     @Test
     public void verifyKeyspace() throws Exception {
-        assertThat(getKeyspaceContainer().keyspaceExists("CaseSensitive"), is(true));
+        assertThat(getCluster().getMetadata().getKeyspace(Metadata.quote("CaseSensitive")), notNullValue());
         assertThat(getKeyspace().getName(), is("CaseSensitive"));
         assertThat(getKeyspace().isCaseSensitiveName(), is(true));
 
-        assertThat(getKeyspaceContainer().keyspaceExists("casesensitive"), is(false));
+        assertThat(getCluster().getMetadata().getKeyspace("casesensitive"), nullValue());
     }
 
     @Test

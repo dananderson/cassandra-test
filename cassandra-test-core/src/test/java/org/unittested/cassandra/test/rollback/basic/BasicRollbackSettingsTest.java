@@ -175,7 +175,7 @@ public class BasicRollbackSettingsTest extends AbstractCassandraTest {
         Keyspace keyspace;
 
         if (useNullKeyspace) {
-            keyspace = new Keyspace(getKeyspace().getContainer().getCluster().connect(), Keyspace.NULL);
+            keyspace = new Keyspace(getCluster().connect(), Keyspace.NULL);
         } else {
             keyspace = getKeyspace();
         }

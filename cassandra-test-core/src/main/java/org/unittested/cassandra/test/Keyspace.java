@@ -23,8 +23,10 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.util.Utils;
 
+import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
@@ -42,14 +44,14 @@ public class Keyspace {
      */
     public static final String NULL = "";
 
-    private KeyspaceContainer container;
     private Session session;
+    private Cluster cluster;
     private String name;
 
     public Keyspace(Session session, String name) {
         this.session = session;
         this.name = name;
-        this.container = new KeyspaceContainer(this.session.getCluster());
+        this.cluster = session.getCluster();
     }
 
     /**
@@ -62,12 +64,12 @@ public class Keyspace {
     }
 
     /**
-     * Get the cluster (or containing) this keyspace belongs to.
+     * Get this {@link Cluster}.
      *
-     * @return {@link KeyspaceContainer}
+     * @return {@link Cluster}
      */
-    public KeyspaceContainer getContainer() {
-        return this.container;
+    public Cluster getCluster() {
+        return this.cluster;
     }
 
     /**
@@ -137,7 +139,7 @@ public class Keyspace {
      * @return {@link Boolean}
      */
     public boolean exists() {
-        return this.container.keyspaceExists(this.name);
+        return (getKeyspaceMetadata(this.name) != null);
     }
 
     /**
@@ -183,7 +185,7 @@ public class Keyspace {
             return false;
         }
 
-        KeyspaceMetadata keyspaceMetadata = this.container.getKeyspaceMetadata(this.name);
+        KeyspaceMetadata keyspaceMetadata = getKeyspaceMetadata(this.name);
 
         return (keyspaceMetadata != null && keyspaceMetadata.getTable(Utils.quote(table)) != null);
     }
@@ -217,18 +219,48 @@ public class Keyspace {
      * @return Hash code of keyspace schema.
      */
     public Integer getSchemaSignature() {
+        KeyspaceMetadata keyspaceMetadata = getKeyspaceMetadata(this.name);
+
         return new HashCodeBuilder(17, 37)
-            .append(exists() ? this.container.getKeyspaceMetadata(this.name).exportAsString() : null)
+            .append(keyspaceMetadata != null ? keyspaceMetadata.exportAsString() : null)
             .build();
     }
 
+    /**
+     * Close the connection.
+     */
+    public void close() {
+        try {
+            if (this.cluster != null) {
+                this.cluster.close();
+            }
+        } catch (Exception e) {
+            // LOG.warn("Failed to close cluster.", e);
+        }
+
+        this.cluster = null;
+        this.session = null;
+    }
+
     private Collection<TableMetadata> getTables() {
-        KeyspaceMetadata keyspaceMetadata = this.container.getKeyspaceMetadata(this.name);
+        KeyspaceMetadata keyspaceMetadata = getKeyspaceMetadata(this.name);
 
         if (keyspaceMetadata == null) {
             return Collections.emptyList();
         }
 
         return keyspaceMetadata.getTables();
+    }
+
+    private KeyspaceMetadata getKeyspaceMetadata(String name) {
+        if (this.cluster == null || this.cluster.isClosed()) {
+            throw new CassandraTestException("Connection is closed. Cannot get keyspace info.");
+        }
+
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+
+        return this.cluster.getMetadata().getKeyspace(Utils.quote(name));
     }
 }

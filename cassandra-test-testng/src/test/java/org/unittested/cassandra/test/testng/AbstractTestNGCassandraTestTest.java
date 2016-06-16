@@ -33,7 +33,6 @@ public class AbstractTestNGCassandraTestTest extends AbstractTestNGCassandraTest
         assertThat(getSession(), notNullValue());
         assertThat(getKeyspace(), notNullValue());
         assertThat(getCluster(), notNullValue());
-        assertThat(getKeyspaceContainer(), notNullValue());
     }
 
     @Test

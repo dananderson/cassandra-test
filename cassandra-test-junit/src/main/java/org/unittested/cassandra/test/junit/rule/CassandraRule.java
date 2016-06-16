@@ -20,7 +20,6 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.unittested.cassandra.test.Keyspace;
-import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
 import org.unittested.cassandra.test.exception.CassandraTestException;
 
@@ -80,9 +79,5 @@ public class CassandraRule implements MethodRule {
 
     public Keyspace getKeyspace() {
         return this.classRule.getAdapter().getRuntime().getKeyspace();
-    }
-
-    public KeyspaceContainer getKeyspaceContainer() {
-        return this.classRule.getAdapter().getRuntime().getKeyspace().getContainer();
     }
 }

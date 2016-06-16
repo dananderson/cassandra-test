@@ -19,7 +19,6 @@ package org.unittested.cassandra.test.junit;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.unittested.cassandra.test.Keyspace;
-import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.junit.rule.CassandraClassRule;
 import org.unittested.cassandra.test.junit.rule.CassandraRule;
 
@@ -54,9 +53,5 @@ public abstract class AbstractJUnit4CassandraTest {
 
     protected Keyspace getKeyspace() {
         return this.cassandraRule.getKeyspace();
-    }
-
-    protected KeyspaceContainer getKeyspaceContainer() {
-        return this.cassandraRule.getKeyspaceContainer();
     }
 }

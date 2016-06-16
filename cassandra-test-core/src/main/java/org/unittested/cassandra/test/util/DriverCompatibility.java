@@ -25,7 +25,7 @@ import com.datastax.driver.core.Statement;
 /**
  * Driver backwards compatibility utility methods.
  *
- * Use reflection to use new driver features and still be able to compile & run with older driver versions.
+ * Use reflection to use new driver features and still be able to compile and run with older driver versions.
  */
 public final class DriverCompatibility {
 

@@ -28,6 +28,5 @@ public class AbstractJUnit4CassandraTestTest extends AbstractJUnit4CassandraTest
         assertThat(getSession(), notNullValue());
         assertThat(getKeyspace(), notNullValue());
         assertThat(getCluster(), notNullValue());
-        assertThat(getKeyspaceContainer(), notNullValue());
     }
 }

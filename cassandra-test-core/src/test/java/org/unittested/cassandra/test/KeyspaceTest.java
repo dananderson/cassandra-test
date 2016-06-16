@@ -31,8 +31,10 @@ import org.testng.annotations.Test;
 import org.unittested.cassandra.test.annotation.CassandraData;
 import org.unittested.cassandra.test.annotation.CassandraKeyspace;
 import org.unittested.cassandra.test.annotation.CassandraRollback;
+import org.unittested.cassandra.test.exception.CassandraTestException;
 import org.unittested.cassandra.test.rollback.RollbackStrategy;
 
+import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
 @CassandraKeyspace(value = "test", schema = "classpath:cql/sample-schema.cql")
@@ -51,8 +53,8 @@ public class KeyspaceTest extends AbstractCassandraTest {
     }
 
     @Test
-    public void getContainer() throws Exception {
-        assertThat(getKeyspace().getContainer(), notNullValue());
+    public void getClusterTest() throws Exception {
+        assertThat(getKeyspace().getCluster(), notNullValue());
     }
 
     @Test
@@ -148,6 +150,32 @@ public class KeyspaceTest extends AbstractCassandraTest {
     }
 
     @DataProvider
+    public static Object[][] closedClusters() {
+        Cluster closedCluster = mock(Cluster.class);
+
+        when(closedCluster.isClosed()).thenReturn(true);
+
+        return new Object[][] {
+                { null },
+                { closedCluster },
+        };
+    }
+
+    @Test(dataProvider = "closedClusters", expectedExceptions = CassandraTestException.class)
+    public void existsWithClosedCluster(Cluster cluster) throws Exception {
+        // given
+        Session session = mock(Session.class);
+        when(session.getCluster()).thenReturn(cluster);
+        Keyspace keyspace = new Keyspace(session, "test");
+
+        // when
+        keyspace.exists();
+
+        // then
+        // CassandraTestException
+    }
+
+    @DataProvider
     public static Object[][] tableExists() {
         return new Object[][] {
                 { "test", "test_table", true },
@@ -222,4 +250,36 @@ public class KeyspaceTest extends AbstractCassandraTest {
             }
         }
     }
+
+    @DataProvider
+    public static Object[][] clusters() {
+        Cluster cluster = mock(Cluster.class);
+        Cluster clusterExceptionOnClose = mock(Cluster.class);
+
+        doThrow(new RuntimeException()).when(clusterExceptionOnClose).close();
+
+        return new Object[][] {
+                { null },
+                { cluster },
+                { clusterExceptionOnClose },
+        };
+    }
+
+    @Test(dataProvider = "clusters")
+    public void close(Cluster cluster) throws Exception {
+        // given
+        Session session = mock(Session.class);
+        when(session.getCluster()).thenReturn(cluster);
+        Keyspace keyspace = new Keyspace(session, "test");
+
+        // when
+        keyspace.close();
+
+        // then
+        if (cluster != null) {
+            verify(cluster, times(1)).close();
+        }
+        assertThat(keyspace.getCluster(), nullValue());
+    }
+
 }

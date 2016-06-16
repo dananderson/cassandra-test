@@ -19,7 +19,6 @@ package org.unittested.cassandra.test.testng;
 import java.lang.reflect.Method;
 
 import org.unittested.cassandra.test.Keyspace;
-import org.unittested.cassandra.test.KeyspaceContainer;
 import org.unittested.cassandra.test.TestEnvironmentAdapter;
 import org.unittested.cassandra.test.TestSettings;
 import org.unittested.cassandra.test.TestSettingsBuilder;
@@ -49,9 +48,6 @@ public abstract class AbstractTestNGCassandraTest {
 
     @CassandraBean
     private Keyspace keyspace;
-
-    @CassandraBean
-    private KeyspaceContainer keyspaceContainer;
 
     public AbstractTestNGCassandraTest() {
 
@@ -107,10 +103,6 @@ public abstract class AbstractTestNGCassandraTest {
 
     protected Keyspace getKeyspace() {
         return this.keyspace;
-    }
-
-    protected KeyspaceContainer getKeyspaceContainer() {
-        return this.keyspaceContainer;
     }
 
     TestEnvironmentAdapter createTestEnvironmentAdapter(Class<?> testClass) {

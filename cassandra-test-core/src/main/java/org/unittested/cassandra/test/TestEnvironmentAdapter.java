@@ -263,7 +263,7 @@ public class TestEnvironmentAdapter {
     }
 
     protected void closeConnection(TestRuntime runtime) {
-        runtime.getKeyspace().getContainer().close();
+        runtime.getKeyspace().close();
     }
 
     protected void rollbackAfterMethod(TestRuntime runtime) {
@@ -306,7 +306,6 @@ public class TestEnvironmentAdapter {
                     beanMap.put(Session.class, runtime.getKeyspace().getSession());
                     beanMap.put(Cluster.class, runtime.getKeyspace().getSession().getCluster());
                     beanMap.put(Keyspace.class, runtime.getKeyspace());
-                    beanMap.put(KeyspaceContainer.class, runtime.getKeyspace().getContainer());
                     beanMap.put(TestSettings.class, runtime.getTestSettings());
                 }
 

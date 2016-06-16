@@ -88,7 +88,6 @@ public class TestEnvironmentAdapterTest {
         assertThat(test.cluster, is(cluster));
         assertThat(test.session, is(session));
         assertThat(test.keyspace, notNullValue());
-        assertThat(test.keyspaceContainer, notNullValue());
         assertThat(test.testSettings, is(testSettings));
     }
 
@@ -322,9 +321,6 @@ public class TestEnvironmentAdapterTest {
 
         @CassandraBean
         Keyspace keyspace;
-
-        @CassandraBean
-        KeyspaceContainer keyspaceContainer;
 
         @CassandraBean
         TestSettings testSettings;
