@@ -21,11 +21,11 @@ Cassandra Test publishes an artifact for each supported test framework.
 
 | Test Framework | Cassandra Test Artifact |
 | --- | --- |
-| TestNG | [org.unittested:cassandra-test-testng:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-testng%7C1.0.2%7Cjar) |
-| JUnit 4 | [org.unittested:cassandra-test-junit:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-junit%7C1.0.2%7Cjar) |
-| Spring Test | [org.unittested:cassandra-test-spring:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-spring%7C1.0.2%7Cjar) |
+| TestNG | [org.unittested:cassandra-test-testng:1.0.3](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-testng%7C1.0.3%7Cjar) |
+| JUnit 4 | [org.unittested:cassandra-test-junit:1.0.3](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-junit%7C1.0.3%7Cjar) |
+| Spring Test | [org.unittested:cassandra-test-spring:1.0.3](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-spring%7C1.0.3%7Cjar) |
 
-If your environment requires a custom integration, use the Cassandra Test Core artifact: [org.unittested:cassandra-test-core:1.0.2](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-core%7C1.0.2%7Cjar). The **TestEnvironmentAdapter** can be used to connect test life cycle events to Cassandra Test.
+If your environment requires a custom integration, use the Cassandra Test Core artifact: [org.unittested:cassandra-test-core:1.0.3](http://search.maven.org/#artifactdetails%7Corg.unittested%7Ccassandra-test-core%7C1.0.3%7Cjar). The **TestEnvironmentAdapter** can be used to connect test life cycle events to Cassandra Test.
 
 ## Writing Tests
 

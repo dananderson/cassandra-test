@@ -1,3 +1,7 @@
+## 1.0.3
+- Removed KeyspaceContainer to simplify API.
+- Fixed bug with case sensitive keyspace and table names.
+- Finalize JUnit rule names.
 ## 1.0.2
 - Added internal CQL file caching in the scope of a test.
 - Properties can be put into class path file /cassandra-test.properties and loaded automatically. @CassandraProperties can still be used for tests that uses a different properties file location.
